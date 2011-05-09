@@ -1,7 +1,7 @@
 Flask-MongoEngine
 =================
 
-A Flask extension that provides integration with `MongoEngine < http://hmarr.com/mongoengine/>`_. It handles connection management for your app.
+A Flask extension that provides integration with `MongoEngine <http://hmarr.com/mongoengine/>`_. It handles connection management for your app.
 
 You can also use `WTForms <http://wtforms.simplecodes.com/>`_ as model forms for your models.
 
@@ -54,27 +54,27 @@ You can use MongoEngine and WTForms like so::
 Supported fields
 -----------------
 
-    * StringField
-    * BinaryField
-    * URLField
-    * EmailField
-    * IntField
-    * FloatField
-    * DecimalField
-    * BooleanField
-    * DateTimeField
-    * **ListField** (using wtforms.fields.FieldList ) 
-    * SortedListField (duplicate ListField)
-    * **EmbeddedDocumentField** (using wtforms.fields.FormField and generating inline Form)
-    * **ReferenceField** (using wtforms.fields.SelectFieldBase with options loaded from QuerySet or Document)
-    * DictField
+* StringField
+* BinaryField
+* URLField
+* EmailField
+* IntField
+* FloatField
+* DecimalField
+* BooleanField
+* DateTimeField
+* **ListField** (using wtforms.fields.FieldList ) 
+* SortedListField (duplicate ListField)
+* **EmbeddedDocumentField** (using wtforms.fields.FormField and generating inline Form)
+* **ReferenceField** (using wtforms.fields.SelectFieldBase with options loaded from QuerySet or Document)
+* DictField
 
 Not currently supported field types:
 -----------------------------------
 
-    * ObjectIdField
-    * GeoLocationField
-    * GenericReferenceField
+* ObjectIdField
+* GeoLocationField
+* GenericReferenceField
 
 
 Credits
