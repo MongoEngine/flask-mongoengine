@@ -5,6 +5,13 @@ A Flask extension that provides integration with `MongoEngine <http://hmarr.com/
 
 You can also use `WTForms <http://wtforms.simplecodes.com/>`_ as model forms for your models.
 
+Installing Flask-MongoEngine
+============================
+
+Install with **pip**::
+
+    pip install https://github.com/sbook/flask-mongoengine/tarball/master
+
 
 Configuration
 =============
