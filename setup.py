@@ -32,7 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'Flask',
+        'flask',
         'mongoengine',
         'flask-wtf'
     ],
