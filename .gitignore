@@ -7,3 +7,4 @@ build/
 dist/
 mongoengine.egg-info/
 env/
+Flask_Mongo*
