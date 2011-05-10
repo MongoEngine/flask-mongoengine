@@ -4,18 +4,20 @@ Tools for generating forms based on mongoengine Document schemas.
 import inspect
 from wtforms import fields as f, validators
 
-from flaskext.mongoengine.wtforms.fields import ModelSelectField
-from flaskext.mongoengine.wtforms.models import ModelForm
+from flaskext.mongoengine.wtf.fields import ModelSelectField
+from flaskext.mongoengine.wtf.models import ModelForm
 
 __all__ = (
     'model_fields', 'model_form',
 )
+
 
 def converts(*args):
     def _inner(func):
         func._converter_for = frozenset(args)
         return func
     return _inner
+
 
 class ModelConverter():
     def __init__(self, converters=None):
@@ -60,14 +62,16 @@ class ModelConverter():
     @classmethod
     def _string_common(cls, model, field, kwargs):
         if field.max_length or field.min_length:
-            kwargs['validators'].append(validators.Length(max=field.max_length or - 1,
-                                                          min=field.min_length or - 1))
+            kwargs['validators'].append(
+                validators.Length(max=field.max_length or - 1,
+                                  min=field.min_length or - 1))
 
     @classmethod
     def _number_common(cls, model, field, kwargs):
         if field.max_value or field.min_value:
-            kwargs['validators'].append(validators.NumberRange(max=field.max_value,
-                                                               min=field.min_value))
+            kwargs['validators'].append(
+                validators.NumberRange(max=field.max_value,
+                                       min=field.min_value))
 
     @converts('StringField')
     def conv_String(self, model, field, kwargs):
@@ -162,6 +166,7 @@ class ModelConverter():
     def conv_GenericReference(self, model, field, kwargs):
         return
 
+
 def model_fields(model, only=None, exclude=None, field_args=None, converter=None):
     """
     Generate a dictionary of fields for a given Django model.
@@ -199,7 +204,7 @@ def model_form(model, base_class=ModelForm, only=None, exclude=None, field_args=
     """
     Create a wtforms Form for a given mongoengine Document schema::
 
-        from flask-ext.wtforms import model_form
+        from flaskext.mongoengine.wtf import model_form
         from myproject.myapp.schemas import Article
         ArticleForm = model_form(Article)
 

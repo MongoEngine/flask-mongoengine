@@ -18,7 +18,7 @@ class QuerySetSelectField(SelectFieldBase):
     Given a QuerySet either at initialization or inside a view, will display a
     select drop-down field of choices. The `data` property actually will
     store/keep an ORM model instance, not the ID. Submitting a choice which is
-    not in the queryset will result in a validation error. 
+    not in the queryset will result in a validation error.
 
     Specifying `label_attr` in the constructor will use that property of the
     model instance for display in the list, else the model object's `__str__`

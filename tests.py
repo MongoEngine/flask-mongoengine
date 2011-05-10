@@ -4,7 +4,7 @@ import unittest
 import datetime
 import flask
 from flaskext import mongoengine
-from flaskext.mongoengine.wtforms import model_form
+from flaskext.mongoengine.wtf import model_form
 
 
 def make_todo_model(db):
@@ -42,7 +42,7 @@ class BasicAppTestCase(unittest.TestCase):
 
         @app.route('/show/<id>/')
         def show(id):
-            todo = self.Todo.objects.get_or_404(id=id)
+            self.Todo.objects.get_or_404(id=id)
 
         self.app = app
         self.db = db

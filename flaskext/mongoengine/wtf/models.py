@@ -1,5 +1,6 @@
 from wtforms.form import Form
 
+
 def update_path(self, **kwargs):
 
     def _get_list(f):
@@ -12,7 +13,7 @@ def update_path(self, **kwargs):
     transforms = {
         'set': lambda o, n: n,
         'unset': lambda o, n: None,
-        'inc': lambda o, n: o + n ,
+        'inc': lambda o, n: o + n,
         'dec': lambda o, n: o - n,
         'push': _get_list(lambda o, n: not o and [n] or o.appned(n)),
         'push_all': _get_list(lambda o, n: not o and n or o.extend(n)),
