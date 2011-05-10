@@ -64,13 +64,17 @@ class QuerySet(BaseQuerySet):
         if error_out and page < 1:
             abort(404)
 
-        offset = (page - 1) * per_page
-        items = self[offset:per_page]
+        total = self.count()
+
+        start_index = (page - 1) * per_page
+        end_index = page * per_page
+
+        items = self[start_index:end_index]
 
         if not items and page != 1 and error_out:
             abort(404)
 
-        return Pagination(self, page, per_page, self.count(), items)
+        return Pagination(self, page, per_page, total, items)
 
 
 class Pagination(object):

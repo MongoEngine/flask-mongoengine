@@ -17,7 +17,7 @@ from setuptools import setup
 
 setup(
     name='Flask-MongoEngine',
-    version='0.1',
+    version='0.1.1',
     url='https://github.com/sbook/flask-mongoengine',
     license='BSD',
     author='Ross Lawley',
