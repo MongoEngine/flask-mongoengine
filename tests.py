@@ -42,7 +42,8 @@ class BasicAppTestCase(unittest.TestCase):
 
         @app.route('/show/<id>/')
         def show(id):
-            self.Todo.objects.get_or_404(id=id)
+            todo = self.Todo.objects.get_or_404(id=id)
+            return '\n'.join([todo.title, todo.text])
 
         self.app = app
         self.db = db
@@ -55,6 +56,12 @@ class BasicAppTestCase(unittest.TestCase):
         c = self.app.test_client()
         resp = c.get('/show/38783728378090/')
         self.assertEqual(resp.status_code, 404)
+        
+        c.post('/add', data={'title': 'First Item', 'text': 'The text'})
+        
+        resp = c.get('/show/%s/' % self.Todo.objects.first_or_404())
+        self.assertEqual(resp.status_code, 200)
+        assert resp.data == 'First Item\nThe text'
 
     def test_basic_insert(self):
         c = self.app.test_client()

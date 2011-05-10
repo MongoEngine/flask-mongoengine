@@ -26,6 +26,50 @@ Basic setup is easy, just fetch the extension::
     db = MongoEngine(app)
 
 
+Custom Queryset
+===============
+
+To get `get_or_404`, `first_or_404` or `paginate` you need to declare the queryset in your model meta like so::
+
+    class Todo(db.Document):
+        title = db.StringField(max_length=60)
+        text = db.StringField()
+        done = db.BooleanField(default=False)
+        pub_date = db.DateTimeField(default=datetime.datetime.now)
+        
+        meta = dict(queryset_class=db.QuerySet)
+
+The you can do things like::
+
+    # 404 if not exists
+    def view_todo(todo_id):
+        todo = Todo.objects.get_or_404(_id=todo_id)
+    ..
+    
+    # Paginate through todo
+    def view_todos(page=1):
+        page = Todo.objects.paginate(page=page, per_page=10)
+
+
+In the template::
+
+    {% macro render_pagination(pagination, endpoint) %}
+      <div class=pagination>
+      {%- for page in pagination.iter_pages() %}
+        {% if page %}
+          {% if page != pagination.page %}
+            <a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
+          {% else %}
+            <strong>{{ page }}</strong>
+          {% endif %}
+        {% else %}
+          <span class=ellipsis>…</span>
+        {% endif %}
+      {%- endfor %}
+      </div>
+    {% endmacro %}
+
+
 MongoEngine and WTForms
 =======================
 

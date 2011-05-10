@@ -70,7 +70,7 @@ class QuerySet(BaseQuerySet):
         if not items and page != 1 and error_out:
             abort(404)
 
-        return Pagination(self, page, per_page, page.count(), items)
+        return Pagination(self, page, per_page, self.count(), items)
 
 
 class Pagination(object):
