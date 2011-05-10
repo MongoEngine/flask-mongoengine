@@ -79,6 +79,7 @@ class Pagination(object):
 
         self.queryset = queryset
         self.page = page
+        self.per_page = per_page
         self.total = total
         self.items = items
 
