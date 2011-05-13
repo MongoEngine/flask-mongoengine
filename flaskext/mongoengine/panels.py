@@ -45,9 +45,13 @@ class MongoenginePanel(DebugPanel):
         [1] http://www.mongodb.org/display/DOCS/Database+Profiler
         """
         self.db.set_profiling_level(0)
-        self.start_ts = self.db.system.profile.find()\
+        try:
+            self.start_ts = self.db.system.profile.find()\
                                               .sort("ts", pymongo.DESCENDING)\
                                               .limit(1)[0].get('ts')
+        except IndexError:
+            self.start_ts = None
+
         self.db.set_profiling_level(2)
 
     def _get_property(self, key, query):
@@ -136,7 +140,10 @@ class MongoenginePanel(DebugPanel):
         """
         Get queries from system.profile with ts > self.start_ts
         """
-        query = {'ts': {'$gt': self.start_ts}}
+        if self.start_ts:
+            query = {'ts': {'$gt': self.start_ts}}
+        else:
+            query = {}
         self.queries = self.db.system.profile.find(query, timeout=False)
         self.queries = [self._process_query(q) for q in self.queries]
         self.queries_count = len(self.queries)
