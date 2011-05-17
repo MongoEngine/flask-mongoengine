@@ -26,7 +26,6 @@ setup(
     long_description=__doc__,
     packages=['flaskext',
               'flaskext.mongoengine',
-              'flaskext.mongoengine.templates',
               'flaskext.mongoengine.wtf'],
     namespace_packages=['flaskext'],
     test_suite='nose.collector',
