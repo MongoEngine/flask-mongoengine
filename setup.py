@@ -17,7 +17,7 @@ from setuptools import setup
 
 setup(
     name='Flask-MongoEngine',
-    version='0.1.1',
+    version='0.1.2',
     url='https://github.com/sbook/flask-mongoengine',
     license='BSD',
     author='Ross Lawley',
@@ -26,6 +26,7 @@ setup(
     long_description=__doc__,
     packages=['flaskext',
               'flaskext.mongoengine',
+              'flaskext.mongoengine.templates'
               'flaskext.mongoengine.wtf'],
     namespace_packages=['flaskext'],
     test_suite='nose.collector',
