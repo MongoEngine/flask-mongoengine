@@ -2,6 +2,6 @@ include AUTHORS LICENSE tests.py
 recursive-include docs *
 recursive-exclude docs *.pyc
 recursive-exclude docs *.pyo
-recursive-include flaskext/mongoengine/templates/ *
+recursive-include flaskext/mongoengine/templates/panels *.html
 prune docs/_build
 prune docs/_themes/.git
