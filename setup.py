@@ -36,7 +36,7 @@ setup(
         'mongoengine',
         'flask-wtf'
     ],
-    package_data={'flaskext': ['mongoengine/templates/panels/*.html']},
+    include_package_data=True,
     tests_require=[
         'nose',
     ],
