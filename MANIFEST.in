@@ -1,5 +1,5 @@
 include AUTHORS LICENSE tests.py
-include flaskext/mongoengine/templates/panels/mongoengine.html
+recursive-include flaskext/mongoengine/templates *.html
 recursive-include docs *
 recursive-exclude docs *.pyc
 recursive-exclude docs *.pyo
