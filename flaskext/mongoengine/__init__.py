@@ -61,31 +61,28 @@ class QuerySet(BaseQuerySet):
 
     def paginate(self, page, per_page, error_out=True):
 
-        if error_out and page < 1:
-            abort(404)
-
-        total = self.count()
-
-        start_index = (page - 1) * per_page
-        end_index = page * per_page
-
-        items = self[start_index:end_index]
-
-        if not items and page != 1 and error_out:
-            abort(404)
-
-        return Pagination(self, page, per_page, total, items)
+        return Pagination(self, page, per_page)
 
 
 class Pagination(object):
 
-    def __init__(self, queryset, page, per_page, total, items):
+    def __init__(self, iterable, page, per_page):
 
-        self.queryset = queryset
+        if page < 1:
+            abort(404)
+
+        self.iterable = iterable
         self.page = page
         self.per_page = per_page
-        self.total = total
-        self.items = items
+        self.total = len(iterable)
+
+        start_index = (page - 1) * per_page
+        end_index = page * per_page
+
+        self.items = iterable[start_index:end_index]
+
+        if not self.items and page != 1:
+            abort(404)
 
     @property
     def pages(self):
@@ -94,9 +91,9 @@ class Pagination(object):
 
     def prev(self, error_out=False):
         """Returns a :class:`Pagination` object for the previous page."""
-        assert self.queryset is not None, 'a query object is required ' \
+        assert self.iterable is not None, 'a query object is required ' \
                                        'for this method to work'
-        return self.queryset.paginate(self.page - 1, self.per_page, error_out)
+        return self.__class__(self.iterable, self.page - 1, self.per_page)
 
     @property
     def prev_num(self):
@@ -110,9 +107,9 @@ class Pagination(object):
 
     def next(self, error_out=False):
         """Returns a :class:`Pagination` object for the next page."""
-        assert self.queryset is not None, 'a query object is required ' \
+        assert self.iterable is not None, 'a query object is required ' \
                                        'for this method to work'
-        return self.queryset.paginate(self.page + 1, self.per_page, error_out)
+        return self.__class__(self.iterable, self.page + 1, self.per_page)
 
     @property
     def has_next(self):
