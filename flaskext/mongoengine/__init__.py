@@ -184,7 +184,7 @@ class ListFieldPagination(object):
         start_index = (page - 1) * per_page
         end_index = page * per_page
 
-        self.items = queryset.get(id=doc_id
+        self.items = queryset(id=doc_id
             ).fields(messages={"$slice": [start_index, end_index]}
             ).messages
 
