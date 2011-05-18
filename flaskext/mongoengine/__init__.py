@@ -11,6 +11,8 @@ from mongoengine import ValidationError
 
 from flask import abort
 
+A = 1
+
 
 def _include_mongoengine(obj):
     for module in mongoengine, mongoengine.fields:
@@ -158,7 +160,7 @@ class Pagination(object):
                 last = num
 
 
-class ListFieldPagination(object):
+class ListFieldPagination(Pagination):
 
     def __init__(self, queryset, doc_id, field_name, page, per_page,
                  total=None):
@@ -186,10 +188,9 @@ class ListFieldPagination(object):
 
         self.items = queryset(id=doc_id
             ).fields(messages={"$slice": [start_index, end_index]}
-            ).messages
+            ).first().messages
 
-        if not total:
-            total = len(self.items)
+        self.total = total or len(self.items)
 
         if not self.items and page != 1:
             abort(404)
