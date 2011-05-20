@@ -63,6 +63,15 @@ class QuerySet(BaseQuerySet):
 
         return Pagination(self, page, per_page)
 
+    def paginate_field(self, field_name, doc_id, page, per_page,
+            total=None):
+        import ipdb; ipdb.set_trace()
+        item = self.get(id=doc_id)
+        count = getattr(item, field_name + "_count", '')
+        total = total or count or len(getattr(item, field_name))
+        return ListFieldPagination(self, field_name, doc_id, page, per_page,
+            total=total)
+
 
 class Pagination(object):
 
@@ -160,7 +169,7 @@ class Pagination(object):
 
 class ListFieldPagination(Pagination):
 
-    def __init__(self, queryset, doc_id, field_name, page, per_page,
+    def __init__(self, queryset, field_name, doc_id, page, per_page,
                  total=None):
         """Allows an array within a document to be paginated.
 
@@ -186,8 +195,7 @@ class ListFieldPagination(Pagination):
 
         field_attrs = {field_name: {"$slice": [start_index, end_index]}}
 
-        self.items = getattr(queryset(id=doc_id
-            ).fields(**field_attrs
+        self.items = getattr(queryset().fields(**field_attrs
             ).first(), field_name)
 
         self.total = total or len(self.items)
