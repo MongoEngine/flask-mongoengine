@@ -65,7 +65,6 @@ class QuerySet(BaseQuerySet):
 
     def paginate_field(self, field_name, doc_id, page, per_page,
             total=None):
-        import ipdb; ipdb.set_trace()
         item = self.get(id=doc_id)
         count = getattr(item, field_name + "_count", '')
         total = total or count or len(getattr(item, field_name))
