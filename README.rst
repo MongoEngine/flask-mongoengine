@@ -75,7 +75,7 @@ MongoEngine and WTForms
 
 You can use MongoEngine and WTForms like so::
 
-    from flaskext.mongoengine.wtforms import model_form
+    from flaskext.mongoengine.wtf import model_form
 
     class User(db.Document):
         email = db.StringField(required=True)
