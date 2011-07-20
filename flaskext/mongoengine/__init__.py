@@ -5,8 +5,7 @@ import math
 
 import mongoengine
 
-from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist
-from mongoengine.queryset import QuerySet as BaseQuerySet
+from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist, QuerySet
 from mongoengine import ValidationError
 
 from flask import abort
@@ -25,8 +24,7 @@ class MongoEngine(object):
 
         _include_mongoengine(self)
 
-        self.QuerySet = QuerySet
-        self.BaseQuerySet = BaseQuerySet
+        self.Document = Document
 
         if app is not None:
             self.init_app(app)
@@ -43,7 +41,10 @@ class MongoEngine(object):
             db=db, username=username, password=password)
 
 
-class QuerySet(BaseQuerySet):
+class BaseQuerySet(QuerySet):
+    """
+    A base queryset with handy extras
+    """
 
     def get_or_404(self, *args, **kwargs):
         try:
@@ -72,6 +73,13 @@ class QuerySet(BaseQuerySet):
             total=total)
 
 
+class Document(mongoengine.Document):
+    """Abstract document with extra helpers in the queryset class"""
+
+    meta = {'abstract': True,
+            'queryset_class': BaseQuerySet}
+
+
 class Pagination(object):
 
     def __init__(self, iterable, page, per_page):
@@ -88,7 +96,8 @@ class Pagination(object):
         end_index = page * per_page
 
         self.items = iterable[start_index:end_index]
-
+        if isinstance(self.items, QuerySet):
+            self.items = self.items.select_related()
         if not self.items and page != 1:
             abort(404)
 
@@ -101,7 +110,12 @@ class Pagination(object):
         """Returns a :class:`Pagination` object for the previous page."""
         assert self.iterable is not None, 'an object is required ' \
                                        'for this method to work'
-        return self.__class__(self.iterable, self.page - 1, self.per_page)
+        iterable = self.iterable
+        if isinstance(iterable, QuerySet):
+            iterable._skip = None
+            iterable._limit = None
+            iterable = iterable.clone()
+        return self.__class__(iterable, self.page - 1, self.per_page)
 
     @property
     def prev_num(self):
@@ -117,7 +131,12 @@ class Pagination(object):
         """Returns a :class:`Pagination` object for the next page."""
         assert self.iterable is not None, 'an object is required ' \
                                        'for this method to work'
-        return self.__class__(self.iterable, self.page + 1, self.per_page)
+        iterable = self.iterable
+        if isinstance(iterable, QuerySet):
+            iterable._skip = None
+            iterable._limit = None
+            iterable = iterable.clone()
+        return self.__class__(iterable, self.page + 1, self.per_page)
 
     @property
     def has_next(self):
