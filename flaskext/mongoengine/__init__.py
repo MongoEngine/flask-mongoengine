@@ -209,9 +209,8 @@ class ListFieldPagination(Pagination):
         self.field_name = field_name
 
         start_index = (page - 1) * per_page
-        end_index = page * per_page
 
-        field_attrs = {field_name: {"$slice": [start_index, end_index]}}
+        field_attrs = {field_name: {"$slice": [start_index, per_page]}}
 
         self.items = getattr(queryset().fields(**field_attrs
             ).first(), field_name)
