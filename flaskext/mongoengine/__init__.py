@@ -31,14 +31,17 @@ class MongoEngine(object):
 
     def init_app(self, app):
 
-        db = app.config['MONGODB_DB']
-        username = app.config.get('MONGODB_USERNAME', None)
-        password = app.config.get('MONGODB_PASSWORD', None)
+        conn_settings : {
+            'db': app.config.get('MONGODB_DB', None),
+            'username': app.config.get('MONGODB_USERNAME', None),
+            'password': app.config.get('MONGODB_PASSWORD', None),
+            'host': app.config.get('MONGODB_HOST', None),
+            'port': app.config.get('MONGODB_PORT', None)
+        }
 
-        # more settings e.g. port etc needed
+        conn_settings = dict([(k,v) for k in conn_settings.items() if v])
 
-        self.connection = mongoengine.connect(
-            db=db, username=username, password=password)
+        self.connection = mongoengine.connect(**conn_settings)
 
 
 class BaseQuerySet(QuerySet):
