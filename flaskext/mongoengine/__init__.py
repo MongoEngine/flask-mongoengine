@@ -36,7 +36,7 @@ class MongoEngine(object):
             'username': app.config.get('MONGODB_USERNAME', None),
             'password': app.config.get('MONGODB_PASSWORD', None),
             'host': app.config.get('MONGODB_HOST', None),
-            'port': app.config.get('MONGODB_PORT', None)
+            'port': int(app.config.get('MONGODB_PORT', 0)) or None
         }
 
         conn_settings = dict([(k,v) for k,v in conn_settings.items() if v])
