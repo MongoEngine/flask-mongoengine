@@ -31,7 +31,7 @@ class MongoEngine(object):
 
     def init_app(self, app):
 
-        conn_settings : {
+        conn_settings = {
             'db': app.config.get('MONGODB_DB', None),
             'username': app.config.get('MONGODB_USERNAME', None),
             'password': app.config.get('MONGODB_PASSWORD', None),
