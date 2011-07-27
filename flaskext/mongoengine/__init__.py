@@ -39,7 +39,7 @@ class MongoEngine(object):
             'port': app.config.get('MONGODB_PORT', None)
         }
 
-        conn_settings = dict([(k,v) for k in conn_settings.items() if v])
+        conn_settings = dict([(k,v) for k,v in conn_settings.items() if v])
 
         self.connection = mongoengine.connect(**conn_settings)
 
