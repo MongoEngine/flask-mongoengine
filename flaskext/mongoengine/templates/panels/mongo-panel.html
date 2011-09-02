@@ -1,0 +1,266 @@
+<style type="text/css">
+.mongo-highlight, .mongo-highlight span {
+    font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', 'Monaco', 'Courier New', monospace !important;
+    font-size: 1.05em !important;
+}
+.mongo-stack-trace {
+    line-height: 2.3em !important;
+}
+table.mongo-stack-trace th {
+    text-align: left !important;
+}
+table.mongo-stack-trace td.code, table.mongo-stack-trace td.code span, table.mongo-stack-trace td.function {
+    font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', 'Monaco', 'Courier New', monospace !important;
+}
+table.mongo-op-table tbody {
+    width: 100% !important;
+}
+</style>
+
+<h4>Queries</h4>
+{% if queries %}
+<table class="mongo-op-table">
+    <thead>
+        <tr>
+            <th>Time (ms)</th>
+            <th>Operation</th>
+            <th>Collection</th>
+            <th>Query</th>
+            <th>Ordering</th>
+            <th>Skip</th>
+            <th>Limit</th>
+            <th>Stack Trace</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for query in queries %}
+            <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
+                <td>{{ query.time }}</td>
+                <td>{{ query.operation|title }}</td>
+                <td>{{ query.collection }}</td>
+                <td>
+                    {% if query.query %}
+                    <span class="mongo-highlight">{{ query.query|safe }}</span>
+                  {% endif %}
+                </td>
+                <td><span class="mongo-highlight">{% if query.ordering %}{{ query.ordering }}{% endif %}</pre></td>
+                <td>{% if query.skip %}{{ query.skip }}{% endif %}</td>
+                <td>{% if query.limit %}{{ query.limit }}{% endif %}</td>
+                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="queries-{{ loop.index }}">Toggle</a></td>
+            </tr>
+            <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
+                <td colspan="8">
+                    <table class="mongo-stack-trace "id="mongo-stack-trace-queries-{{ loop.index }}">
+                        <thead>
+                            <tr>
+                                <th>Line</th>
+                                <th>File</th>
+                                <th>Function</th>
+                                <th>Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for line in query.stack_trace %}
+                            <tr {% if not line.4 %}style="display:none" {% endif %}>
+                                <td class="lineno">{{ line.1 }}</td>
+                                <td class="file">{{ line.0 }}</td>
+                                <td class="function">{{ line.2 }}</td>
+                                <td class="code">{{ line.3|safe }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No queries recorded</p>
+{% endif %}
+
+<h4>Inserts</h4>
+{% if inserts %}
+<table class="mongo-op-table">
+    <thead>
+        <tr>
+            <th>Time (ms)</th>
+            <th>Document</th>
+            <th>Safe</th>
+            <th>Stack Trace</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for insert in inserts %}
+            <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
+                <td>{{ insert.time }}</td>
+                <td>
+                    <span class="mongo-highlight">{{ insert.document|safe }}</pre>
+                </td>
+                <td>{{ insert.safe }}</td>
+                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="inserts-{{ loop.index }}">Toggle</a></td>
+            </tr>
+            <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
+                <td colspan="4">
+                    <table class="mongo-stack-trace "id="mongo-stack-trace-inserts-{{ loop.index }}">
+                        <thead>
+                            <tr>
+                                <th>Line</th>
+                                <th>File</th>
+                                <th>Function</th>
+                                <th>Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for line in insert.stack_trace %}
+                            <tr {% if not line.4 %}style="display:none" {% endif %}>
+                                <td class="lineno">{{ line.1 }}</td>
+                                <td class="file">{{ line.0 }}</td>
+                                <td class="function">{{ line.2 }}</td>
+                                <td class="code">{{ line.3|safe }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No inserts recorded</p>
+{% endif %}
+
+<h4>Removes</h4>
+{% if removes %}
+<table class="mongo-op-table">
+    <thead>
+        <tr>
+            <th>Time (ms)</th>
+            <th>Query / Id</th>
+            <th>Safe</th>
+            <th>Stack Trace</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for remove in removes %}
+            <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
+                <td>{{ remove.time }}</td>
+                <td>
+                    <span class="mongo-highlight">{{ remove.spec_or_id|safe }}</pre>
+                </td>
+                <td>{{ remove.safe }}</td>
+                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="removes-{{ loop.index }}">Toggle</a></td>
+            </tr>
+            <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
+                <td colspan="4">
+                    <table class="mongo-stack-trace "id="mongo-stack-trace-removes-{{ loop.index }}">
+                        <thead>
+                            <tr>
+                                <th>Line</th>
+                                <th>File</th>
+                                <th>Function</th>
+                                <th>Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for line in remove.stack_trace %}
+                            <tr {% if not line.4 %}style="display:none" {% endif %}>
+                                <td class="lineno">{{ line.1 }}</td>
+                                <td class="file">{{ line.0 }}</td>
+                                <td class="function">{{ line.2 }}</td>
+                                <td class="code">{{ line.3|safe }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No removes recorded</p>
+{% endif %}
+
+<h4>Updates</h4>
+{% if updates %}
+<table class="mongo-op-table">
+    <thead>
+        <tr>
+            <th>Time (ms)</th>
+            <th>Query</th>
+            <th>Update</th>
+            <th>Safe</th>
+            <th>Multi</th>
+            <th>Upsert</th>
+            <th>Stack Trace</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for update in updates %}
+            <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
+                <td>{{ update.time }}</td>
+                <td>
+                    <span class="mongo-highlight">{{ update.spec|safe }}</pre>
+                </td>
+                <td>
+                    <span class="mongo-highlight">{{ update.document|safe }}</pre>
+                </td>
+                <td>{{ update.safe }}</td>
+                <td>{{ update.multi }}</td>
+                <td>{{ update.upsert }}</td>
+                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="updates-{{ loop.index }}">Toggle</a></td>
+            </tr>
+            <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
+                <td colspan="7">
+                    <table class="mongo-stack-trace "id="mongo-stack-trace-updates-{{ loop.index }}">
+                        <thead>
+                            <tr>
+                                <th>Line</th>
+                                <th>File</th>
+                                <th>Function</th>
+                                <th>Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for line in update.stack_trace %}
+                            <tr {% if not line.4 %}style="display:none" {% endif %}>
+                                <td class="lineno">{{ line.1 }}</td>
+                                <td class="file">{{ line.0 }}</td>
+                                <td class="function">{{ line.2 }}</td>
+                                <td class="code">{{ line.3|safe }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No updates recorded</p>
+{% endif %}
+
+<script>
+(function() {
+    var toggleButtons = document.querySelectorAll('a.mongo-toggle-trace');
+    for (var i = 0; i < toggleButtons.length; i++) {
+        (function() {
+            var button = toggleButtons[i];
+            var index = button.dataset.row;
+            var trace = document.getElementById('mongo-stack-trace-' + index);
+            trace.style.display = "none";
+
+            button.addEventListener("click", function() {
+                if (trace.style.display == "none") {
+                    trace.style.display = "";
+                } else {
+                    trace.style.display = "none";
+                }
+            }, true);
+        })();
+    }
+})();
+</script>
