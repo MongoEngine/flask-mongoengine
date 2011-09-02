@@ -3,7 +3,6 @@ import time
 import inspect
 import sys
 import os
-import SocketServer
 
 import pymongo
 import pymongo.collection
@@ -210,8 +209,6 @@ def _tidy_stacktrace():
         return [(path, '?', '?', '?', True) for path in fnames]
 
     stack = reversed(inspect.stack())
-
-    socketserver_path = os.path.realpath(os.path.dirname(SocketServer.__file__))
     pymongo_path = os.path.realpath(os.path.dirname(pymongo.__file__))
 
     trace = []
@@ -221,8 +218,6 @@ def _tidy_stacktrace():
         # inspection.
         if '__traceback_hide__' in frame.f_locals:
             continue
-        if socketserver_path in s_path:
-            continue
         if pymongo_path in s_path:
             continue
         if not text:
@@ -231,4 +226,3 @@ def _tidy_stacktrace():
             text = (''.join(text)).strip()
         trace.append((path, line_no, func_name, text, 'streetlife' in path))
     return trace
-
