@@ -28,7 +28,7 @@ removes = []
 # Wrap Cursor._refresh for getting queries
 @functools.wraps(_original_methods['insert'])
 def _insert(collection_self, doc_or_docs, manipulate=True,
-           safe=False, check_keys=True, **kwargs):
+           safe=False, **kwargs):
     start_time = time.time()
     result = _original_methods['insert'](
         collection_self,
