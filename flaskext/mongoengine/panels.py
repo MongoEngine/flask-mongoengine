@@ -45,7 +45,7 @@ class MongoenginePanel(DebugPanel):
 
         [1] http://www.mongodb.org/display/DOCS/Database+Profiler
         """
-        self.db.set_profiling_level(0)
+
         try:
             self.start_ts = self.db.system.profile.find()\
                                               .sort("ts", pymongo.DESCENDING)\
@@ -102,37 +102,17 @@ class MongoenginePanel(DebugPanel):
         """
         Split the query to recover all interesting information.
         """
-        query_search_pattern = r'\nquery: (\{.*\})  nreturned'
-        query_search_remove_pattern = r'(.*)(\nquery: \{.*\} )( nreturned.*)'
-
-        command_search_pattern = r'command: (\{.*\}) reslen'
-        command_search_remove_pattern = r'(.*)(command: \{.*\})( reslen.*)'
-
         out = {}
         out['millis'] = query.get('millis', 0)
         out['ts'] = query.get('ts')
 
         out['org_info'] = query.get('info')
 
-        info = query.get('info').split(' ')
-        out['operation_type'] = info[0]
-        out['collection'] = info[1]
+        out['operation_type'] = query.get('op')
+        out['collection'] = query.get('ns')
 
-        info = ' '.join(info[2:])
-        mongo_query = re.search(query_search_pattern, info)
-        mongo_command = re.search(command_search_pattern, info)
+        out['query'] = query.get('query')
 
-        if mongo_query:
-            out['query'] = mongo_query.group(1)
-            info = re.sub(query_search_remove_pattern, r'\1\3', info)
-
-        elif mongo_command:
-            out['query'] = mongo_command.group(1)
-            info = re.sub(command_search_remove_pattern, r'\1\3', info)
-        else:
-            out['query'] = ""
-
-        out['extra'] = info
         out['optimizations'] = ', '.join(self._should_optimize(out))
 
         return out
