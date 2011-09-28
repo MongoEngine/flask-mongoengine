@@ -94,6 +94,18 @@ You can use MongoEngine and WTForms like so::
         return render_response('add_post.html', form=form)
 
 
+Debug Toolbar panels
+====================
+
+There are two panels for the flask-debugtoolbar included with flask-mongoengine. Both of them contain information about the MongoDB operations made by your app, although they work in different ways. Both of them track the time operations take, how many items had to be scanned, the query parameters and the collection being accessed, amongst other things. The key difference to the end user is that MongoDebugPanel records where the query was made from in your codebase.
+
+MongoenginePanel uses MongoDB's in-built system profiler to track operations. It supports 2.0's overhaul of the profiler.
+
+MongoDebugPanel (adapted from https://github.com/hmarr/django-debug-toolbar-mongo) works by monkey-patching PyMongo's operation functions (insert, update, etc.). It tries to identify where the query originated, and shows the relevant stacktrace (with line numbers, filenames, etc.). At the moment, it can't do this for queries made from templates.
+
+See: https://github.com/sbook/flask-debugtoolbar
+
+
 Supported fields
 -----------------
 
