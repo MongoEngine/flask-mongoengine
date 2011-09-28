@@ -155,7 +155,7 @@ class ModelConverter():
             'validators': [],
             'filters': [],
         }
-        form_class = model_form(field.document, field_args={})
+        form_class = model_form(field.document_type_obj, field_args={})
         return f.FormField(form_class, **kwargs)
 
     @converts('ReferenceField')
