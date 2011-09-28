@@ -13,7 +13,6 @@ def make_todo_model(db):
         text = db.StringField()
         done = db.BooleanField(default=False)
         pub_date = db.DateTimeField(default=datetime.datetime.now)
-        meta = dict(queryset_class=db.QuerySet)
     return Todo
 
 
@@ -56,9 +55,9 @@ class BasicAppTestCase(unittest.TestCase):
         c = self.app.test_client()
         resp = c.get('/show/38783728378090/')
         self.assertEqual(resp.status_code, 404)
-        
+
         c.post('/add', data={'title': 'First Item', 'text': 'The text'})
-        
+
         resp = c.get('/show/%s/' % self.Todo.objects.first_or_404().id)
         self.assertEqual(resp.status_code, 200)
         assert resp.data == 'First Item\nThe text'

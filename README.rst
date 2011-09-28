@@ -29,23 +29,15 @@ Basic setup is easy, just fetch the extension::
 Custom Queryset
 ===============
 
-To get `get_or_404`, `first_or_404` or `paginate` you need to declare the queryset in your model meta like so::
+flask-mongoengine uses a custom queryset with methods like `get_or_404`, `first_or_404` and `paginate`. It works like this:
 
-    class Todo(db.Document):
-        title = db.StringField(max_length=60)
-        text = db.StringField()
-        done = db.BooleanField(default=False)
-        pub_date = db.DateTimeField(default=datetime.datetime.now)
-        
-        meta = dict(queryset_class=db.QuerySet)
+You can do things like::
 
-The you can do things like::
-
-    # 404 if not exists
+    # 404 if object doesn't exist
     def view_todo(todo_id):
         todo = Todo.objects.get_or_404(_id=todo_id)
     ..
-    
+
     # Paginate through todo
     def view_todos(page=1):
         page = Todo.objects.paginate(page=page, per_page=10)
@@ -114,7 +106,7 @@ Supported fields
 * DecimalField
 * BooleanField
 * DateTimeField
-* **ListField** (using wtforms.fields.FieldList ) 
+* **ListField** (using wtforms.fields.FieldList )
 * SortedListField (duplicate ListField)
 * **EmbeddedDocumentField** (using wtforms.fields.FormField and generating inline Form)
 * **ReferenceField** (using wtforms.fields.SelectFieldBase with options loaded from QuerySet or Document)
