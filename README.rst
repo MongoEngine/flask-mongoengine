@@ -29,9 +29,14 @@ Basic setup is easy, just fetch the extension::
 Custom Queryset
 ===============
 
-flask-mongoengine uses a custom queryset with methods like `get_or_404`, `first_or_404` and `paginate`. It works like this:
+flask-mongoengine attaches the following methods to Mongoengine's default QuerySet:
 
-You can do things like::
+* **get_or_404**: works like .get(), but calls abort(404) if the object DoesNotExist.
+* **first_or_404**: same as above, except for .first().
+* **paginate**: paginates the QuerySet. Takes two arguments, *page* and *per_page*.
+* **paginate_field**: paginates a field from one document in the QuerySet. Arguments: *field_name*, *doc_id*, *page*, *per_page*.
+
+Examples::
 
     # 404 if object doesn't exist
     def view_todo(todo_id):
@@ -40,8 +45,15 @@ You can do things like::
 
     # Paginate through todo
     def view_todos(page=1):
-        page = Todo.objects.paginate(page=page, per_page=10)
+        paginated_todos = Todo.objects.paginate(page=page, per_page=10)
 
+    # Paginate through tags of todo
+    def view_todo_tags(page=1):
+        todo_id = Todo.objects.first().id
+        paginated_tags = Todo.objects.paginate_field('tags', todo_id, page,
+                                                     per_page=10)
+
+Properties of the pagination object include: iter_pages, next, prev, has_next, has_prev, next_num, prev_num.
 
 In the template::
 
@@ -94,10 +106,12 @@ You can use MongoEngine and WTForms like so::
         return render_response('add_post.html', form=form)
 
 
-Debug Toolbar panels
+Debug Toolbar Panels
 ====================
 
-There are two panels for the flask-debugtoolbar included with flask-mongoengine. Both of them contain information about the MongoDB operations made by your app, although they work in different ways. Both of them track the time operations take, how many items had to be scanned, the query parameters and the collection being accessed, amongst other things. The key difference to the end user is that MongoDebugPanel records where the query was made from in your codebase.
+There are two panels for the flask-debugtoolbar included with flask-mongoengine. Both of them contain information about the MongoDB operations made by your app, although they work in different ways.
+
+Both of them track the time operations take, how many items had to be scanned, the query parameters and the collection being accessed, amongst other things. The key difference to the end user is that MongoDebugPanel records where the query was made from in your codebase.
 
 MongoenginePanel uses MongoDB's in-built system profiler to track operations. It supports 2.0's overhaul of the profiler.
 
@@ -107,7 +121,7 @@ See: https://github.com/sbook/flask-debugtoolbar
 
 
 Supported fields
------------------
+================
 
 * StringField
 * BinaryField
@@ -125,7 +139,7 @@ Supported fields
 * DictField
 
 Not currently supported field types:
------------------------------------
+====================================
 
 * ObjectIdField
 * GeoLocationField

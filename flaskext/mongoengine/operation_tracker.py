@@ -80,7 +80,7 @@ def _update(collection_self, spec, document, upsert=False,
 @functools.wraps(_original_methods['remove'])
 def _remove(collection_self, spec_or_id, safe=False, **kwargs):
     start_time = time.time()
-    result = _original_methods['insert'](
+    result = _original_methods['remove'](
         collection_self,
         spec_or_id,
         safe=safe,
