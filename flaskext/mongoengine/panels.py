@@ -46,8 +46,6 @@ class MongoDebugPanel(DebugPanel):
         self.jinja_env.loader = ChoiceLoader([self.jinja_env.loader,
                           PackageLoader('flaskext.mongoengine', 'templates')])
         operation_tracker.install_tracker()
-        self.jinja_env.loader = ChoiceLoader([self.jinja_env.loader,
-                        PackageLoader('flaskext.mongoengine', 'templates')])
 
     def process_request(self, request):
         operation_tracker.reset()
