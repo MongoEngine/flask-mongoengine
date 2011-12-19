@@ -35,7 +35,7 @@ table.mongo-op-table tbody {
     <tbody>
         {% for query in queries %}
             <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
-                <td>{{ query.time }}</td>
+                <td style="{{ 'color:red;' if query.time > slow_query_limit else '' }}">{{ query.time|round(3) }}</td>
                 <td>{{ query.operation|title }}</td>
                 <td>{{ query.collection }}</td>
                 <td>
@@ -93,7 +93,7 @@ table.mongo-op-table tbody {
     <tbody>
         {% for insert in inserts %}
             <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
-                <td>{{ insert.time }}</td>
+                <td style="{{ 'color:red;' if insert.time > slow_query_limit else '' }}">{{ insert.time|round(3) }}</td>
                 <td>
                     <span class="mongo-highlight">{{ insert.document|safe }}</pre>
                 </td>
@@ -145,7 +145,7 @@ table.mongo-op-table tbody {
     <tbody>
         {% for remove in removes %}
             <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
-                <td>{{ remove.time }}</td>
+                <td style="{{ 'color:red;' if remove.time > slow_query_limit else '' }}">{{ remove.time|round(3) }}</td>
                 <td>
                     <span class="mongo-highlight">{{ remove.spec_or_id|safe }}</pre>
                 </td>
