@@ -10,7 +10,7 @@ Installing Flask-MongoEngine
 
 Install with **pip**::
 
-    pip install https://github.com/sbook/flask-mongoengine/tarball/master
+    pip install https://github.com/rozza/flask-mongoengine/tarball/master
 
 
 Configuration
@@ -117,7 +117,7 @@ MongoenginePanel uses MongoDB's in-built system profiler to track operations. It
 
 MongoDebugPanel (adapted from https://github.com/hmarr/django-debug-toolbar-mongo) works by monkey-patching PyMongo's operation functions (insert, update, etc.). It tries to identify where the query originated, and shows the relevant stacktrace (with line numbers, filenames, etc.). At the moment, it can't do this for queries made from templates.
 
-See: https://github.com/sbook/flask-debugtoolbar
+See: https://github.com/mvantellingen/flask-debugtoolbar
 
 
 Supported fields
