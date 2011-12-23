@@ -1,7 +1,7 @@
 """
 Tools for generating forms based on mongoengine Document schemas.
 """
-import inspect
+from operator import itemgetter
 from wtforms import fields as f, validators
 
 from flaskext.mongoengine.wtf.fields import ModelSelectField
@@ -35,7 +35,7 @@ class ModelConverter():
 
     def convert(self, model, field, field_args):
         kwargs = {
-            'label': field.name,
+            'label': getattr(field, 'verbose_name', field.name),
             'description': '',
             'validators': [],
             'filters': [],
@@ -78,7 +78,9 @@ class ModelConverter():
         if field.regex:
             kwargs['validators'].append(validators.Regexp(regex=field.regex))
         self._string_common(model, field, kwargs)
-        return f.TextField(**kwargs)
+        if field.max_length:
+            return f.TextField(**kwargs)
+        return f.TextAreaField(**kwargs)
 
     @converts('URLField')
     def conv_URL(self, model, field, kwargs):
@@ -173,17 +175,15 @@ def model_fields(model, only=None, exclude=None, field_args=None, converter=None
 
     See `model_form` docstring for description of parameters.
     """
-    from mongoengine.base import BaseDocument
-    if BaseDocument not in inspect.getmro(model):
+    from mongoengine.base import BaseDocument, DocumentMetaclass
+    if not isinstance(model, (BaseDocument, DocumentMetaclass)):
         raise TypeError('model must be a mongoengine Document schema')
 
     converter = converter or ModelConverter()
     field_args = field_args or {}
 
-    if hasattr(model, '_fields_order'):
-        field_names = model._fields_order
-    else:
-        field_names = model._fields.keys()
+    names = ((k, v.creation_counter) for k, v in model._fields.iteritems())
+    field_names = map(itemgetter(0), sorted(names, key=itemgetter(1)))
 
     if only:
         field_names = (x for x in field_names if x in only)
