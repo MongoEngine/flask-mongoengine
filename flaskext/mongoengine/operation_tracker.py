@@ -1,15 +1,18 @@
 import functools
 import time
 import inspect
+import copy
 import sys
 import os
 
 import pymongo
 import pymongo.collection
 import pymongo.cursor
+import pymongo.helpers
+
 
 __all__ = ['queries', 'inserts', 'updates', 'removes', 'install_tracker',
-           'uninstall_tracker', 'reset']
+           'uninstall_tracker', 'reset', 'response_sizes']
 
 
 _original_methods = {
@@ -17,13 +20,26 @@ _original_methods = {
     'update': pymongo.collection.Collection.update,
     'remove': pymongo.collection.Collection.remove,
     'refresh': pymongo.cursor.Cursor._refresh,
+    '_unpack_response': pymongo.helpers._unpack_response,
 }
 
 queries = []
 inserts = []
 updates = []
 removes = []
+response_sizes = []
 
+# Wrap helpers._unpack_response for getting response size
+@functools.wraps(_original_methods['_unpack_response'])
+def _unpack_response(response, *args, **kwargs):
+
+    result = _original_methods['_unpack_response'](
+        response,
+        *args,
+        **kwargs
+    )
+    response_sizes.append(sys.getsizeof(response) / 1024.0)
+    return result
 
 # Wrap Cursor._refresh for getting queries
 @functools.wraps(_original_methods['insert'])
@@ -45,6 +61,7 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
         'safe': safe,
         'time': total_time,
         'stack_trace': _tidy_stacktrace(),
+        'size': response_sizes[-1],
     })
     return result
 
@@ -73,6 +90,7 @@ def _update(collection_self, spec, document, upsert=False,
         'safe': safe,
         'time': total_time,
         'stack_trace': _tidy_stacktrace(),
+        'size': response_sizes[-1]
     })
     return result
 
@@ -94,6 +112,7 @@ def _remove(collection_self, spec_or_id, safe=False, **kwargs):
         'safe': safe,
         'time': total_time,
         '   ': _tidy_stacktrace(),
+        'size': response_sizes[-1]
     })
     return result
 
@@ -123,6 +142,8 @@ def _cursor_refresh(cursor_self):
         'time': total_time,
         'operation': 'query',
         'stack_trace': _tidy_stacktrace(),
+        'size': response_sizes[-1],
+        'data': copy.copy(privar('data'))
     }
 
     # Collection in format <db_name>.<collection_name>
@@ -159,6 +180,8 @@ def install_tracker():
         pymongo.collection.Collection.remove = _remove
     if pymongo.cursor.Cursor._refresh != _cursor_refresh:
         pymongo.cursor.Cursor._refresh = _cursor_refresh
+    if pymongo.helpers._unpack_response != _unpack_response:
+        pymongo.helpers._unpack_response = _unpack_response
 
 def uninstall_tracker():
     if pymongo.collection.Collection.insert == _insert:
@@ -169,13 +192,16 @@ def uninstall_tracker():
         pymongo.collection.Collection.remove = _original_methods['remove']
     if pymongo.cursor.Cursor._refresh == _cursor_refresh:
         pymongo.cursor.Cursor._refresh = _original_methods['cursor_refresh']
+    if pymongo.helpers._unpack_response == _unpack_response:
+        pymongo.helpers._unpack_response = _original_methods['_unpack_response']
 
 def reset():
-    global queries, inserts, updates, removes
+    global queries, inserts, updates, removes, response_sizes
     queries = []
     inserts = []
     updates = []
     removes = []
+    response_sizes = []
 
 def _get_ordering(son):
     """Helper function to extract formatted ordering from dict.

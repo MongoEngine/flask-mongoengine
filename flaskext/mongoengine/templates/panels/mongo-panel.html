@@ -23,12 +23,14 @@ table.mongo-op-table tbody {
     <thead>
         <tr>
             <th>Time (ms)</th>
+            <th>Size</th>
             <th>Operation</th>
             <th>Collection</th>
             <th>Query</th>
             <th>Ordering</th>
             <th>Skip</th>
             <th>Limit</th>
+            <th>Data</th>
             <th>Stack Trace</th>
         </tr>
     </thead>
@@ -36,6 +38,7 @@ table.mongo-op-table tbody {
         {% for query in queries %}
             <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
                 <td style="{{ 'color:red;' if query.time > slow_query_limit else '' }}">{{ query.time|round(3) }}</td>
+                <td>{{ query.size|round(2) }}Kb</td>
                 <td>{{ query.operation|title }}</td>
                 <td>{{ query.collection }}</td>
                 <td>
@@ -46,7 +49,15 @@ table.mongo-op-table tbody {
                 <td><span class="mongo-highlight">{% if query.ordering %}{{ query.ordering }}{% endif %}</pre></td>
                 <td>{% if query.skip %}{{ query.skip }}{% endif %}</td>
                 <td>{% if query.limit %}{{ query.limit }}{% endif %}</td>
+                <td><a href="javascript:void(0);" class="mongo-toggle-data" data-row="data-{{ loop.index }}">Toggle</a></td>
                 <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="queries-{{ loop.index }}">Toggle</a></td>
+            </tr>
+            <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
+                <td colspan="8">
+                    <div class="mongo-data" id="mongo-data-{{ loop.index }}">
+                        <code>{{ query.data|pprint }}</code>
+                    </div>
+                </td>
             </tr>
             <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
                 <td colspan="8">
@@ -85,6 +96,7 @@ table.mongo-op-table tbody {
     <thead>
         <tr>
             <th>Time (ms)</th>
+            <th>Size</th>
             <th>Document</th>
             <th>Safe</th>
             <th>Stack Trace</th>
@@ -94,6 +106,7 @@ table.mongo-op-table tbody {
         {% for insert in inserts %}
             <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
                 <td style="{{ 'color:red;' if insert.time > slow_query_limit else '' }}">{{ insert.time|round(3) }}</td>
+                <td>{{ insert.size|round(2) }}Kb</td>
                 <td>
                     <span class="mongo-highlight">{{ insert.document|safe }}</pre>
                 </td>
@@ -137,6 +150,7 @@ table.mongo-op-table tbody {
     <thead>
         <tr>
             <th>Time (ms)</th>
+            <th>Size</th>
             <th>Query / Id</th>
             <th>Safe</th>
             <th>Stack Trace</th>
@@ -146,6 +160,7 @@ table.mongo-op-table tbody {
         {% for remove in removes %}
             <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
                 <td style="{{ 'color:red;' if remove.time > slow_query_limit else '' }}">{{ remove.time|round(3) }}</td>
+                <td>{{ remove.size|round(2) }}Kb</td>
                 <td>
                     <span class="mongo-highlight">{{ remove.spec_or_id|safe }}</pre>
                 </td>
@@ -189,6 +204,7 @@ table.mongo-op-table tbody {
     <thead>
         <tr>
             <th>Time (ms)</th>
+            <th>Size</th>
             <th>Query</th>
             <th>Update</th>
             <th>Safe</th>
@@ -201,6 +217,7 @@ table.mongo-op-table tbody {
         {% for update in updates %}
             <tr class="{{ loop.cycle('djDebugOdd' 'djDebugEven') }}">
                 <td>{{ update.time }}</td>
+                <td>{{ update.size|round(2) }}Kb</td>
                 <td>
                     <span class="mongo-highlight">{{ update.spec|safe }}</pre>
                 </td>
@@ -245,22 +262,30 @@ table.mongo-op-table tbody {
 
 <script>
 (function() {
-    var toggleButtons = document.querySelectorAll('a.mongo-toggle-trace');
-    for (var i = 0; i < toggleButtons.length; i++) {
-        (function() {
-            var button = toggleButtons[i];
-            var index = button.dataset.row;
-            var trace = document.getElementById('mongo-stack-trace-' + index);
-            trace.style.display = "none";
 
-            button.addEventListener("click", function() {
-                if (trace.style.display == "none") {
-                    trace.style.display = "";
-                } else {
-                    trace.style.display = "none";
-                }
-            }, true);
-        })();
+    function register_toggles(toggle_selector, block_selector){
+        var toggleButtons = document.querySelectorAll(toggle_selector);
+        for (var i = 0; i < toggleButtons.length; i++) {
+            (function() {
+                var button = toggleButtons[i];
+                var index = button.dataset.row;
+                var trace = document.getElementById(block_selector + index);
+                console.log(block_selector);
+                console.log(block_selector + index);
+                trace.style.display = "none";
+
+                button.addEventListener("click", function() {
+                    if (trace.style.display == "none") {
+                        trace.style.display = "";
+                    } else {
+                        trace.style.display = "none";
+                    }
+                }, true);
+            })();
+        }
     }
+    register_toggles('a.mongo-toggle-trace', 'mongo-stack-trace-');
+    register_toggles('a.mongo-toggle-data', 'mongo-');
+
 })();
 </script>
