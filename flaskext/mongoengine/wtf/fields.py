@@ -80,4 +80,5 @@ class ModelSelectField(QuerySetSelectField):
     queryset and lists everything in it.
     """
     def __init__(self, label=u'', validators=None, model=None, **kwargs):
-        super(ModelSelectField, self).__init__(label, validators, queryset=model.objects, **kwargs)
+        queryset = kwargs.pop('queryset', model.objects)
+        super(ModelSelectField, self).__init__(label, validators, queryset=queryset, **kwargs)
