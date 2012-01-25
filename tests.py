@@ -6,6 +6,7 @@ import flask
 from flaskext import mongoengine
 from flaskext.mongoengine.wtf import model_form
 
+from mongoengine import queryset_manager
 
 def make_todo_model(db):
     class Todo(db.Document):
@@ -121,3 +122,30 @@ class WTFormsAppTestCase(unittest.TestCase):
         form.save()
 
         self.assertEquals(BlogPost.objects.count(), 1)
+
+
+    def test_model_form_with_custom_query_set(self):
+
+        db = self.db
+
+        class Dog(db.Document):
+            breed = db.StringField()
+
+            @queryset_manager
+            def large_objects(cls, queryset):
+                return queryset(breed__in = ['german sheppard', 'wolfhound'])
+
+        class DogOwner(db.Document):
+            dog = db.ReferenceField(Dog)
+
+        big_dogs = [Dog(breed="german sheppard"), Dog(breed="wolfhound")]
+        dogs = [Dog(breed="poodle")] + big_dogs
+        for dog in dogs:
+            dog.save()
+
+        BigDogForm = model_form(DogOwner, field_args={'dog': {'queryset' : Dog.large_objects} })
+
+        form = BigDogForm()
+
+        self.assertEqual( big_dogs, [d[1] for d in form.dog.iter_choices()] )
+
