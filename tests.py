@@ -3,8 +3,8 @@ from __future__ import with_statement
 import unittest
 import datetime
 import flask
-from flaskext import mongoengine
-from flaskext.mongoengine.wtf import model_form
+from flask.ext import mongoengine
+from flask.ext.mongoengine.wtf import model_form
 
 from mongoengine import queryset_manager
 
