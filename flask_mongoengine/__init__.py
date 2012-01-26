@@ -83,6 +83,13 @@ class Document(mongoengine.Document):
             'queryset_class': BaseQuerySet}
 
 
+class DynamicDocument(mongoengine.DynamicDocument):
+    """Abstract Dynamic document with extra helpers in the queryset class"""
+
+    meta = {'abstract': True,
+            'queryset_class': BaseQuerySet}
+
+
 class Pagination(object):
 
     def __init__(self, iterable, page, per_page):
