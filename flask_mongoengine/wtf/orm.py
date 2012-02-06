@@ -3,8 +3,9 @@ Tools for generating forms based on mongoengine Document schemas.
 """
 from operator import itemgetter
 from wtforms import fields as f, validators
+from mongoengine import ReferenceField
 
-from flask.ext.mongoengine.wtf.fields import ModelSelectField
+from flask.ext.mongoengine.wtf.fields import ModelSelectField, ModelSelectMultipleField
 from flask.ext.mongoengine.wtf.models import ModelForm
 
 __all__ = (
@@ -130,6 +131,8 @@ class ModelConverter():
 
     @converts('ListField')
     def conv_List(self, model, field, kwargs):
+        if isinstance(field.field, ReferenceField):
+            return ModelSelectMultipleField(model=field.field.document_type, **kwargs)
         kwargs = {
             'validators': [],
             'filters': [],

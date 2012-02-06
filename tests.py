@@ -149,3 +149,7 @@ class WTFormsAppTestCase(unittest.TestCase):
 
         self.assertEqual( big_dogs, [d[1] for d in form.dog.iter_choices()] )
 
+
+    def test_querysetselectmultiple(self):
+
+        self.assertFalse()

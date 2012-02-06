@@ -82,12 +82,12 @@ class Document(mongoengine.Document):
     meta = {'abstract': True,
             'queryset_class': BaseQuerySet}
 
+# TODO rocloutier: Cannot find a mongoengine version that has DynamicDocument
+# class DynamicDocument(mongoengine.DynamicDocument):
+#     """Abstract Dynamic document with extra helpers in the queryset class"""
 
-class DynamicDocument(mongoengine.DynamicDocument):
-    """Abstract Dynamic document with extra helpers in the queryset class"""
-
-    meta = {'abstract': True,
-            'queryset_class': BaseQuerySet}
+#     meta = {'abstract': True,
+#             'queryset_class': BaseQuerySet}
 
 
 class Pagination(object):

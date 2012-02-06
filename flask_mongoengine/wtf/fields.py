@@ -10,6 +10,7 @@ from wtforms.validators import ValidationError
 
 __all__ = (
     'ModelSelectField', 'QuerySetSelectField',
+    'ModelSelectMultipleField', 'QuerySetSelectMultipleField',
 )
 
 
@@ -73,12 +74,45 @@ class QuerySetSelectField(SelectFieldBase):
             if not self.data:
                 raise ValidationError(_(u'Not a valid choice'))
 
+class QuerySetSelectMultipleField(QuerySetSelectField):
+
+    widget = widgets.Select(multiple=True)
+
+    def  __init__(self, label=u'', validators=None, queryset=None, label_attr='',
+                  allow_blank=False, blank_text=u'---', **kwargs):
+        super(QuerySetSelectMultipleField, self).__init__(label, validators, queryset, label_attr, allow_blank, blank_text, **kwargs)
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            if valuelist[0] == '__None':
+                self.data = None
+            else:
+                if not self.queryset:
+                    self.data = None
+                    return
+
+                self.queryset.rewind()
+                self.data = [obj for obj in self.queryset if str(obj.id) in valuelist]
+                if not len(self.data):
+                    self.data = None
+
 
 class ModelSelectField(QuerySetSelectField):
     """
     Like a QuerySetSelectField, except takes a model class instead of a
-    queryset and lists everything in it.
+    queryset and lists everything in it or optionally a queryset.
+    The queryset was added so that we can still use the model_form function without having to
+    write a form with a QuerySetSelectField. Simply pass a queryset in the fields_args keyword arg.
+
+    model_form( model, field_args={ 'field_in_model' : { 'queryset' : custom_model_queryset}} )
     """
     def __init__(self, label=u'', validators=None, model=None, **kwargs):
         queryset = kwargs.pop('queryset', model.objects)
         super(ModelSelectField, self).__init__(label, validators, queryset=queryset, **kwargs)
+
+
+class ModelSelectMultipleField(QuerySetSelectMultipleField):
+
+    def __init__(self, label=u'', validators=None, model=None, **kwargs):
+        queryset = kwargs.pop('queryset', model.objects)
+        super(ModelSelectMultipleField, self).__init__(label, validators, queryset=queryset, **kwargs)
