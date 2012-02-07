@@ -7,6 +7,7 @@ from flask.ext import mongoengine
 from flask.ext.mongoengine.wtf import model_form
 
 from mongoengine import queryset_manager
+import wtforms
 
 def make_todo_model(db):
     class Todo(db.Document):
@@ -145,11 +146,55 @@ class WTFormsAppTestCase(unittest.TestCase):
 
         BigDogForm = model_form(DogOwner, field_args={'dog': {'queryset' : Dog.large_objects} })
 
-        form = BigDogForm()
-
+        form = BigDogForm(dog=big_dogs[0])
+        self.assertTrue(form.validate())
         self.assertEqual( big_dogs, [d[1] for d in form.dog.iter_choices()] )
 
 
-    def test_querysetselectmultiple(self):
+    def test_modelselectfield(self):
 
-        self.assertFalse()
+        db = self.db
+
+        class Dog(db.Document):
+            name = db.StringField()
+
+        class DogOwner(db.Document):
+            dog = db.ReferenceField(Dog)
+
+        DogOwnerForm = model_form(DogOwner)
+
+        dog = Dog(name="fido")
+        dog.save()
+
+        form = DogOwnerForm(dog=dog)
+        self.assertTrue(form.validate())
+
+        self.assertEqual(wtforms.widgets.Select, type(form.dog.widget))
+        self.assertEqual(False, form.dog.widget.multiple)
+
+
+    def test_modelselectfield_multiple(self):
+
+        db = self.db
+
+        class Dog(db.Document):
+            name = db.StringField()
+
+        class DogOwner(db.Document):
+            dogs = db.ListField(db.ReferenceField(Dog))
+
+        DogOwnerForm = model_form(DogOwner)
+
+        dogs = [Dog(name="fido"), Dog(name="rex")]
+        for dog in dogs:
+            dog.save()
+
+        form = DogOwnerForm(dogs=dogs)
+        self.assertTrue(form.validate())
+
+        self.assertEqual(wtforms.widgets.Select, type(form.dogs.widget))
+        self.assertEqual(True, form.dogs.widget.multiple)
+
+
+
+
