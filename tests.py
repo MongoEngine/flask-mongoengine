@@ -105,6 +105,7 @@ class WTFormsAppTestCase(unittest.TestCase):
         class LinkPost(BlogPost):
             url = db.StringField(required=True)
 
+
         # Create a text-based post
         TextPostForm = model_form(TextPost)
 
@@ -196,5 +197,13 @@ class WTFormsAppTestCase(unittest.TestCase):
         self.assertEqual(True, form.dogs.widget.multiple)
 
 
+    def test_passwordfield(self):
+        db = self.db
+        class User(db.Document):
+            password = db.StringField()
+
+        UserForm = model_form(User, field_args = { 'password': {'password' : True} })
+        form = UserForm(password='12345')
+        self.assertEqual(wtforms.widgets.PasswordInput, type(form.password.widget))
 
 
