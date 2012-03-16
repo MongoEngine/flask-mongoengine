@@ -50,6 +50,8 @@ class ModelConverter():
 
         if field.choices:
             kwargs['choices'] = field.choices
+            if kwargs.pop('multiple', False):
+                return f.SelectMultipleField(**kwargs)
             return f.SelectField(**kwargs)
 
         ftype = type(field).__name__
@@ -136,11 +138,14 @@ class ModelConverter():
     def conv_List(self, model, field, kwargs):
         if isinstance(field.field, ReferenceField):
             return ModelSelectMultipleField(model=field.field.document_type, **kwargs)
+        if field.field.choices:
+            kwargs['multiple'] = True
+            return self.convert(model, field.field, kwargs)
+        unbound_field = self.convert(model, field.field, {})
         kwargs = {
             'validators': [],
             'filters': [],
         }
-        unbound_field = self.convert(model, field.field, {})
         return f.FieldList(unbound_field, min_entries=0, **kwargs)
 
     @converts('SortedListField')
