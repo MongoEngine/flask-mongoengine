@@ -18,7 +18,7 @@ Configuration
 Basic setup is easy, just fetch the extension::
 
     from flask import Flask
-    from flask.ext import MongoEngine
+    from flask_mongoengine import MongoEngine
 
     app = Flask(__name__)
     app.config.from_pyfile('the-config.cfg')
@@ -78,7 +78,7 @@ MongoEngine and WTForms
 
 You can use MongoEngine and WTForms like so::
 
-    from flaskext.mongoengine.wtf import model_form
+    from flask_mongoengine.wtf import model_form
 
     class User(db.Document):
         email = db.StringField(required=True)

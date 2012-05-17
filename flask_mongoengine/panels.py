@@ -17,12 +17,12 @@ class MongoDebugPanel(DebugPanel):
 
     def __init__(self, *args, **kwargs):
         """
-        We need to patch jinja_env loader to include flaskext.mongoengine
+        We need to patch jinja_env loader to include flask_mongoengine
         templates folder.
         """
         super(MongoDebugPanel, self).__init__(*args, **kwargs)
         self.jinja_env.loader = ChoiceLoader([self.jinja_env.loader,
-                          PackageLoader('flaskext.mongoengine', 'templates')])
+                          PackageLoader('flask_mongoengine', 'templates')])
         operation_tracker.install_tracker()
 
     def process_request(self, request):

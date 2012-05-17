@@ -5,8 +5,8 @@ import flask
 
 from random import choice
 
-from flaskext import mongoengine
-from flaskext.mongoengine.wtf import model_form
+from flask_mongoengine import MongoEngine
+from flask_mongoengine.wtf import model_form
 from flask_debugtoolbar import DebugToolbarExtension
 
 app = flask.Flask(__name__)
@@ -22,12 +22,12 @@ app.config['DEBUG_TB_PANELS'] = (
              'flask_debugtoolbar.panels.request_vars.RequestVarsDebugPanel',
              'flask_debugtoolbar.panels.template.TemplateDebugPanel',
              'flask_debugtoolbar.panels.logger.LoggingPanel',
-             'flaskext.mongoengine.panels.MongoDebugPanel'
+             'flask_mongoengine.panels.MongoDebugPanel'
              )
 
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
-db = mongoengine.MongoEngine()
+db = MongoEngine()
 db.init_app(app)
 
 DebugToolbarExtension(app)

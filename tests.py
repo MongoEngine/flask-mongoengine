@@ -4,8 +4,8 @@ import unittest
 import datetime
 import flask
 
-from flask.ext import mongoengine
-from flask.ext.mongoengine.wtf import model_form
+from flask_mongoengine import MongoEngine
+from flask_mongoengine.wtf import model_form
 
 from mongoengine import queryset_manager
 
@@ -25,7 +25,7 @@ class BasicAppTestCase(unittest.TestCase):
         app = flask.Flask(__name__)
         app.config['MONGODB_DB'] = 'testing'
         app.config['TESTING'] = True
-        db = mongoengine.MongoEngine()
+        db = MongoEngine()
         self.Todo = make_todo_model(db)
 
         db.init_app(app)
@@ -88,7 +88,7 @@ class WTFormsAppTestCase(unittest.TestCase):
         app.config['MONGODB_DB'] = self.db_name
         app.config['TESTING'] = True
         app.config['CSRF_ENABLED'] = False
-        self.db = mongoengine.MongoEngine()
+        self.db = MongoEngine()
         self.db.init_app(app)
 
     def tearDown(self):
