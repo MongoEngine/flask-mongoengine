@@ -10,4 +10,5 @@ You can also use `WTForms <http://wtforms.simplecodes.com/>`_ as model forms for
 
 Full documentation: `Read The Docs <http://readthedocs.org/docs/flask-mongoengine/en/latest/>`_
 
-.. image:: https://secure.travis-ci.org/MongoEngine/flask-mongoengine.png
+.. image:: https://secure.travis-ci.org/MongoEngine/flask-mongoengine.png?branch=master
+  :target: http://travis-ci.org/MongoEngine/flask-mongoengine
