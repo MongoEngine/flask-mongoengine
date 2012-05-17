@@ -3,11 +3,13 @@ from __future__ import with_statement
 import unittest
 import datetime
 import flask
-from flask.ext import mongoengine
-from flask.ext.mongoengine.wtf import model_form
+
+from flask_mongoengine import MongoEngine
+from flask_mongoengine.wtf import model_form
 
 from mongoengine import queryset_manager
 import wtforms
+
 
 def make_todo_model(db):
     class Todo(db.Document):
@@ -24,7 +26,7 @@ class BasicAppTestCase(unittest.TestCase):
         app = flask.Flask(__name__)
         app.config['MONGODB_DB'] = 'testing'
         app.config['TESTING'] = True
-        db = mongoengine.MongoEngine()
+        db = MongoEngine()
         self.Todo = make_todo_model(db)
 
         db.init_app(app)
@@ -62,14 +64,14 @@ class BasicAppTestCase(unittest.TestCase):
 
         resp = c.get('/show/%s/' % self.Todo.objects.first_or_404().id)
         self.assertEqual(resp.status_code, 200)
-        assert resp.data == 'First Item\nThe text'
+        self.assertEquals(resp.data, 'First Item\nThe text')
 
     def test_basic_insert(self):
         c = self.app.test_client()
         c.post('/add', data={'title': 'First Item', 'text': 'The text'})
         c.post('/add', data={'title': '2nd Item', 'text': 'The text'})
         rv = c.get('/')
-        assert rv.data == 'First Item\n2nd Item'
+        self.assertEquals(rv.data, 'First Item\n2nd Item')
 
     def test_request_context(self):
         with self.app.test_request_context():
@@ -81,15 +83,17 @@ class BasicAppTestCase(unittest.TestCase):
 class WTFormsAppTestCase(unittest.TestCase):
 
     def setUp(self):
+        self.db_name = 'testing'
+
         app = flask.Flask(__name__)
-        app.config['MONGODB_DB'] = 'testing'
+        app.config['MONGODB_DB'] = self.db_name
         app.config['TESTING'] = True
         app.config['CSRF_ENABLED'] = False
-        self.db = mongoengine.MongoEngine()
+        self.db = MongoEngine()
         self.db.init_app(app)
 
     def tearDown(self):
-        self.db.connection.connection.drop_database(self.db.connection)
+        self.db.connection.drop_database(self.db_name)
 
     def test_model_form(self):
         db = self.db
@@ -196,14 +200,12 @@ class WTFormsAppTestCase(unittest.TestCase):
         self.assertEqual(wtforms.widgets.Select, type(form.dogs.widget))
         self.assertEqual(True, form.dogs.widget.multiple)
 
-
     def test_passwordfield(self):
         db = self.db
+
         class User(db.Document):
             password = db.StringField()
 
         UserForm = model_form(User, field_args = { 'password': {'password' : True} })
         form = UserForm(password='12345')
         self.assertEqual(wtforms.widgets.PasswordInput, type(form.password.widget))
-
-

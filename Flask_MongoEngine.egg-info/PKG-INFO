@@ -1,0 +1,31 @@
+Metadata-Version: 1.0
+Name: flask-mongoengine
+Version: 0.1
+Summary: Flask support for MongoDB and with WTF model forms
+Home-page: https://github.com/mongoengine/flask-mongoengine
+Author: Ross Lawley
+Author-email: ross.lawley@gmail.com
+License: BSD
+Description: 
+        Flask-MongoEngine
+        --------------
+        
+        Flask support for MongoDB using MongoEngine.
+        Includes `WTForms`_ support.
+        
+        Links
+        `````
+        
+        * `development version
+          <https://github.com/mongoengine/flask-mongoengine/raw/master#egg=Flask-MongoEngine-dev>`_
+        
+        
+Platform: any
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Software Development :: Libraries :: Python Modules

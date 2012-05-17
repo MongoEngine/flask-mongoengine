@@ -10,8 +10,7 @@ Installing Flask-MongoEngine
 
 Install with **pip**::
 
-    pip install https://github.com/rozza/flask-mongoengine/tarball/master
-
+    pip install flask-mongoengine
 
 Configuration
 =============
@@ -19,7 +18,7 @@ Configuration
 Basic setup is easy, just fetch the extension::
 
     from flask import Flask
-    from flaskext.mongoengine import MongoEngine
+    from flask_mongoengine import MongoEngine
 
     app = Flask(__name__)
     app.config.from_pyfile('the-config.cfg')
@@ -79,7 +78,7 @@ MongoEngine and WTForms
 
 You can use MongoEngine and WTForms like so::
 
-    from flaskext.mongoengine.wtf import model_form
+    from flask_mongoengine.wtf import model_form
 
     class User(db.Document):
         email = db.StringField(required=True)
@@ -113,11 +112,9 @@ There are two panels for the flask-debugtoolbar included with flask-mongoengine.
 
 Both of them track the time operations take, how many items had to be scanned, the query parameters and the collection being accessed, amongst other things. The key difference to the end user is that MongoDebugPanel records where the query was made from in your codebase.
 
-MongoenginePanel uses MongoDB's in-built system profiler to track operations. It supports 2.0's overhaul of the profiler.
-
 MongoDebugPanel (adapted from https://github.com/hmarr/django-debug-toolbar-mongo) works by monkey-patching PyMongo's operation functions (insert, update, etc.). It tries to identify where the query originated, and shows the relevant stacktrace (with line numbers, filenames, etc.). At the moment, it can't do this for queries made from templates.
 
-See: https://github.com/mvantellingen/flask-debugtoolbar
+See: https://github.com/MongoEngine/flask-debugtoolbar
 
 
 Supported fields

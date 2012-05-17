@@ -24,7 +24,7 @@ It is also assumed that you have `MongoDB`_ installed and running.
 API
 ---
 
-.. module:: flaskext.mongoengine
+.. module:: flask_mongoengine
 
 .. _Flask: http://flask.pocoo.org
 .. _Github: https://github.com/sbook/flask-mongoengine

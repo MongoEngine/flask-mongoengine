@@ -1,32 +1,10 @@
 from flask import current_app
 
-from flaskext.debugtoolbar.panels import DebugPanel
+from flask_debugtoolbar.panels import DebugPanel
 from jinja2 import PackageLoader, ChoiceLoader
 import operation_tracker
 
 _ = lambda x: x
-
-
-class MongoenginePanel(DebugPanel):
-    """ Panel deprecated in favor of MongoDebugPanel """
-
-    name = 'Mongoengine'
-    has_content = True
-
-    def process_response(self, request, response):
-        pass
-
-    def nav_title(self):
-        return _('Mongoengine')
-
-    def title(self):
-        return _('Mongoengine Usage')
-
-    def url(self):
-        return ''
-
-    def content(self):
-        return '<h2>Panel deprecated in favor of MongoDebugPanel'
 
 
 class MongoDebugPanel(DebugPanel):
@@ -39,12 +17,12 @@ class MongoDebugPanel(DebugPanel):
 
     def __init__(self, *args, **kwargs):
         """
-        We need to patch jinja_env loader to include flaskext.mongoengine
+        We need to patch jinja_env loader to include flask_mongoengine
         templates folder.
         """
         super(MongoDebugPanel, self).__init__(*args, **kwargs)
         self.jinja_env.loader = ChoiceLoader([self.jinja_env.loader,
-                          PackageLoader('flaskext.mongoengine', 'templates')])
+                          PackageLoader('flask_mongoengine', 'templates')])
         operation_tracker.install_tracker()
 
     def process_request(self, request):
@@ -54,11 +32,13 @@ class MongoDebugPanel(DebugPanel):
         return 'MongoDB'
 
     def nav_subtitle(self):
-        num_queries = len(operation_tracker.queries)
         attrs = ['queries', 'inserts', 'updates', 'removes']
+        ops = sum(sum((1 for o in getattr(operation_tracker, a)
+                         if not o['internal']))
+                         for a in attrs)
         total_time = sum(sum(o['time'] for o in getattr(operation_tracker, a))
                          for a in attrs)
-        return '{0} operations in {1:.2f}ms'.format(num_queries, total_time)
+        return '{0} operations in {1:.2f}ms'.format(ops, total_time)
 
     def title(self):
         return 'MongoDB Operations'

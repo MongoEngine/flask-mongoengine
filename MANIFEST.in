@@ -1,4 +1,7 @@
-include AUTHORS LICENSE tests.py
+include MANIFEST.in
+include README.rst
+include LICENSE
+include AUTHORS
 recursive-include flask_mongoengine/templates *.html
 recursive-include docs *
 recursive-exclude docs *.pyc

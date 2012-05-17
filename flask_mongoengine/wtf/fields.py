@@ -10,7 +10,6 @@ from wtforms.validators import ValidationError
 
 __all__ = (
     'ModelSelectField', 'QuerySetSelectField',
-    'ModelSelectMultipleField', 'QuerySetSelectMultipleField',
 )
 
 
@@ -74,6 +73,7 @@ class QuerySetSelectField(SelectFieldBase):
             if not self.data:
                 raise ValidationError(_(u'Not a valid choice'))
 
+
 class QuerySetSelectMultipleField(QuerySetSelectField):
 
     widget = widgets.Select(multiple=True)
@@ -100,11 +100,7 @@ class QuerySetSelectMultipleField(QuerySetSelectField):
 class ModelSelectField(QuerySetSelectField):
     """
     Like a QuerySetSelectField, except takes a model class instead of a
-    queryset and lists everything in it or optionally a queryset.
-    The queryset was added so that we can still use the model_form function without having to
-    write a form with a QuerySetSelectField. Simply pass a queryset in the fields_args keyword arg.
-
-    model_form( model, field_args={ 'field_in_model' : { 'queryset' : custom_model_queryset}} )
+    queryset and lists everything in it.
     """
     def __init__(self, label=u'', validators=None, model=None, **kwargs):
         queryset = kwargs.pop('queryset', model.objects)
