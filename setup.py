@@ -23,7 +23,7 @@ except:
 
 setup(
     name='flask-mongoengine',
-    version='0.1',
+    version='0.2',
     url='https://github.com/mongoengine/flask-mongoengine',
     license='BSD',
     author='Ross Lawley',
@@ -34,7 +34,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'Flask',
+        'Flask>=0.8',
         'mongoengine',
         'flask-wtf'
     ],
