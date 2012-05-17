@@ -3,8 +3,11 @@ from __future__ import with_statement
 import unittest
 import datetime
 import flask
-from flaskext import mongoengine
-from flaskext.mongoengine.wtf import model_form
+
+from flask.ext import mongoengine
+from flask.ext.mongoengine.wtf import model_form
+
+from mongoengine import queryset_manager
 
 
 def make_todo_model(db):
@@ -60,14 +63,14 @@ class BasicAppTestCase(unittest.TestCase):
 
         resp = c.get('/show/%s/' % self.Todo.objects.first_or_404().id)
         self.assertEqual(resp.status_code, 200)
-        assert resp.data == 'First Item\nThe text'
+        self.assertEquals(resp.data, 'First Item\nThe text')
 
     def test_basic_insert(self):
         c = self.app.test_client()
         c.post('/add', data={'title': 'First Item', 'text': 'The text'})
         c.post('/add', data={'title': '2nd Item', 'text': 'The text'})
         rv = c.get('/')
-        assert rv.data == 'First Item\n2nd Item'
+        self.assertEquals(rv.data, 'First Item\n2nd Item')
 
     def test_request_context(self):
         with self.app.test_request_context():
@@ -79,15 +82,17 @@ class BasicAppTestCase(unittest.TestCase):
 class WTFormsAppTestCase(unittest.TestCase):
 
     def setUp(self):
+        self.db_name = 'testing'
+
         app = flask.Flask(__name__)
-        app.config['MONGODB_DB'] = 'testing'
+        app.config['MONGODB_DB'] = self.db_name
         app.config['TESTING'] = True
         app.config['CSRF_ENABLED'] = False
         self.db = mongoengine.MongoEngine()
         self.db.init_app(app)
 
     def tearDown(self):
-        self.db.connection.connection.drop_database(self.db.connection)
+        self.db.connection.drop_database(self.db_name)
 
     def test_model_form(self):
         db = self.db
@@ -121,3 +126,28 @@ class WTFormsAppTestCase(unittest.TestCase):
         form.save()
 
         self.assertEquals(BlogPost.objects.count(), 1)
+
+    def test_model_form_with_custom_query_set(self):
+
+        db = self.db
+
+        class Dog(db.Document):
+            breed = db.StringField()
+
+            @queryset_manager
+            def large_objects(cls, queryset):
+                return queryset(breed__in = ['german sheppard', 'wolfhound'])
+
+        class DogOwner(db.Document):
+            dog = db.ReferenceField(Dog)
+
+        big_dogs = [Dog(breed="german sheppard"), Dog(breed="wolfhound")]
+        dogs = [Dog(breed="poodle")] + big_dogs
+        for dog in dogs:
+            dog.save()
+
+        BigDogForm = model_form(DogOwner, field_args={'dog': {'queryset' : Dog.large_objects} })
+
+        form = BigDogForm()
+
+        self.assertEqual( big_dogs, [d[1] for d in form.dog.iter_choices()] )

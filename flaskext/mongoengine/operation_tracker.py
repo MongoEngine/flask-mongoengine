@@ -4,11 +4,14 @@ import inspect
 import copy
 import sys
 import os
+import SocketServer
 
 import pymongo
 import pymongo.collection
 import pymongo.cursor
 import pymongo.helpers
+
+from bson import SON
 
 
 __all__ = ['queries', 'inserts', 'updates', 'removes', 'install_tracker',
@@ -41,7 +44,7 @@ def _unpack_response(response, *args, **kwargs):
     response_sizes.append(sys.getsizeof(response) / 1024.0)
     return result
 
-# Wrap Cursor._refresh for getting queries
+# Wrap Cursor.insert for getting queries
 @functools.wraps(_original_methods['insert'])
 def _insert(collection_self, doc_or_docs, manipulate=True,
            safe=False, **kwargs):
@@ -55,17 +58,18 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
     total_time = (time.time() - start_time) * 1000
 
     __traceback_hide__ = True
-
+    stack_trace, internal = _tidy_stacktrace()
     inserts.append({
         'document': doc_or_docs,
         'safe': safe,
         'time': total_time,
-        'stack_trace': _tidy_stacktrace(),
+        'stack_trace': stack_trace,
         'size': response_sizes[-1],
+        'internal': internal
     })
     return result
 
-# Wrap Cursor._refresh for getting queries
+# Wrap Cursor.update for getting queries
 @functools.wraps(_original_methods['update'])
 def _update(collection_self, spec, document, upsert=False,
            maniuplate=False, safe=False, multi=False, **kwargs):
@@ -82,6 +86,7 @@ def _update(collection_self, spec, document, upsert=False,
     total_time = (time.time() - start_time) * 1000
 
     __traceback_hide__ = True
+    stack_trace, internal = _tidy_stacktrace()
     updates.append({
         'document': document,
         'upsert': upsert,
@@ -89,12 +94,13 @@ def _update(collection_self, spec, document, upsert=False,
         'spec': spec,
         'safe': safe,
         'time': total_time,
-        'stack_trace': _tidy_stacktrace(),
-        'size': response_sizes[-1]
+        'stack_trace': stack_trace,
+        'size': response_sizes[-1],
+        'internal': internal
     })
     return result
 
-# Wrap Cursor._refresh for getting queries
+# Wrap Cursor.remove for getting queries
 @functools.wraps(_original_methods['remove'])
 def _remove(collection_self, spec_or_id, safe=False, **kwargs):
     start_time = time.time()
@@ -107,12 +113,14 @@ def _remove(collection_self, spec_or_id, safe=False, **kwargs):
     total_time = (time.time() - start_time) * 1000
 
     __traceback_hide__ = True
+    stack_trace, internal = _tidy_stacktrace()
     removes.append({
         'spec_or_id': spec_or_id,
         'safe': safe,
         'time': total_time,
-        '   ': _tidy_stacktrace(),
-        'size': response_sizes[-1]
+        '   ': stack_trace,
+        'size': response_sizes[-1] if response_sizes else 0,
+        'internal': internal
     })
     return result
 
@@ -136,14 +144,42 @@ def _cursor_refresh(cursor_self):
     total_time = (time.time() - start_time) * 1000
 
     query_son = privar('query_spec')()
+    if not isinstance(query_son, SON):
+        if not query_son:
+            return result
+
+        if "$query" not in query_son:
+            query_son = {"$query": query_son}
+
+        data = privar("data")
+        if data:
+            query_son["data"] = data
+
+        orderby = privar("ordering")
+        if orderby:
+            query_son["$orderby"] = orderby
+
+        hint = privar("hint")
+        if hint:
+            query_son["$hint"] = hint
+
+        snapshot = privar("snapshot")
+        if snapshot:
+            query_son["$snapshot"] = snapshot
+
+        maxScan = privar("max_scan")
+        if maxScan:
+            query_son["$maxScan"] = maxScan
 
     __traceback_hide__ = True
+    stack_trace, internal = _tidy_stacktrace()
     query_data = {
         'time': total_time,
         'operation': 'query',
-        'stack_trace': _tidy_stacktrace(),
+        'stack_trace': stack_trace,
         'size': response_sizes[-1],
-        'data': copy.copy(privar('data'))
+        'data': copy.copy(privar('data')),
+        'internal': internal
     }
 
     # Collection in format <db_name>.<collection_name>
@@ -212,16 +248,16 @@ def _get_ordering(son):
     if '$orderby' in son:
         return ', '.join(fmt(f, d) for f, d in son['$orderby'].items())
 
-# Taken from Django Debug Toolbar 0.8.6
 def _tidy_stacktrace():
     """
-    Clean up stacktrace and remove all entries that:
-    1. Are part of Django (except contrib apps)
-    2. Are part of SocketServer (used by Django's dev server)
-    3. Are the last entry (which is part of our stacktracing code)
-
-    ``stack`` should be a list of frame tuples from ``inspect.stack()``
+    Tidy the stack_trace
     """
+    socketserver_path = os.path.realpath(os.path.dirname(SocketServer.__file__))
+    pymongo_path = os.path.realpath(os.path.dirname(pymongo.__file__))
+    paths = ['/site-packages/', '/flaskext/', socketserver_path, pymongo_path]
+    internal = False
+
+    # Check html templates
     fnames = []
     for i in xrange(100):
         try:
@@ -231,11 +267,18 @@ def _tidy_stacktrace():
         except:
             break
     fnames = list(set(fnames))
-    if fnames:
-        return [(path, '?', '?', '?', True) for path in fnames]
+    trace = []
 
-    stack = reversed(inspect.stack())
-    pymongo_path = os.path.realpath(os.path.dirname(pymongo.__file__))
+    for path in fnames:
+        if 'flask_debugtoolbar' in path:
+            internal = True
+        trace.append((path, '?', '?', '?', False))
+
+    if trace:
+        return trace, internal
+
+    stack = inspect.stack()
+    reversed(stack)
 
     trace = []
     for frame, path, line_no, func_name, text in (f[:5] for f in stack):
@@ -244,11 +287,14 @@ def _tidy_stacktrace():
         # inspection.
         if '__traceback_hide__' in frame.f_locals:
             continue
-        if pymongo_path in s_path:
-            continue
+        hidden = False
+        if func_name == "<genexpr>":
+            hidden = True
+        if any([p for p in paths if p in s_path]):
+            hidden = True
         if not text:
             text = ''
         else:
             text = (''.join(text)).strip()
-        trace.append((path, line_no, func_name, text, 'streetlife' in path))
-    return trace
+        trace.append((path, line_no, func_name, text, hidden))
+    return trace, internal

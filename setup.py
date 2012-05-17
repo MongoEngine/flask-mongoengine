@@ -9,19 +9,25 @@ Links
 `````
 
 * `development version
-  <https://github.com/sbook/flask-mongoengine/raw/master#egg=Flask-MongoEngine-dev>`_
+  <https://github.com/mongoengine/flask-mongoengine/raw/master#egg=Flask-MongoEngine-dev>`_
 
 """
 from setuptools import setup
 
+# Stops exit traceback on tests
+try:
+    import multiprocessing
+except:
+   pass
+
 
 setup(
     name='Flask-MongoEngine',
-    version='0.1.3-dev',
-    url='https://github.com/sbook/flask-mongoengine',
+    version='0.2',
+    url='https://github.com/mongoengine/flask-mongoengine',
     license='BSD',
     author='Ross Lawley',
-    author_email='ross.lawley@streetlife.com',
+    author_email='ross.lawley@gmail.com',
     description='Flask support for MongoDB and with WTF model forms',
     long_description=__doc__,
     packages=['flaskext',

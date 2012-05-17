@@ -6,7 +6,7 @@ import math
 import mongoengine
 
 from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist, QuerySet
-from mongoengine import ValidationError
+from mongoengine.base import ValidationError
 
 from flask import abort
 
@@ -22,9 +22,8 @@ class MongoEngine(object):
 
     def __init__(self, app=None):
 
-        _include_mongoengine(self)
-
         self.Document = Document
+        _include_mongoengine(self)
 
         if app is not None:
             self.init_app(app)
