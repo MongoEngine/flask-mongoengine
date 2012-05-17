@@ -38,6 +38,8 @@ setup(
         'mongoengine',
         'flask-wtf'
     ],
+    packages=['flask_mongoengine',
+              'flask_mongoengine.wtf'],
     include_package_data=True,
     tests_require=[
         'nose',
