@@ -9,3 +9,5 @@ A Flask extension that provides integration with `MongoEngine <http://mongoengin
 You can also use `WTForms <http://wtforms.simplecodes.com/>`_ as model forms for your models.
 
 Full documentation: `Read The Docs <http://readthedocs.org/docs/flask-mongoengine/en/latest/>`_
+
+.. image:: https://secure.travis-ci.org/MongoEngine/flask-mongoengine.png
