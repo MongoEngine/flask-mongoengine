@@ -8,3 +8,4 @@ dist/
 *.egg-info/
 env/
 ._*
+.DS_Store

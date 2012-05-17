@@ -132,12 +132,16 @@ Not currently supported field types:
 * GeoLocationField
 * GenericReferenceField
 
-Debug Toolbar Panels
-====================
+Debug Toolbar Panel
+===================
+
+.. image:: _static/debugtoolbar.png
+  :target: #debug-toolbar-panel
 
 If you use the Flask-DebugToolbar you can add
 `'flask_mongoengine.panels.MongoDebugPanel'` to the `DEBUG_TB_PANELS` config
 list and then it will automatically track your queries.
+
 
 Credits
 ========
