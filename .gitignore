@@ -5,6 +5,6 @@ docs/.build
 docs/_build
 build/
 dist/
-mongoengine.egg-info/
+*.egg-info/
 env/
 ._*
