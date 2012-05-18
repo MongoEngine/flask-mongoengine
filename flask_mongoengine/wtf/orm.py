@@ -5,8 +5,8 @@ from operator import itemgetter
 from wtforms import fields as f, validators
 from mongoengine import ReferenceField
 
-from flask_mongoengine.wtf.fields import ModelSelectField, ModelSelectMultipleField
-from flask_mongoengine.wtf.models import ModelForm
+from flask.ext.mongoengine.wtf.fields import ModelSelectField, ModelSelectMultipleField
+from flask.ext.mongoengine.wtf.models import ModelForm
 
 __all__ = (
     'model_fields', 'model_form',
@@ -215,7 +215,7 @@ def model_form(model, base_class=ModelForm, only=None, exclude=None, field_args=
     """
     Create a wtforms Form for a given mongoengine Document schema::
 
-        from flask_mongoengine.wtf import model_form
+        from flask.ext.mongoengine.wtf import model_form
         from myproject.myapp.schemas import Article
         ArticleForm = model_form(Article)
 

@@ -18,7 +18,7 @@ Configuration
 Basic setup is easy, just fetch the extension::
 
     from flask import Flask
-    from flask_mongoengine import MongoEngine
+    from flask.ext.mongoengine import MongoEngine
 
     app = Flask(__name__)
     app.config.from_pyfile('the-config.cfg')
@@ -80,7 +80,7 @@ MongoEngine and WTForms
 
 You can use MongoEngine and WTForms like so::
 
-    from flask_mongoengine.wtf import model_form
+    from flask.ext.mongoengine.wtf import model_form
 
     class User(db.Document):
         email = db.StringField(required=True)
@@ -139,7 +139,7 @@ Debug Toolbar Panel
   :target: #debug-toolbar-panel
 
 If you use the Flask-DebugToolbar you can add
-`'flask_mongoengine.panels.MongoDebugPanel'` to the `DEBUG_TB_PANELS` config
+`'flask.ext.mongoengine.panels.MongoDebugPanel'` to the `DEBUG_TB_PANELS` config
 list and then it will automatically track your queries.
 
 

@@ -1,0 +1,4 @@
+Flask>=0.8
+Flask-DebugToolbar==0.6.3.1
+Flask-WTF==0.6
+mongoengine>=0.6.9

@@ -4,8 +4,8 @@ import unittest
 import datetime
 import flask
 
-from flask_mongoengine import MongoEngine
-from flask_mongoengine.wtf import model_form
+from flask.ext.mongoengine import MongoEngine
+from flask.ext.mongoengine.wtf import model_form
 
 from mongoengine import queryset_manager
 import wtforms
@@ -31,6 +31,8 @@ class BasicAppTestCase(unittest.TestCase):
 
         db.init_app(app)
 
+        self.Todo.drop_collection()
+
         @app.route('/')
         def index():
             return '\n'.join(x.title for x in self.Todo.objects)
@@ -50,10 +52,6 @@ class BasicAppTestCase(unittest.TestCase):
 
         self.app = app
         self.db = db
-
-    def tearDown(self):
-        for todo in self.Todo.objects:
-            todo.delete()
 
     def test_with_id(self):
         c = self.app.test_client()

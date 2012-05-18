@@ -10,6 +10,16 @@ from mongoengine.base import ValidationError
 
 from flask import abort
 
+VERSION = (0, 3, 0)
+
+def get_version():
+    version = '%s.%s' % (VERSION[0], VERSION[1])
+    if VERSION[2]:
+        version = '%s.%s' % (version, VERSION[2])
+    return version
+
+__version__ = get_version()
+
 
 def _include_mongoengine(obj):
     for module in mongoengine, mongoengine.fields:
@@ -22,8 +32,10 @@ class MongoEngine(object):
 
     def __init__(self, app=None):
 
-        self.Document = Document
         _include_mongoengine(self)
+
+        self.Document = Document
+        self.Document = DynamicDocument
 
         if app is not None:
             self.init_app(app)
@@ -81,12 +93,12 @@ class Document(mongoengine.Document):
     meta = {'abstract': True,
             'queryset_class': BaseQuerySet}
 
-# TODO rocloutier: Cannot find a mongoengine version that has DynamicDocument
-# class DynamicDocument(mongoengine.DynamicDocument):
-#     """Abstract Dynamic document with extra helpers in the queryset class"""
 
-#     meta = {'abstract': True,
-#             'queryset_class': BaseQuerySet}
+class DynamicDocument(mongoengine.DynamicDocument):
+    """Abstract Dynamic document with extra helpers in the queryset class"""
+
+    meta = {'abstract': True,
+            'queryset_class': BaseQuerySet}
 
 
 class Pagination(object):
