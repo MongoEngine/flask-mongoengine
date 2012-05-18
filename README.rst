@@ -1,10 +1,11 @@
 =================
 Flask-MongoEngine
 =================
-:Info: Flask extension to help with MongoEngine
-:Author: Ross Lawley (http://github.com/rozza)
 .. image:: https://secure.travis-ci.org/MongoEngine/flask-mongoengine.png?branch=master
   :target: http://travis-ci.org/MongoEngine/flask-mongoengine
+
+:Info: Flask extension to help with MongoEngine
+:Author: Ross Lawley (http://github.com/rozza)
 
 A Flask extension that provides integration with `MongoEngine <http://mongoengine.org/>`_. It handles connection management for your app.
 
@@ -15,6 +16,7 @@ Full documentation: `Read The Docs <http://readthedocs.org/docs/flask-mongoengin
 For a demo run - simply setup a virtualenv:
 
     pip install -r requirements.txt
+
     python example/simpleapp.py
 
 
