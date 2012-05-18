@@ -20,11 +20,9 @@ try:
 except:
    pass
 
-from flask_mongoengine import __version__
-
 setup(
     name='flask-mongoengine',
-    version=__version__,
+    version='0.3',
     url='https://github.com/mongoengine/flask-mongoengine',
     license='BSD',
     author='Ross Lawley',
