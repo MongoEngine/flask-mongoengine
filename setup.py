@@ -40,9 +40,7 @@ setup(
     packages=['flask_mongoengine',
               'flask_mongoengine.wtf'],
     include_package_data=True,
-    tests_require=[
-        'nose',
-    ],
+    setup_requires=['nose', 'coverage'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',

@@ -15,7 +15,7 @@ def update_path(self, **kwargs):
         'unset': lambda o, n: None,
         'inc': lambda o, n: o + n,
         'dec': lambda o, n: o - n,
-        'push': _get_list(lambda o, n: not o and [n] or o.appned(n)),
+        'push': _get_list(lambda o, n: not o and [n] or o.append(n)),
         'push_all': _get_list(lambda o, n: not o and n or o.extend(n)),
         'pull': _get_list(lambda o, n: n in o and o.remove(n)),
         'pull_all': _get_list(lambda o, n: reduce(lambda x, y: y in o and o.remove(y), n, False)),

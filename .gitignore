@@ -9,3 +9,4 @@ dist/
 env/
 ._*
 .DS_Store
+.coverage
