@@ -1,4 +1,4 @@
-from wtforms.form import Form
+from flask.ext.wtf import Form
 
 
 def update_path(self, **kwargs):
