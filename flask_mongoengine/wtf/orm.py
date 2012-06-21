@@ -47,6 +47,8 @@ class ModelConverter():
 
         if field.required:
             kwargs['validators'].append(validators.Required())
+        else:
+            kwargs['validators'].append(validators.Optional())
 
         if field.choices:
             kwargs['choices'] = field.choices

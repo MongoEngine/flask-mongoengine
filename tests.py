@@ -87,6 +87,7 @@ class WTFormsAppTestCase(unittest.TestCase):
         app.config['MONGODB_DB'] = self.db_name
         app.config['TESTING'] = True
         app.config['CSRF_ENABLED'] = False
+        self.app = app
         self.db = MongoEngine()
         self.db.init_app(app)
 
@@ -94,116 +95,118 @@ class WTFormsAppTestCase(unittest.TestCase):
         self.db.connection.drop_database(self.db_name)
 
     def test_model_form(self):
-        db = self.db
+        with self.app.test_request_context('/'):
+            db = self.db
 
-        class BlogPost(db.Document):
-            title = db.StringField(required=True, max_length=200)
-            posted = db.DateTimeField(default=datetime.datetime.now)
-            tags = db.ListField(db.StringField(max_length=50))
+            class BlogPost(db.Document):
+                title = db.StringField(required=True, max_length=200)
+                posted = db.DateTimeField(default=datetime.datetime.now)
+                tags = db.ListField(db.StringField(max_length=50))
 
-        class TextPost(BlogPost):
-            content = db.StringField(required=True)
+            class TextPost(BlogPost):
+                content = db.StringField(required=True)
 
-        class LinkPost(BlogPost):
-            url = db.StringField(required=True)
+            class LinkPost(BlogPost):
+                url = db.StringField(required=True)
 
 
-        # Create a text-based post
-        TextPostForm = model_form(TextPost)
+            # Create a text-based post
+            TextPostForm = model_form(TextPost)
 
-        form = TextPostForm(**{
-            'title': 'Using MongoEngine',
-            'tags': ['mongodb', 'mongoengine']})
+            form = TextPostForm(**{
+                'title': 'Using MongoEngine',
+                'tags': ['mongodb', 'mongoengine']})
 
-        self.assertFalse(form.validate())
+            self.assertFalse(form.validate())
 
-        form = TextPostForm(**{
-            'title': 'Using MongoEngine',
-            'content': 'See the tutorial',
-            'tags': ['mongodb', 'mongoengine']})
+            form = TextPostForm(**{
+                'title': 'Using MongoEngine',
+                'content': 'See the tutorial',
+                'tags': ['mongodb', 'mongoengine']})
 
-        self.assertTrue(form.validate())
-        form.save()
+            self.assertTrue(form.validate())
+            form.save()
 
-        self.assertEquals(BlogPost.objects.count(), 1)
+            self.assertEquals(BlogPost.objects.count(), 1)
 
 
     def test_model_form_with_custom_query_set(self):
+        with self.app.test_request_context('/'):
+            db = self.db
 
-        db = self.db
+            class Dog(db.Document):
+                breed = db.StringField()
 
-        class Dog(db.Document):
-            breed = db.StringField()
+                @queryset_manager
+                def large_objects(cls, queryset):
+                    return queryset(breed__in = ['german sheppard', 'wolfhound'])
 
-            @queryset_manager
-            def large_objects(cls, queryset):
-                return queryset(breed__in = ['german sheppard', 'wolfhound'])
+            class DogOwner(db.Document):
+                dog = db.ReferenceField(Dog)
 
-        class DogOwner(db.Document):
-            dog = db.ReferenceField(Dog)
+            big_dogs = [Dog(breed="german sheppard"), Dog(breed="wolfhound")]
+            dogs = [Dog(breed="poodle")] + big_dogs
+            for dog in dogs:
+                dog.save()
 
-        big_dogs = [Dog(breed="german sheppard"), Dog(breed="wolfhound")]
-        dogs = [Dog(breed="poodle")] + big_dogs
-        for dog in dogs:
-            dog.save()
+            BigDogForm = model_form(DogOwner, field_args={'dog': {'queryset' : Dog.large_objects} })
 
-        BigDogForm = model_form(DogOwner, field_args={'dog': {'queryset' : Dog.large_objects} })
-
-        form = BigDogForm(dog=big_dogs[0])
-        self.assertTrue(form.validate())
-        self.assertEqual( big_dogs, [d[1] for d in form.dog.iter_choices()] )
+            form = BigDogForm(dog=big_dogs[0])
+            self.assertTrue(form.validate())
+            self.assertEqual( big_dogs, [d[1] for d in form.dog.iter_choices()] )
 
 
     def test_modelselectfield(self):
+        with self.app.test_request_context('/'):
+            db = self.db
 
-        db = self.db
+            class Dog(db.Document):
+                name = db.StringField()
 
-        class Dog(db.Document):
-            name = db.StringField()
+            class DogOwner(db.Document):
+                dog = db.ReferenceField(Dog)
 
-        class DogOwner(db.Document):
-            dog = db.ReferenceField(Dog)
+            DogOwnerForm = model_form(DogOwner)
 
-        DogOwnerForm = model_form(DogOwner)
+            dog = Dog(name="fido")
+            dog.save()
 
-        dog = Dog(name="fido")
-        dog.save()
+            form = DogOwnerForm(dog=dog)
+            self.assertTrue(form.validate())
 
-        form = DogOwnerForm(dog=dog)
-        self.assertTrue(form.validate())
-
-        self.assertEqual(wtforms.widgets.Select, type(form.dog.widget))
-        self.assertEqual(False, form.dog.widget.multiple)
+            self.assertEqual(wtforms.widgets.Select, type(form.dog.widget))
+            self.assertEqual(False, form.dog.widget.multiple)
 
 
     def test_modelselectfield_multiple(self):
+        with self.app.test_request_context('/'):
+            db = self.db
 
-        db = self.db
+            class Dog(db.Document):
+                name = db.StringField()
 
-        class Dog(db.Document):
-            name = db.StringField()
+            class DogOwner(db.Document):
+                dogs = db.ListField(db.ReferenceField(Dog))
 
-        class DogOwner(db.Document):
-            dogs = db.ListField(db.ReferenceField(Dog))
+            DogOwnerForm = model_form(DogOwner)
 
-        DogOwnerForm = model_form(DogOwner)
+            dogs = [Dog(name="fido"), Dog(name="rex")]
+            for dog in dogs:
+                dog.save()
 
-        dogs = [Dog(name="fido"), Dog(name="rex")]
-        for dog in dogs:
-            dog.save()
+            form = DogOwnerForm(dogs=dogs)
+            self.assertTrue(form.validate())
 
-        form = DogOwnerForm(dogs=dogs)
-        self.assertTrue(form.validate())
-
-        self.assertEqual(wtforms.widgets.Select, type(form.dogs.widget))
-        self.assertEqual(True, form.dogs.widget.multiple)
+            self.assertEqual(wtforms.widgets.Select, type(form.dogs.widget))
+            self.assertEqual(True, form.dogs.widget.multiple)
 
     def test_passwordfield(self):
-        db = self.db
+        with self.app.test_request_context('/'):
+            db = self.db
 
-        class User(db.Document):
-            password = db.StringField()
+            class User(db.Document):
+                password = db.StringField()
 
-        UserForm = model_form(User, field_args = { 'password': {'password' : True} })
-        form = UserForm(password='12345')
-        self.assertEqual(wtforms.widgets.PasswordInput, type(form.password.widget))
+            UserForm = model_form(User, field_args = { 'password': {'password' : True} })
+            form = UserForm(password='12345')
+            self.assertEqual(wtforms.widgets.PasswordInput, type(form.password.widget))
