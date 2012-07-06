@@ -2,9 +2,10 @@
 Useful form fields for use with the mongoengine.
 """
 from gettext import gettext as _
+import json
 
 from wtforms import widgets
-from wtforms.fields import SelectFieldBase
+from wtforms.fields import SelectFieldBase, TextAreaField
 from wtforms.validators import ValidationError
 
 
@@ -114,3 +115,24 @@ class ModelSelectMultipleField(QuerySetSelectMultipleField):
     def __init__(self, label=u'', validators=None, model=None, **kwargs):
         queryset = kwargs.pop('queryset', model.objects)
         super(ModelSelectMultipleField, self).__init__(label, validators, queryset=queryset, **kwargs)
+
+
+
+class JSONField(TextAreaField):
+    def process_formdata(self, valuelist):
+        self._error = False
+        if valuelist:
+            try:
+                self.data = json.loads(valuelist[0])
+            except ValueError:
+                self._error = True
+
+    def pre_validate(self, form):
+        if self._error:
+            raise ValidationError('Invalid JSON data.')
+
+
+class DictField(JSONField):
+    def pre_validate(self, form):
+        if self._error or (self.data != None and not isinstance(self.data, dict)):
+            raise ValidationError('Invalid JSON data.')
