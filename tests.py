@@ -210,3 +210,7 @@ class WTFormsAppTestCase(unittest.TestCase):
             UserForm = model_form(User, field_args = { 'password': {'password' : True} })
             form = UserForm(password='12345')
             self.assertEqual(wtforms.widgets.PasswordInput, type(form.password.widget))
+
+
+if __name__ == '__main__':
+    unittest.main()
