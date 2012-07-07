@@ -53,6 +53,25 @@ class BasicAppTestCase(unittest.TestCase):
         self.app = app
         self.db = db
 
+    def test_connection_kwargs(self):
+        app = flask.Flask(__name__)
+        app.config['MONGODB_SETTINGS'] = {
+            'DB': 'testing_tz_aware',
+            'alias': 'tz_aware_true',
+            'TZ_AWARE': True,
+        }
+        app.config['TESTING'] = True
+        db = MongoEngine()
+        db.init_app(app)
+        self.assertTrue(db.connection.tz_aware)
+
+        app.config['MONGODB_SETTINGS'] = {
+            'DB': 'testing',
+            'alias': 'tz_aware_false',
+        }
+        db.init_app(app)
+        self.assertFalse(db.connection.tz_aware)
+
     def test_with_id(self):
         c = self.app.test_client()
         resp = c.get('/show/38783728378090/')
@@ -76,7 +95,6 @@ class BasicAppTestCase(unittest.TestCase):
             todo = self.Todo(title='Test', text='test')
             todo.save()
             self.assertEqual(self.Todo.objects.count(), 1)
-
 
 class WTFormsAppTestCase(unittest.TestCase):
 
