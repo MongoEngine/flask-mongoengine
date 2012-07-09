@@ -119,20 +119,22 @@ class ModelSelectMultipleField(QuerySetSelectMultipleField):
 
 
 class JSONField(TextAreaField):
-    def process_formdata(self, valuelist):
-        self._error = False
-        if valuelist:
-            try:
-                self.data = json.loads(valuelist[0])
-            except ValueError:
-                self._error = True
+    def _value(self):
+        if self.raw_data:
+            return self.raw_data[0]
+        else:
+            return self.data and unicode(json.dumps(self.data)) or u''
 
-    def pre_validate(self, form):
-        if self._error:
-            raise ValidationError('Invalid JSON data.')
+    def process_formdata(self, value):
+        if value:
+            try:
+                self.data = json.loads(value[0])
+            except ValueError:
+                raise ValueError(self.gettext(u'Invalid JSON data.'))
 
 
 class DictField(JSONField):
-    def pre_validate(self, form):
-        if self._error or (self.data != None and not isinstance(self.data, dict)):
-            raise ValidationError('Invalid JSON data.')
+    def process_formdata(self, value):
+        super(DictField, self).process_formdata(value)
+        if value and not isinstance(self.data, dict):
+            raise ValueError(self.gettext(u'Not a valid dictionary.'))
