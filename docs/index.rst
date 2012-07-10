@@ -25,6 +25,10 @@ Basic setup is easy, just fetch the extension::
     db = MongoEngine(app)
 
 
+To configure the MongoDB connection settings set a in a dictionary of
+`'MONGODB_SETTINGS'` in the `app.config`.
+
+
 Custom Queryset
 ===============
 
