@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Changes in 0.5
+==============
+- Fixed extended DynamicDocument
+
 Changes in 0.4
 ==============
 - Added CRSF support and validate_on_save via flask.ext.WTF
