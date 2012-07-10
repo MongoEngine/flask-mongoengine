@@ -4,6 +4,7 @@ Changelog
 
 Changes in 0.5
 ==============
+- Added support for all connection settings
 - Fixed extended DynamicDocument
 
 Changes in 0.4
