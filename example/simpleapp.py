@@ -15,7 +15,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 app = flask.Flask(__name__)
 app.config.from_object(__name__)
-app.config['MONGODB_DB'] = 'testing'
+app.config['MONGODB_SETTINGS'] = {'DB': 'testing'}
 app.config['TESTING'] = True
 app.config['SECRET_KEY'] = 'flask+mongoengine=<3'
 app.debug = True
