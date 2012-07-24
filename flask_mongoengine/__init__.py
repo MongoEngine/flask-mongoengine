@@ -24,7 +24,7 @@ class MongoEngine(object):
         _include_mongoengine(self)
 
         self.Document = Document
-        self.Document = DynamicDocument
+        self.DynamicDocument = DynamicDocument
 
         if app is not None:
             self.init_app(app)
@@ -91,6 +91,8 @@ class DynamicDocument(mongoengine.DynamicDocument):
 
     meta = {'abstract': True,
             'queryset_class': BaseQuerySet}
+
+    test = 1
 
 
 class Pagination(object):
