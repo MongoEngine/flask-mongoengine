@@ -8,6 +8,8 @@ from wtforms import widgets
 from wtforms.fields import SelectFieldBase, TextAreaField
 from wtforms.validators import ValidationError
 
+from mongoengine.queryset import DoesNotExist
+
 
 __all__ = (
     'ModelSelectField', 'QuerySetSelectField',
@@ -38,13 +40,13 @@ class QuerySetSelectField(SelectFieldBase):
         self.label_attr = label_attr
         self.allow_blank = allow_blank
         self.blank_text = blank_text
-        self.queryset = queryset or []
+        self.queryset = queryset
 
     def iter_choices(self):
         if self.allow_blank:
             yield (u'__None', self.blank_text, self.data is None)
 
-        if not self.queryset:
+        if self.queryset == None:
             return
 
         self.queryset.rewind()
@@ -57,16 +59,15 @@ class QuerySetSelectField(SelectFieldBase):
             if valuelist[0] == '__None':
                 self.data = None
             else:
-                if not self.queryset:
+                if self.queryset == None:
                     self.data = None
                     return
 
-                self.queryset.rewind()
-                for obj in self.queryset:
-                    if str(obj.id) == valuelist[0]:
-                        self.data = obj
-                        break
-                else:
+                try:
+                    # clone() because of https://github.com/MongoEngine/mongoengine/issues/56
+                    obj = self.queryset.clone().get(id=valuelist[0])
+                    self.data = obj
+                except DoesNotExist:
                     self.data = None
 
     def pre_validate(self, form):
