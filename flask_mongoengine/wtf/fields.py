@@ -2,10 +2,13 @@
 Useful form fields for use with the mongoengine.
 """
 from gettext import gettext as _
+import json
 
 from wtforms import widgets
-from wtforms.fields import SelectFieldBase
+from wtforms.fields import SelectFieldBase, TextAreaField
 from wtforms.validators import ValidationError
+
+from mongoengine.queryset import DoesNotExist
 
 
 __all__ = (
@@ -37,13 +40,13 @@ class QuerySetSelectField(SelectFieldBase):
         self.label_attr = label_attr
         self.allow_blank = allow_blank
         self.blank_text = blank_text
-        self.queryset = queryset or []
+        self.queryset = queryset
 
     def iter_choices(self):
         if self.allow_blank:
             yield (u'__None', self.blank_text, self.data is None)
 
-        if not self.queryset:
+        if self.queryset == None:
             return
 
         self.queryset.rewind()
@@ -56,16 +59,15 @@ class QuerySetSelectField(SelectFieldBase):
             if valuelist[0] == '__None':
                 self.data = None
             else:
-                if not self.queryset:
+                if self.queryset == None:
                     self.data = None
                     return
 
-                self.queryset.rewind()
-                for obj in self.queryset:
-                    if str(obj.id) == valuelist[0]:
-                        self.data = obj
-                        break
-                else:
+                try:
+                    # clone() because of https://github.com/MongoEngine/mongoengine/issues/56
+                    obj = self.queryset.clone().get(id=valuelist[0])
+                    self.data = obj
+                except DoesNotExist:
                     self.data = None
 
     def pre_validate(self, form):
@@ -114,3 +116,26 @@ class ModelSelectMultipleField(QuerySetSelectMultipleField):
     def __init__(self, label=u'', validators=None, model=None, **kwargs):
         queryset = kwargs.pop('queryset', model.objects)
         super(ModelSelectMultipleField, self).__init__(label, validators, queryset=queryset, **kwargs)
+
+
+
+class JSONField(TextAreaField):
+    def _value(self):
+        if self.raw_data:
+            return self.raw_data[0]
+        else:
+            return self.data and unicode(json.dumps(self.data)) or u''
+
+    def process_formdata(self, value):
+        if value:
+            try:
+                self.data = json.loads(value[0])
+            except ValueError:
+                raise ValueError(self.gettext(u'Invalid JSON data.'))
+
+
+class DictField(JSONField):
+    def process_formdata(self, value):
+        super(DictField, self).process_formdata(value)
+        if value and not isinstance(self.data, dict):
+            raise ValueError(self.gettext(u'Not a valid dictionary.'))
