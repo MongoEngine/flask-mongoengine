@@ -5,7 +5,7 @@ from operator import itemgetter
 from wtforms import fields as f, validators
 from mongoengine import ReferenceField
 
-from flask.ext.mongoengine.wtf.fields import ModelSelectField, ModelSelectMultipleField
+from flask.ext.mongoengine.wtf.fields import ModelSelectField, ModelSelectMultipleField, DictField
 from flask.ext.mongoengine.wtf.models import ModelForm
 
 __all__ = (
@@ -18,6 +18,7 @@ def converts(*args):
         func._converter_for = frozenset(args)
         return func
     return _inner
+
 
 
 class ModelConverter():
@@ -134,7 +135,7 @@ class ModelConverter():
 
     @converts('DictField')
     def conv_Dict(self, model, field, kwargs):
-        return f.TextAreaField(**kwargs)
+        return DictField(**kwargs)
 
     @converts('ListField')
     def conv_List(self, model, field, kwargs):
