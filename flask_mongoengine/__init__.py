@@ -46,6 +46,10 @@ class MongoEngine(object):
 
         self.connection = mongoengine.connect(**conn_settings)
 
+        app.extensions = getattr(app, 'extensions', {})
+        app.extensions['mongoengine'] = self
+        self.app = app
+
 
 class BaseQuerySet(QuerySet):
     """
