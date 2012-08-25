@@ -4,6 +4,8 @@ Changelog
 
 Changes in 0.5
 ==============
+- Support for JSON and DictFields
+- Speeding up QuerySetSelectField with big querysets
 - Added support for all connection settings
 - Fixed extended DynamicDocument
 
