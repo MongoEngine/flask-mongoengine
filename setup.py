@@ -22,7 +22,7 @@ except:
 
 setup(
     name='flask-mongoengine',
-    version='0.5',
+    version='0.6',
     url='https://github.com/mongoengine/flask-mongoengine',
     license='BSD',
     author='Ross Lawley',
