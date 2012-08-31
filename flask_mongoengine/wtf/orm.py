@@ -5,7 +5,7 @@ from operator import itemgetter
 from wtforms import fields as f, validators
 from mongoengine import ReferenceField
 
-from flask.ext.mongoengine.wtf.fields import ModelSelectField, ModelSelectMultipleField, DictField
+from flask.ext.mongoengine.wtf.fields import ModelSelectField, ModelSelectMultipleField, DictField, NoneStringField
 from flask.ext.mongoengine.wtf.models import ModelForm
 
 __all__ = (
@@ -101,7 +101,7 @@ class ModelConverter():
     def conv_Email(self, model, field, kwargs):
         kwargs['validators'].append(validators.Email())
         self._string_common(model, field, kwargs)
-        return f.StringField(**kwargs)
+        return NoneStringField(**kwargs)
 
     @converts('IntField')
     def conv_Int(self, model, field, kwargs):
