@@ -140,8 +140,6 @@ class ModelConverter():
     @converts('ListField')
     def conv_List(self, model, field, kwargs):
         if isinstance(field.field, ReferenceField):
-            if not field.required:
-                kwargs['allow_blank'] = True
             return ModelSelectMultipleField(model=field.field.document_type, **kwargs)
         if field.field.choices:
             kwargs['multiple'] = True
@@ -178,8 +176,6 @@ class ModelConverter():
 
     @converts('ReferenceField')
     def conv_Reference(self, model, field, kwargs):
-        if not field.required:
-            kwargs['allow_blank'] = True
         return ModelSelectField(model=field.document_type, **kwargs)
 
     @converts('GenericReferenceField')
