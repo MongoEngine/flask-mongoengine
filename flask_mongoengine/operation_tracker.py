@@ -47,12 +47,13 @@ def _unpack_response(response, *args, **kwargs):
 # Wrap Cursor.insert for getting queries
 @functools.wraps(_original_methods['insert'])
 def _insert(collection_self, doc_or_docs, manipulate=True,
-           safe=False, **kwargs):
+           safe=False, check_keys=True, **kwargs):
     start_time = time.time()
     result = _original_methods['insert'](
         collection_self,
         doc_or_docs,
         safe=safe,
+        check_keys=check_keys,
         **kwargs
     )
     total_time = (time.time() - start_time) * 1000
