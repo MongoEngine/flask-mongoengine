@@ -141,7 +141,7 @@ class DictField(JSONField):
             raise ValueError(self.gettext(u'Not a valid dictionary.'))
 
 
-# MongoEngine validates '' as an invalid email. Therefor the standard StringField which returns '' if it is passed None won't work.
+# MongoEngine validates '' as an invalid email. Therefore the standard StringField which returns '' if it is passed None won't work.
 class NoneStringField(Field):
     """
     This field is the base for most of the more complicated fields, and
