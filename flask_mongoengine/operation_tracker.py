@@ -146,8 +146,6 @@ def _cursor_refresh(cursor_self):
 
     query_son = privar('query_spec')()
     if not isinstance(query_son, SON):
-        if not query_son:
-            return result
 
         if "$query" not in query_son:
             query_son = {"$query": query_son}
