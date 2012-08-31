@@ -88,20 +88,20 @@ class ModelConverter():
             if kwargs.pop('password'):
                 return f.PasswordField(**kwargs)
         if field.max_length:
-            return f.TextField(**kwargs)
+            return f.StringField(**kwargs)
         return f.TextAreaField(**kwargs)
 
     @converts('URLField')
     def conv_URL(self, model, field, kwargs):
         kwargs['validators'].append(validators.URL())
         self._string_common(model, field, kwargs)
-        return f.TextField(**kwargs)
+        return f.StringField(**kwargs)
 
     @converts('EmailField')
     def conv_Email(self, model, field, kwargs):
         kwargs['validators'].append(validators.Email())
         self._string_common(model, field, kwargs)
-        return f.TextField(**kwargs)
+        return f.StringField(**kwargs)
 
     @converts('IntField')
     def conv_Int(self, model, field, kwargs):
