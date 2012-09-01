@@ -6,6 +6,7 @@ import flask
 
 from flask.ext.mongoengine import MongoEngine
 from flask.ext.mongoengine.wtf import model_form
+from werkzeug.datastructures import MultiDict
 
 from mongoengine import queryset_manager
 import wtforms
@@ -122,6 +123,7 @@ class WTFormsAppTestCase(unittest.TestCase):
                 tags = db.ListField(db.StringField(max_length=50))
 
             class TextPost(BlogPost):
+                email = db.EmailField(required=False)
                 content = db.StringField(required=True)
 
             class LinkPost(BlogPost):
@@ -145,7 +147,17 @@ class WTFormsAppTestCase(unittest.TestCase):
             self.assertTrue(form.validate())
             form.save()
 
+            self.assertEquals(BlogPost.objects.first().title, 'Using MongoEngine')
             self.assertEquals(BlogPost.objects.count(), 1)
+
+            form = TextPostForm(MultiDict({
+                'title': 'Using MongoEngine',
+                'content': 'See the tutorial',
+                'tags': ['mongodb', 'mongoengine']}))
+
+            self.assertTrue(form.validate())
+            form.save()
+            self.assertEquals(BlogPost.objects.count(), 2)
 
 
     def test_model_form_with_custom_query_set(self):
