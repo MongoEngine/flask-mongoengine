@@ -5,7 +5,7 @@ from gettext import gettext as _
 import json
 
 from wtforms import widgets
-from wtforms.fields import SelectFieldBase, TextAreaField
+from wtforms.fields import SelectFieldBase, TextAreaField, Field
 from wtforms.validators import ValidationError
 
 from mongoengine.queryset import DoesNotExist
@@ -139,3 +139,24 @@ class DictField(JSONField):
         super(DictField, self).process_formdata(value)
         if value and not isinstance(self.data, dict):
             raise ValueError(self.gettext(u'Not a valid dictionary.'))
+
+
+# MongoEngine validates '' as an invalid email. Therefore the standard StringField which returns '' if it is passed None won't work.
+class NoneStringField(Field):
+    """
+    This field is the base for most of the more complicated fields, and
+    represents an ``<input type="text">``.
+    """
+    widget = widgets.TextInput()
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = valuelist[0]
+        else:
+            self.data = None
+
+    def _value(self):
+        return text_type(self.data) if self.data else None
+
+
+
