@@ -145,10 +145,11 @@ class ModelConverter():
             kwargs['multiple'] = True
             return self.convert(model, field.field, kwargs)
         unbound_field = self.convert(model, field.field, {})
-        kwargs = {
+        unacceptable = {
             'validators': [],
             'filters': [],
         }
+        kwargs.update(unacceptable)
         return f.FieldList(unbound_field, min_entries=0, **kwargs)
 
     @converts('SortedListField')
