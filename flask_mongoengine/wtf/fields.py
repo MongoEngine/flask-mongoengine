@@ -159,5 +159,3 @@ class NoneStringField(Field):
     def _value(self):
         return six.text_type(self.data) if self.data else None
 
-
-
