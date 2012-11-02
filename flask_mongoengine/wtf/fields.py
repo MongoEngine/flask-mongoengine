@@ -10,6 +10,7 @@ from wtforms.validators import ValidationError
 
 from mongoengine.queryset import DoesNotExist
 
+import six
 
 __all__ = (
     'ModelSelectField', 'QuerySetSelectField',
@@ -156,4 +157,5 @@ class NoneStringField(Field):
             self.data = None
 
     def _value(self):
-        return text_type(self.data) if self.data else None
+        return six.text_type(self.data) if self.data else None
+
