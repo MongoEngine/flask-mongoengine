@@ -65,7 +65,7 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
         'safe': safe,
         'time': total_time,
         'stack_trace': stack_trace,
-        'size': response_sizes[-1],
+        'size': response_sizes[-1] if response_sizes else 0,
         'internal': internal
     })
     return result
@@ -96,7 +96,7 @@ def _update(collection_self, spec, document, upsert=False,
         'safe': safe,
         'time': total_time,
         'stack_trace': stack_trace,
-        'size': response_sizes[-1],
+        'size': response_sizes[-1] if response_sizes else 0,
         'internal': internal
     })
     return result
