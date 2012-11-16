@@ -44,7 +44,7 @@ class ModelForm(Form):
                                         kwargs.get('obj', None)
         super(ModelForm, self).__init__(*args, **kwargs)
 
-    def save(self, commit=True):
+    def save(self, commit=True, **kwargs):
         if self.instance:
             update = {}
             for name, field in self._fields.iteritems():
@@ -61,5 +61,5 @@ class ModelForm(Form):
         else:
             self.instance = self.model_class(**self.data)
             if commit:
-                self.instance.save()
+                self.instance.save(**kwargs)
         return self.instance
