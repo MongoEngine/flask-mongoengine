@@ -122,9 +122,7 @@ class ModelSelectMultipleField(QuerySetSelectMultipleField):
     """
     def __init__(self, label=u'', validators=None, model=None, **kwargs):
         queryset = kwargs.pop('queryset', model.objects)
-        print 'qs', queryset
         super(ModelSelectMultipleField, self).__init__(label, validators, queryset=queryset, **kwargs)
-
 
 
 class JSONField(TextAreaField):
