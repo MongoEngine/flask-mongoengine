@@ -32,7 +32,7 @@ class MongoEngine(object):
     def init_app(self, app):
 
         conn_settings = app.config.get('MONGODB_SETTINGS', None)
-        
+
         if not conn_settings:
             conn_settings = {
                 'db': app.config.get('MONGODB_DB', None),
@@ -43,6 +43,10 @@ class MongoEngine(object):
             }
 
         conn_settings = dict([(k.lower(), v) for k, v in conn_settings.items() if v])
+
+        if 'replicaset' in conn_settings:
+            conn_settings['replicaSet'] = conn_settings['replicaset']
+            del conn_settings['replicaset']
 
         self.connection = mongoengine.connect(**conn_settings)
 
