@@ -1,8 +1,10 @@
 Flask-MongoEngine
 =================
 
-A Flask extension that provides integration with `MongoEngine <http://mongoengine.org/>`_. It handles connection management for your app.
+A Flask extension that provides integration with `MongoEngine <http://mongoengine.org/>`_. 
+For more information on MongoEngine please check out the `MongoEngine Documentation <http://docs.mongoengine.org/>`_.
 
+It handles connection management for your app.
 You can also use `WTForms <http://wtforms.simplecodes.com/>`_ as model forms for your models.
 
 Installing Flask-MongoEngine
