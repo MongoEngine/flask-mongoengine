@@ -20,10 +20,8 @@ def converts(*args):
     return _inner
 
 
-
-class ModelConverter():
+class ModelConverter(object):
     def __init__(self, converters=None):
-
         if not converters:
             converters = {}
 

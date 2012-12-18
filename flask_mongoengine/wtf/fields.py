@@ -53,7 +53,7 @@ class QuerySetSelectField(SelectFieldBase):
         self.queryset.rewind()
         for obj in self.queryset:
             label = self.label_attr and getattr(obj, self.label_attr) or obj
-            yield (obj.id, label, obj == self.data)
+            yield (obj.id, label, self._is_selected(obj))
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -75,6 +75,9 @@ class QuerySetSelectField(SelectFieldBase):
         if not self.allow_blank or self.data is not None:
             if not self.data:
                 raise ValidationError(_(u'Not a valid choice'))
+
+    def _is_selected(self, item):
+        return item == self.data
 
 
 class QuerySetSelectMultipleField(QuerySetSelectField):
@@ -99,6 +102,9 @@ class QuerySetSelectMultipleField(QuerySetSelectField):
                 if not len(self.data):
                     self.data = None
 
+    def _is_selected(self, item):
+        return item in self.data
+
 
 class ModelSelectField(QuerySetSelectField):
     """
@@ -117,7 +123,6 @@ class ModelSelectMultipleField(QuerySetSelectMultipleField):
     def __init__(self, label=u'', validators=None, model=None, **kwargs):
         queryset = kwargs.pop('queryset', model.objects)
         super(ModelSelectMultipleField, self).__init__(label, validators, queryset=queryset, **kwargs)
-
 
 
 class JSONField(TextAreaField):

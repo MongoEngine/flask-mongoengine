@@ -230,6 +230,12 @@ class WTFormsAppTestCase(unittest.TestCase):
             self.assertEqual(wtforms.widgets.Select, type(form.dogs.widget))
             self.assertEqual(True, form.dogs.widget.multiple)
 
+            # Validate if both dogs are selected
+            choices = list(form.dogs)
+            self.assertEqual(len(choices), 2)
+            self.assertTrue(choices[0].checked)
+            self.assertTrue(choices[1].checked)
+
     def test_passwordfield(self):
         with self.app.test_request_context('/'):
             db = self.db
