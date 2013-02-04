@@ -27,8 +27,11 @@ Basic setup is easy, just fetch the extension::
     db = MongoEngine(app)
 
 
-To configure the MongoDB connection settings set a in a dictionary of
-`'MONGODB_SETTINGS'` in the `app.config`.
+To configure the MongoDB connection settings set a key (DB, USERNAME, PASSWORD, HOST, PORT) in the
+`'MONGODB_SETTINGS'` dictionary wih `àpp.config`. For example :
+
+    app.config["MONGODB_SETTINGS"] = {"DB": "my_tumble_log"}
+
 
 
 Custom Queryset
