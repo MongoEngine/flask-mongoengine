@@ -170,6 +170,7 @@ class ModelConverter():
         kwargs = {
             'validators': [],
             'filters': [],
+			'default': field.default or field.document_type_obj,
         }
         form_class = model_form(field.document_type_obj, field_args={})
         return f.FormField(form_class, **kwargs)
