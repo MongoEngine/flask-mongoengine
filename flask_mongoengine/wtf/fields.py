@@ -85,6 +85,18 @@ class QuerySetSelectMultipleField(QuerySetSelectField):
                   allow_blank=False, blank_text=u'---', **kwargs):
         super(QuerySetSelectMultipleField, self).__init__(label, validators, queryset, label_attr, allow_blank, blank_text, **kwargs)
 
+    def iter_choices(self):
+        if self.allow_blank:
+            yield (u'__None', self.blank_text, self.data is None)
+
+        if self.queryset == None:
+            return
+
+        self.queryset.rewind()
+        for obj in self.queryset:
+            label = self.label_attr and getattr(obj, self.label_attr) or obj
+            yield (obj.id, label, obj in self.data)
+
     def process_formdata(self, valuelist):
         if valuelist:
             if valuelist[0] == '__None':
