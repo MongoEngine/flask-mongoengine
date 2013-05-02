@@ -4,6 +4,7 @@ Changelog
 
 Changes in 0.7
 ==============
+- Keep model_forms fields in order of creation
 - Added MongoEngineSessionInterface (#5)
 - Added customisation hooks for FieldList sub fields (#19)
 - Handle non ascii chars in the MongoDebugPanel (#22)
