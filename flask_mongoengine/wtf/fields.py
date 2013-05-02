@@ -55,7 +55,7 @@ class QuerySetSelectField(SelectFieldBase):
             if isinstance(self.data, list):
                 selected = obj in self.data
             else:
-                selected = obj == self.data
+                selected = self._is_selected(obj)
             yield (obj.id, label, selected)
 
     def process_formdata(self, valuelist):
@@ -79,6 +79,9 @@ class QuerySetSelectField(SelectFieldBase):
             if not self.data:
                 raise ValidationError(_(u'Not a valid choice'))
 
+    def _is_selected(self, item):
+        return item == self.data
+
 
 class QuerySetSelectMultipleField(QuerySetSelectField):
 
@@ -101,6 +104,9 @@ class QuerySetSelectMultipleField(QuerySetSelectField):
                 self.data = [obj for obj in self.queryset if str(obj.id) in valuelist]
                 if not len(self.data):
                     self.data = None
+
+    def _is_selected(self, item):
+        return item in self.data
 
 
 class ModelSelectField(QuerySetSelectField):
@@ -144,7 +150,8 @@ class DictField(JSONField):
             raise ValueError(self.gettext(u'Not a valid dictionary.'))
 
 
-# MongoEngine validates '' as an invalid email. Therefore the standard StringField which returns '' if it is passed None won't work.
+# MongoEngine validates '' as an invalid email.
+# Therefore the standard StringField which returns '' if it is passed None won't work.
 class NoneStringField(Field):
     """
     This field is the base for most of the more complicated fields, and

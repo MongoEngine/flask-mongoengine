@@ -4,6 +4,8 @@ Changelog
 
 Changes in 0.7
 ==============
+- Clarified configuration documentation (#33)
+- Fixed forms when EmbeddedDocument has no default (#36)
 - Fixed multiselect restore bug (#37)
 - Split out the examples into a single file app and a cross file app
 
