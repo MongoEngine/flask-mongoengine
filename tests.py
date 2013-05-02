@@ -3,6 +3,7 @@ from __future__ import with_statement
 import unittest
 import datetime
 import flask
+from bson import ObjectId
 
 from flask.ext.mongoengine import MongoEngine
 from flask.ext.mongoengine.wtf import model_form
@@ -160,7 +161,6 @@ class WTFormsAppTestCase(unittest.TestCase):
             form.save()
             self.assertEquals(BlogPost.objects.count(), 2)
 
-
     def test_model_form_with_custom_query_set(self):
         with self.app.test_request_context('/'):
             db = self.db
@@ -170,7 +170,7 @@ class WTFormsAppTestCase(unittest.TestCase):
 
                 @queryset_manager
                 def large_objects(cls, queryset):
-                    return queryset(breed__in = ['german sheppard', 'wolfhound'])
+                    return queryset(breed__in=['german sheppard', 'wolfhound'])
 
             class DogOwner(db.Document):
                 dog = db.ReferenceField(Dog)
@@ -180,12 +180,11 @@ class WTFormsAppTestCase(unittest.TestCase):
             for dog in dogs:
                 dog.save()
 
-            BigDogForm = model_form(DogOwner, field_args={'dog': {'queryset' : Dog.large_objects} })
+            BigDogForm = model_form(DogOwner, field_args={'dog': {'queryset': Dog.large_objects}})
 
             form = BigDogForm(dog=big_dogs[0])
             self.assertTrue(form.validate())
-            self.assertEqual( big_dogs, [d[1] for d in form.dog.iter_choices()] )
-
+            self.assertEqual(big_dogs, [d[1] for d in form.dog.iter_choices()])
 
     def test_modelselectfield(self):
         with self.app.test_request_context('/'):
@@ -207,7 +206,6 @@ class WTFormsAppTestCase(unittest.TestCase):
 
             self.assertEqual(wtforms.widgets.Select, type(form.dog.widget))
             self.assertEqual(False, form.dog.widget.multiple)
-
 
     def test_modelselectfield_multiple(self):
         with self.app.test_request_context('/'):
@@ -244,10 +242,31 @@ class WTFormsAppTestCase(unittest.TestCase):
             class User(db.Document):
                 password = db.StringField()
 
-            UserForm = model_form(User, field_args = { 'password': {'password' : True} })
+            UserForm = model_form(User, field_args={'password': {'password': True}})
             form = UserForm(password='12345')
             self.assertEqual(wtforms.widgets.PasswordInput, type(form.password.widget))
 
+    def test_unique_with(self):
+
+        with self.app.test_request_context('/'):
+            db = self.db
+
+            class Item (db.Document):
+                owner_id = db.ObjectIdField(required=True)
+                owner_item_id = db.StringField(required=True, unique_with='owner_id')
+
+            Item.drop_collection()
+
+            object_id = ObjectId()
+            Item(object_id, owner_item_id="1").save()
+
+            try:
+                Item(object_id, owner_item_id="1").save()
+                self.fail("Should have raised duplicate key error")
+            except:
+                pass
+
+            self.assertEqual(1, Item.objects.count())
 
 if __name__ == '__main__':
     unittest.main()
