@@ -4,6 +4,7 @@ Changelog
 
 Changes in 0.7
 ==============
+- No longer wipe field kwargs in ListField (#20, #19)
 - Passthrough ModelField.save-arguments (#26)
 - QuerySetSelectMultipleField now supports initial value (#27)
 - Clarified configuration documentation (#33)
