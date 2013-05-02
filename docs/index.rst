@@ -141,6 +141,18 @@ Not currently supported field types:
 * GeoLocationField
 * GenericReferenceField
 
+Session Interface
+=================
+
+To use MongoEngine as your session store simple configure the session interface::
+
+    from flask.ext.mongoengine import MongoEngine, MongoEngineSessionInterface
+
+    app = Flask(__name__)
+    db = MongoEngine(app)
+    app.session_interface = MongoEngineSessionInterface(db)
+
+
 Debug Toolbar Panel
 ===================
 
@@ -150,6 +162,8 @@ Debug Toolbar Panel
 If you use the Flask-DebugToolbar you can add
 `'flask.ext.mongoengine.panels.MongoDebugPanel'` to the `DEBUG_TB_PANELS` config
 list and then it will automatically track your queries.
+
+
 
 
 Credits
