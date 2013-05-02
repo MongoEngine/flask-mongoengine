@@ -294,6 +294,6 @@ def _tidy_stacktrace():
         if not text:
             text = ''
         else:
-            text = (''.join(text)).strip()
+            text = unicode(''.join(text).strip(), errors="ignore")
         trace.append((path, line_no, func_name, text, hidden))
     return trace, internal

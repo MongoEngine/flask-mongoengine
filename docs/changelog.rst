@@ -4,6 +4,7 @@ Changelog
 
 Changes in 0.7
 ==============
+- Handle non ascii chars in the MongoDebugPanel (#22)
 - Fixed toolbar stacktrace if a html directory is in the path (#31)
 - ModelForms no longer patch Document.update (#32)
 - No longer wipe field kwargs in ListField (#20, #19)
