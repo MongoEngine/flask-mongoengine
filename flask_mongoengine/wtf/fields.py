@@ -52,7 +52,11 @@ class QuerySetSelectField(SelectFieldBase):
         self.queryset.rewind()
         for obj in self.queryset:
             label = self.label_attr and getattr(obj, self.label_attr) or obj
-            yield (obj.id, label, obj == self.data)
+            if isinstance(self.data, list):
+                selected = obj in self.data
+            else:
+                selected = obj == self.data
+            yield (obj.id, label, selected)
 
     def process_formdata(self, valuelist):
         if valuelist:
