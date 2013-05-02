@@ -261,7 +261,7 @@ def _tidy_stacktrace():
     for i in xrange(100):
         try:
             fname = sys._getframe(i).f_code.co_filename
-            if 'html' in fname:
+            if '.html' in fname:
                 fnames.append(fname)
         except:
             break

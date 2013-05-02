@@ -4,6 +4,7 @@ Changelog
 
 Changes in 0.7
 ==============
+- Fixed toolbar stacktrace if a html directory is in the path (#31)
 - ModelForms no longer patch Document.update (#32)
 - No longer wipe field kwargs in ListField (#20, #19)
 - Passthrough ModelField.save-arguments (#26)
