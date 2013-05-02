@@ -1,7 +1,7 @@
 Flask-MongoEngine
 =================
 
-A Flask extension that provides integration with `MongoEngine <http://mongoengine.org/>`_. 
+A Flask extension that provides integration with `MongoEngine <http://mongoengine.org/>`_.
 For more information on MongoEngine please check out the `MongoEngine Documentation <http://docs.mongoengine.org/>`_.
 
 It handles connection management for your app.
@@ -28,7 +28,7 @@ Basic setup is easy, just fetch the extension::
 
 
 To configure the MongoDB connection settings set a key (DB, USERNAME, PASSWORD, HOST, PORT) in the
-`'MONGODB_SETTINGS'` dictionary wih `àpp.config`. For example :
+`'MONGODB_SETTINGS'` dictionary wih `app.config`. For example :
 
     app.config["MONGODB_SETTINGS"] = {"DB": "my_tumble_log"}
 
