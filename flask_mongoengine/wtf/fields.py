@@ -9,8 +9,7 @@ from wtforms.fields import SelectFieldBase, TextAreaField, Field
 from wtforms.validators import ValidationError
 
 from mongoengine.queryset import DoesNotExist
-
-import six
+from mongoengine.python_support import txt_type
 
 __all__ = (
     'ModelSelectField', 'QuerySetSelectField',
@@ -119,7 +118,6 @@ class ModelSelectMultipleField(QuerySetSelectMultipleField):
         super(ModelSelectMultipleField, self).__init__(label, validators, queryset=queryset, **kwargs)
 
 
-
 class JSONField(TextAreaField):
     def _value(self):
         if self.raw_data:
@@ -157,5 +155,4 @@ class NoneStringField(Field):
             self.data = None
 
     def _value(self):
-        return six.text_type(self.data) if self.data else None
-
+        return txt_type(self.data) if self.data else None

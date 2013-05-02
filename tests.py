@@ -97,6 +97,7 @@ class BasicAppTestCase(unittest.TestCase):
             todo.save()
             self.assertEqual(self.Todo.objects.count(), 1)
 
+
 class WTFormsAppTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -118,6 +119,7 @@ class WTFormsAppTestCase(unittest.TestCase):
             db = self.db
 
             class BlogPost(db.Document):
+                meta = {'allow_inheritance': True}
                 title = db.StringField(required=True, max_length=200)
                 posted = db.DateTimeField(default=datetime.datetime.now)
                 tags = db.ListField(db.StringField(max_length=50))
@@ -128,7 +130,6 @@ class WTFormsAppTestCase(unittest.TestCase):
 
             class LinkPost(BlogPost):
                 url = db.StringField(required=True)
-
 
             # Create a text-based post
             TextPostForm = model_form(TextPost)

@@ -2,9 +2,26 @@
 language: python
 services: mongodb
 python:
-    - 2.6
-    - 2.7
+    - "2.6"
+    - "2.7"
+env:
+  - PYMONGO=dev MONGOENGINE=dev
+  - PYMONGO=dev MONGOENGINE=0.7.10
+  - PYMONGO=dev MONGOENGINE=0.8.0RC2
+  - PYMONGO=2.5 MONGOENGINE=dev
+  - PYMONGO=2.5 MONGOENGINE=0.7.10
+  - PYMONGO=2.5 MONGOENGINE=0.8.0RC2
 install:
+    - if [[ $PYMONGO == 'dev' ]]; then pip install https://github.com/mongodb/mongo-python-driver/tarball/master; true; fi
+    - if [[ $PYMONGO != 'dev' ]]; then pip install pymongo==$PYMONGO --use-mirrors; true; fi
+    - if [[ $MONGOENGINE == 'dev' ]]; then pip install https://github.com/mongoengine/mongoengine/tarball/master; true; fi
+    - if [[ $MONGOENGINE != 'dev' ]]; then pip install mongoengine==$MONGOENGINE --use-mirrors; true; fi
     - python setup.py install
 script:
     - python setup.py nosetests
+notifications:
+  irc: "irc.freenode.org#mongoengine"
+branches:
+  only:
+    - master
+    - dev

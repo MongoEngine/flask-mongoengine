@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Changes in 0.7
+==============
+- Split out the examples into a single file app and a cross file app
+
 Changes in 0.6
 ==============
 - Support for JSON and DictFields

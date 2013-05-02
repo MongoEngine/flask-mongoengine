@@ -10,6 +10,7 @@ from mongoengine.base import ValidationError
 
 from flask import abort
 
+
 def _include_mongoengine(obj):
     for module in mongoengine, mongoengine.fields:
         for key in module.__all__:
@@ -79,12 +80,12 @@ class BaseQuerySet(QuerySet):
         return Pagination(self, page, per_page)
 
     def paginate_field(self, field_name, doc_id, page, per_page,
-            total=None):
+                       total=None):
         item = self.get(id=doc_id)
         count = getattr(item, field_name + "_count", '')
         total = total or count or len(getattr(item, field_name))
         return ListFieldPagination(self, field_name, doc_id, page, per_page,
-            total=total)
+                                   total=total)
 
 
 class Document(mongoengine.Document):
@@ -99,8 +100,6 @@ class DynamicDocument(mongoengine.DynamicDocument):
 
     meta = {'abstract': True,
             'queryset_class': BaseQuerySet}
-
-    test = 1
 
 
 class Pagination(object):
@@ -131,8 +130,8 @@ class Pagination(object):
 
     def prev(self, error_out=False):
         """Returns a :class:`Pagination` object for the previous page."""
-        assert self.iterable is not None, 'an object is required ' \
-                                       'for this method to work'
+        assert self.iterable is not None, ('an object is required '
+                                           'for this method to work')
         iterable = self.iterable
         if isinstance(iterable, QuerySet):
             iterable._skip = None
@@ -152,8 +151,8 @@ class Pagination(object):
 
     def next(self, error_out=False):
         """Returns a :class:`Pagination` object for the next page."""
-        assert self.iterable is not None, 'an object is required ' \
-                                       'for this method to work'
+        assert self.iterable is not None, ('an object is required '
+                                           'for this method to work')
         iterable = self.iterable
         if isinstance(iterable, QuerySet):
             iterable._skip = None
@@ -235,8 +234,7 @@ class ListFieldPagination(Pagination):
 
         field_attrs = {field_name: {"$slice": [start_index, per_page]}}
 
-        self.items = getattr(queryset().fields(**field_attrs
-            ).first(), field_name)
+        self.items = getattr(queryset().fields(**field_attrs).first(), field_name)
 
         self.total = total or len(self.items)
 
@@ -245,14 +243,14 @@ class ListFieldPagination(Pagination):
 
     def prev(self, error_out=False):
         """Returns a :class:`Pagination` object for the previous page."""
-        assert self.items is not None, 'a query object is required ' \
-                                       'for this method to work'
+        assert self.items is not None, ('a query object is required '
+                                        'for this method to work')
         return self.__class__(self.queryset, self.doc_id, self.field_name,
-            self.page - 1, self.per_page, self.total)
+                              self.page - 1, self.per_page, self.total)
 
     def next(self, error_out=False):
         """Returns a :class:`Pagination` object for the next page."""
-        assert self.iterable is not None, 'a query object is required ' \
-                                       'for this method to work'
+        assert self.iterable is not None, ('a query object is required '
+                                           'for this method to work')
         return self.__class__(self.queryset, self.doc_id, self.field_name,
-            self.page + 1, self.per_page, self.total)
+                              self.page + 1, self.per_page, self.total)

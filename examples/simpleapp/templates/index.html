@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% for todo in todos %}
+    <div>
+      <h2>{{ todo.title }}</h2>
+      {{ todo.text|safe }}
+    </div>
+  {% else %}
+    <em>Unbelievable.  No todos here so far <a href="/add">Add one</a></em>
+  {% endfor %}
+{% endblock %}

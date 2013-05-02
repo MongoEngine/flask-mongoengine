@@ -36,7 +36,6 @@ setup(
         'Flask>=0.8',
         'mongoengine',
         'flask-wtf',
-        'six'
     ],
     packages=['flask_mongoengine',
               'flask_mongoengine.wtf'],
