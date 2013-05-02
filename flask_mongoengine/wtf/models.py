@@ -3,6 +3,7 @@ from flask.ext.wtf import Form
 
 class ModelForm(Form):
     """A WTForms mongoengine model form"""
+
     def __init__(self, formdata=None, obj=None, prefix='', **kwargs):
         self.instance = (kwargs.pop('instance', None) or kwargs.get('obj', None))
         if self.instance and not formdata:

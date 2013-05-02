@@ -284,5 +284,26 @@ class WTFormsAppTestCase(unittest.TestCase):
 
             self.assertEqual(1, Item.objects.count())
 
+    def test_sub_field_args(self):
+        with self.app.test_request_context('/'):
+            db = self.db
+
+            class TestModel(db.Document):
+                lst = db.ListField(db.StringField())
+
+            field_args = {'lst': {'label': 'Custom Label',
+                                  'sub_field_args': {'widget': wtforms.widgets.HiddenInput(),
+                                                     'label': "Hidden Input"}}}
+            CustomForm = model_form(TestModel, field_args=field_args)
+
+            custom_form = CustomForm(obj=TestModel(lst=["Foo"]))
+            list_label = flask.render_template_string("{{ custom_form.lst.label }}", custom_form=custom_form)
+            self.assertTrue("Custom Label" in list_label)
+            self.assertTrue("Hidden Input" not in list_label)
+
+            sub_label = flask.render_template_string("{{ custom_form.lst }}", custom_form=custom_form)
+            self.assertTrue("Hidden Input" in sub_label)
+
+
 if __name__ == '__main__':
     unittest.main()

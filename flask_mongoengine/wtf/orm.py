@@ -141,8 +141,9 @@ class ModelConverter(object):
             return ModelSelectMultipleField(model=field.field.document_type, **kwargs)
         if field.field.choices:
             kwargs['multiple'] = True
-            return self.convert(model, field.field, kwargs)
-        unbound_field = self.convert(model, field.field, {})
+            return self.convert(model, field.field, **kwargs)
+        sub_field_args = kwargs.pop("sub_field_args", {})
+        unbound_field = self.convert(model, field.field, sub_field_args)
         unacceptable = {
             'validators': [],
             'filters': [],

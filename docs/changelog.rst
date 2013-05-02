@@ -4,6 +4,7 @@ Changelog
 
 Changes in 0.7
 ==============
+- Added customisation hooks for FieldList sub fields (#19)
 - Handle non ascii chars in the MongoDebugPanel (#22)
 - Fixed toolbar stacktrace if a html directory is in the path (#31)
 - ModelForms no longer patch Document.update (#32)
