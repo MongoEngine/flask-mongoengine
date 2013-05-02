@@ -1,3 +1,4 @@
+The PRIMARY AUTHORS are (and/or have been):
 
 Ross Lawley <ross.lawley@gmail.com>
 Jorge Bastida <me@jorgebastida.com>
@@ -8,3 +9,12 @@ atroche - https://github.com/atroche
 Rodrigue Cloutier
 Thomas Steinacher
 Anthony Nemitz
+
+
+CONTRIBUTORS
+
+Dervived from the git logs, inevitably incomplete but all of whom and others
+have submitted patches, reported bugs and generally helped make MongoEngine
+that much better:
+
+* Dragos - https://github.com/cdragos

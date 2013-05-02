@@ -4,6 +4,7 @@ Changelog
 
 Changes in 0.7
 ==============
+- Fixed multiselect restore bug (#37)
 - Split out the examples into a single file app and a cross file app
 
 Changes in 0.6
