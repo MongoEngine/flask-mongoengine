@@ -3,14 +3,14 @@ from __future__ import with_statement
 import unittest
 import datetime
 import flask
-from bson import ObjectId
+import wtforms
 
+from bson import ObjectId
+from werkzeug.datastructures import MultiDict
 from flask.ext.mongoengine import MongoEngine
 from flask.ext.mongoengine.wtf import model_form
-from werkzeug.datastructures import MultiDict
 
 from mongoengine import queryset_manager
-import wtforms
 
 
 def make_todo_model(db):
@@ -123,7 +123,7 @@ class WTFormsAppTestCase(unittest.TestCase):
                 meta = {'allow_inheritance': True}
                 title = db.StringField(required=True, max_length=200)
                 posted = db.DateTimeField(default=datetime.datetime.now)
-                tags = db.ListField(db.StringField(max_length=50))
+                tags = db.ListField(db.StringField())
 
             class TextPost(BlogPost):
                 email = db.EmailField(required=False)
@@ -152,14 +152,30 @@ class WTFormsAppTestCase(unittest.TestCase):
             self.assertEquals(BlogPost.objects.first().title, 'Using MongoEngine')
             self.assertEquals(BlogPost.objects.count(), 1)
 
-            form = TextPostForm(MultiDict({
-                'title': 'Using MongoEngine',
+            form = TextPostForm(**{
+                'title': 'Using Flask-MongoEngine',
                 'content': 'See the tutorial',
-                'tags': ['mongodb', 'mongoengine']}))
+                'tags': ['flask', 'mongodb', 'mongoengine']})
 
             self.assertTrue(form.validate())
             form.save()
             self.assertEquals(BlogPost.objects.count(), 2)
+
+            post = BlogPost.objects(title="Using Flask-MongoEngine").get()
+
+            form = TextPostForm(MultiDict({
+                'title': 'Using Flask-MongoEngine',
+                'content': 'See the tutorial',
+                'tags-0': 'flask',
+                'tags-1': 'mongodb',
+                'tags-2': 'mongoengine',
+                'tags-3': 'flask-mongoengine',
+            }), instance=post)
+            self.assertTrue(form.validate())
+            form.save()
+            post = post.reload()
+
+            self.assertEqual(post.tags, ['flask', 'mongodb', 'mongoengine', 'flask-mongoengine'])
 
     def test_model_form_with_custom_query_set(self):
         with self.app.test_request_context('/'):
