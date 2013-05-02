@@ -4,6 +4,8 @@ Changelog
 
 Changes in 0.7
 ==============
+- Passthrough ModelField.save-arguments (#26)
+- QuerySetSelectMultipleField now supports initial value (#27)
 - Clarified configuration documentation (#33)
 - Fixed forms when EmbeddedDocument has no default (#36)
 - Fixed multiselect restore bug (#37)
