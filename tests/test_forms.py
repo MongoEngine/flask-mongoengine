@@ -287,7 +287,7 @@ class WTFormsAppTestCase(unittest.TestCase):
             html = form.dogs()
 
             m = re.search("<option selected .+?>(.*?)</option>", html)
-            self.assertIsNotNone(m, "Should have one selected option")
+            self.assertTrue(m is not None, "Should have one selected option")
             self.assertEqual("fido", m.group(1))
 
     def test_model_form_help_text(self):

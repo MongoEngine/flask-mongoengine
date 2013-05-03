@@ -3,8 +3,13 @@ Tools for generating forms based on mongoengine Document schemas.
 """
 import decimal
 from bson import ObjectId
-from collections import OrderedDict
 from operator import itemgetter
+
+try:
+    from collections import OrderedDict
+except ImportError:
+    # Use bson's SON implementation instead
+    from bson import SON as OrderedDict
 
 from wtforms import fields as f, validators
 from mongoengine import ReferenceField

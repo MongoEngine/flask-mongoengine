@@ -147,7 +147,7 @@ class ListFieldPagination(Pagination):
 
         qs = queryset.filter(pk=doc_id)
         self.items = getattr(qs.fields(**field_attrs).first(), field_name)
-        self.total = total or len(getattr(qs.fields({field_name: 1}).first(),
+        self.total = total or len(getattr(qs.fields(**{field_name: 1}).first(),
                                           field_name))
 
         if not self.items and page != 1:
