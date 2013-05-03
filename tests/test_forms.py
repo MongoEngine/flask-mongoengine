@@ -49,6 +49,16 @@ class WTFormsAppTestCase(unittest.TestCase):
             self.assertFalse("None" in "%s" % form.email)
             self.assertTrue(form.validate())
 
+            # Ensure required works
+
+            class Email(db.Document):
+                email = db.EmailField(required=True)
+
+            EmailForm = model_form(Email)
+            form = EmailForm(MultiDict({"email": ""}))
+            self.assertFalse("None" in "%s" % form.email)
+            self.assertFalse(form.validate())
+
     def test_model_form(self):
         with self.app.test_request_context('/'):
             db = self.db
