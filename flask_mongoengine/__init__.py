@@ -77,7 +77,6 @@ class BaseQuerySet(QuerySet):
         return obj
 
     def paginate(self, page, per_page, error_out=True):
-
         return Pagination(self, page, per_page)
 
     def paginate_field(self, field_name, doc_id, page, per_page,
@@ -85,7 +84,7 @@ class BaseQuerySet(QuerySet):
         item = self.get(id=doc_id)
         count = getattr(item, field_name + "_count", '')
         total = total or count or len(getattr(item, field_name))
-        return ListFieldPagination(self, field_name, doc_id, page, per_page,
+        return ListFieldPagination(self, doc_id, field_name, page, per_page,
                                    total=total)
 
 
@@ -94,6 +93,12 @@ class Document(mongoengine.Document):
 
     meta = {'abstract': True,
             'queryset_class': BaseQuerySet}
+
+    def paginate_field(self, field_name, page, per_page, total=None):
+        count = getattr(self, field_name + "_count", '')
+        total = total or count or len(getattr(self, field_name))
+        return ListFieldPagination(self.__class__.objects, self.pk, field_name,
+                                   page, per_page, total=total)
 
 
 class DynamicDocument(mongoengine.DynamicDocument):

@@ -120,7 +120,7 @@ class Pagination(object):
 
 class ListFieldPagination(Pagination):
 
-    def __init__(self, queryset, field_name, doc_id, page, per_page,
+    def __init__(self, queryset, doc_id, field_name, page, per_page,
                  total=None):
         """Allows an array within a document to be paginated.
 
@@ -157,12 +157,12 @@ class ListFieldPagination(Pagination):
         """Returns a :class:`Pagination` object for the previous page."""
         assert self.items is not None, ('a query object is required '
                                         'for this method to work')
-        return self.__class__(self.queryset, self.field_name, self.doc_id,
+        return self.__class__(self.queryset, self.doc_id, self.field_name,
                               self.page - 1, self.per_page, self.total)
 
     def next(self, error_out=False):
         """Returns a :class:`Pagination` object for the next page."""
         assert self.items is not None, ('a query object is required '
                                         'for this method to work')
-        return self.__class__(self.queryset, self.field_name, self.doc_id,
+        return self.__class__(self.queryset, self.doc_id, self.field_name,
                               self.page + 1, self.per_page, self.total)

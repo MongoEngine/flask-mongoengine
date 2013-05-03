@@ -38,30 +38,7 @@ class PaginationTestCase(unittest.TestCase):
         self.assertRaises(NotFound, Pagination, Post.objects, 6, 10)
 
         paginator = Pagination(Post.objects, 1, 10)
-        self.assertEqual(5, paginator.pages)
-        self.assertEqual([1, 2, 3, 4, 5], list(paginator.iter_pages()))
-
-        for i in [1, 2, 3, 4, 5]:
-
-            if i == 1:
-                self.assertRaises(NotFound, paginator.prev)
-                self.assertFalse(paginator.has_prev)
-            else:
-                self.assertTrue(paginator.has_prev)
-
-            if i == 5:
-                self.assertRaises(NotFound, paginator.next)
-                self.assertFalse(paginator.has_next)
-            else:
-                self.assertTrue(paginator.has_next)
-
-            self.assertEqual(i, paginator.page)
-            self.assertEqual(i-1, paginator.prev_num)
-            self.assertEqual(i+1, paginator.next_num)
-
-            # Paginate to the next page
-            if i < 5:
-                paginator = paginator.next()
+        self._test_paginator(paginator)
 
     def test_paginate_plain_list(self):
 
@@ -69,30 +46,7 @@ class PaginationTestCase(unittest.TestCase):
         self.assertRaises(NotFound, Pagination, range(1, 42), 6, 10)
 
         paginator = Pagination(range(1, 42), 1, 10)
-        self.assertEqual(5, paginator.pages)
-        self.assertEqual([1, 2, 3, 4, 5], list(paginator.iter_pages()))
-
-        for i in [1, 2, 3, 4, 5]:
-
-            if i == 1:
-                self.assertRaises(NotFound, paginator.prev)
-                self.assertFalse(paginator.has_prev)
-            else:
-                self.assertTrue(paginator.has_prev)
-
-            if i == 5:
-                self.assertRaises(NotFound, paginator.next)
-                self.assertFalse(paginator.has_next)
-            else:
-                self.assertTrue(paginator.has_next)
-
-            self.assertEqual(i, paginator.page)
-            self.assertEqual(i-1, paginator.prev_num)
-            self.assertEqual(i+1, paginator.next_num)
-
-            # Paginate to the next page
-            if i < 5:
-                paginator = paginator.next()
+        self._test_paginator(paginator)
 
     def test_list_field_pagination(self):
 
@@ -109,14 +63,19 @@ class PaginationTestCase(unittest.TestCase):
                         comment_count=len(comments)).save()
 
             # Check without providing a total
-            paginator = ListFieldPagination(Post.objects, "comments", post.id,
+            paginator = ListFieldPagination(Post.objects, post.id, "comments",
                                             1, 10)
-            self.assertEqual(5, paginator.pages)
-            self.assertEqual([1, 2, 3, 4, 5], list(paginator.iter_pages()))
+            self._test_paginator(paginator)
 
             # Check with providing a total (saves a query)
-            paginator = ListFieldPagination(Post.objects, "comments", post.id,
+            paginator = ListFieldPagination(Post.objects, post.id, "comments",
                                             1, 10, post.comment_count)
+            self._test_paginator(paginator)
+
+            paginator = post.paginate_field('comments', 1, 10)
+            self._test_paginator(paginator)
+
+    def _test_paginator(self, paginator):
             self.assertEqual(5, paginator.pages)
             self.assertEqual([1, 2, 3, 4, 5], list(paginator.iter_pages()))
 

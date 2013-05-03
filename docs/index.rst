@@ -57,10 +57,9 @@ Examples::
         paginated_todos = Todo.objects.paginate(page=page, per_page=10)
 
     # Paginate through tags of todo
-    def view_todo_tags(page=1):
-        todo_id = Todo.objects.first().id
-        paginated_tags = Todo.objects.paginate_field('tags', todo_id, page,
-                                                     per_page=10)
+    def view_todo_tags(todo_id, page=1):
+        todo = Todo.objects.get_or_404(_id=todo_id)
+        paginated_tags = todo.paginate_field('tags', page, per_page=10)
 
 Properties of the pagination object include: iter_pages, next, prev, has_next,
 has_prev, next_num, prev_num.
