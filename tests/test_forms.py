@@ -207,8 +207,8 @@ class WTFormsAppTestCase(unittest.TestCase):
                 lst = db.ListField(db.StringField())
 
             field_args = {'lst': {'label': 'Custom Label',
-                                  'sub_field_args': {'widget': wtforms.widgets.HiddenInput(),
-                                                     'label': "Hidden Input"}}}
+                                  'field_args': {'widget': wtforms.widgets.HiddenInput(),
+                                                 'label': "Hidden Input"}}}
             CustomForm = model_form(TestModel, field_args=field_args)
 
             custom_form = CustomForm(obj=TestModel(lst=["Foo"]))

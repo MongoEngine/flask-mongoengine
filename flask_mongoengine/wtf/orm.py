@@ -144,14 +144,15 @@ class ModelConverter(object):
         if field.field.choices:
             kwargs['multiple'] = True
             return self.convert(model, field.field, **kwargs)
-        sub_field_args = kwargs.pop("sub_field_args", {})
-        unbound_field = self.convert(model, field.field, sub_field_args)
+        field_args = kwargs.pop("field_args", {})
+        unbound_field = self.convert(model, field.field, field_args)
         unacceptable = {
             'validators': [],
             'filters': [],
+            'min_entries': kwargs.get('min_entries', 0)
         }
         kwargs.update(unacceptable)
-        return f.FieldList(unbound_field, min_entries=0, **kwargs)
+        return f.FieldList(unbound_field, **kwargs)
 
     @converts('SortedListField')
     def conv_SortedList(self, model, field, kwargs):
