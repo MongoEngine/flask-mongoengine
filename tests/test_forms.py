@@ -32,6 +32,23 @@ class WTFormsAppTestCase(unittest.TestCase):
     def tearDown(self):
         self.db.connection.drop_database(self.db_name)
 
+    def test_emailfield(self):
+
+        with self.app.test_request_context('/'):
+            db = self.db
+
+            class Email(db.Document):
+                email = db.EmailField(required=False)
+
+            EmailForm = model_form(Email)
+            form = EmailForm(instance=Email())
+            self.assertFalse("None" in "%s" % form.email)
+            self.assertTrue(form.validate())
+
+            form = EmailForm(MultiDict({"email": ""}))
+            self.assertFalse("None" in "%s" % form.email)
+            self.assertTrue(form.validate())
+
     def test_model_form(self):
         with self.app.test_request_context('/'):
             db = self.db
@@ -276,7 +293,7 @@ class WTFormsAppTestCase(unittest.TestCase):
 
             PostForm = model_form(Post)
             form = PostForm()
-            self.assertTrue("content-text" in form.content.text)
+            self.assertTrue("content-text" in "%s" % form.content.text)
 
 
 if __name__ == '__main__':

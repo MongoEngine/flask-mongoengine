@@ -162,8 +162,8 @@ class NoneStringField(Field):
     def process_formdata(self, valuelist):
         if valuelist:
             self.data = valuelist[0]
-        else:
+        if not self.data:
             self.data = None
 
     def _value(self):
-        return txt_type(self.data) if self.data else None
+        return txt_type(self.data) if self.data else ""
