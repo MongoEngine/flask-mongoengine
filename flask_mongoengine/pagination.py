@@ -144,6 +144,7 @@ class ListFieldPagination(Pagination):
 
         field_attrs = {field_name: {"$slice": [start_index, per_page]}}
 
+        # Clone for mongoengine 0.7
         qs = queryset.clone().filter(pk=doc_id)
         self.items = getattr(qs.clone().fields(**field_attrs).first(), field_name)
         self.total = total or len(getattr(qs.clone().fields(**{field_name: 1}).first(),
