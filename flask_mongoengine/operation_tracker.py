@@ -176,7 +176,7 @@ def _cursor_refresh(cursor_self):
         'time': total_time,
         'operation': 'query',
         'stack_trace': stack_trace,
-        'size': response_sizes[-1],
+        'size': response_sizes[-1] if response_sizes else 0,
         'data': copy.copy(privar('data')),
         'internal': internal
     }
