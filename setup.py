@@ -18,7 +18,7 @@ from setuptools import setup
 try:
     import multiprocessing
 except:
-   pass
+    pass
 
 setup(
     name='flask-mongoengine',
@@ -40,7 +40,7 @@ setup(
     packages=['flask_mongoengine',
               'flask_mongoengine.wtf'],
     include_package_data=True,
-    setup_requires=['nose', 'coverage'],
+    tests_require=['nose', 'coverage'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
