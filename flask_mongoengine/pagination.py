@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import math
 
 from flask import abort
@@ -145,9 +144,9 @@ class ListFieldPagination(Pagination):
 
         field_attrs = {field_name: {"$slice": [start_index, per_page]}}
 
-        qs = queryset.filter(pk=doc_id)
-        self.items = getattr(qs.fields(**field_attrs).first(), field_name)
-        self.total = total or len(getattr(qs.fields(**{field_name: 1}).first(),
+        qs = queryset.clone().filter(pk=doc_id)
+        self.items = getattr(qs.clone().fields(**field_attrs).first(), field_name)
+        self.total = total or len(getattr(qs.clone().fields(**{field_name: 1}).first(),
                                           field_name))
 
         if not self.items and page != 1:
