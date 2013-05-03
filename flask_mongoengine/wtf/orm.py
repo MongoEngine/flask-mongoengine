@@ -95,7 +95,7 @@ class ModelConverter(object):
     def conv_URL(self, model, field, kwargs):
         kwargs['validators'].append(validators.URL())
         self._string_common(model, field, kwargs)
-        return f.StringField(**kwargs)
+        return NoneStringField(**kwargs)
 
     @converts('EmailField')
     def conv_Email(self, model, field, kwargs):
