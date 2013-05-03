@@ -52,3 +52,6 @@ class BasicAppTestCase(unittest.TestCase):
         resp = c.get('/check-session-database')
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(resp.data, 'sessions: 1')
+
+if __name__ == '__main__':
+    unittest.main()
