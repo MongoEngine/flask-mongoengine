@@ -5,6 +5,8 @@ import unittest
 import datetime
 import flask
 import wtforms
+import re
+
 
 from bson import ObjectId
 from werkzeug.datastructures import MultiDict
@@ -219,6 +221,31 @@ class WTFormsAppTestCase(unittest.TestCase):
             sub_label = flask.render_template_string("{{ custom_form.lst }}", custom_form=custom_form)
             self.assertTrue("Hidden Input" in sub_label)
 
+    def test_modelselectfield_multiple_selected_elements_must_be_retained(self):
+        with self.app.test_request_context('/'):
+            db = self.db
+
+            class Dog(db.Document):
+                name = db.StringField()
+
+                def __unicode__(self):
+                    return self.name
+
+            class DogOwner(db.Document):
+                dogs = db.ListField(db.ReferenceField(Dog))
+
+            DogOwnerForm = model_form(DogOwner)
+
+            fido = Dog(name="fido").save()
+            Dog(name="rex").save()
+
+            dogOwner = DogOwner(dogs=[fido])
+            form = DogOwnerForm(obj=dogOwner)
+            html = form.dogs()
+
+            m = re.search("<option selected .+?>(.*?)</option>", html)
+            self.assertIsNotNone(m, "Should have one selected option")
+            self.assertEqual("fido", m.group(1))
 
 if __name__ == '__main__':
     unittest.main()
