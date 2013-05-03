@@ -46,7 +46,7 @@ class QuerySetSelectField(SelectFieldBase):
         if self.allow_blank:
             yield (u'__None', self.blank_text, self.data is None)
 
-        if self.queryset == None:
+        if self.queryset is None:
             return
 
         self.queryset.rewind()
@@ -63,7 +63,7 @@ class QuerySetSelectField(SelectFieldBase):
             if valuelist[0] == '__None':
                 self.data = None
             else:
-                if self.queryset == None:
+                if self.queryset is None:
                     self.data = None
                     return
 
