@@ -99,10 +99,10 @@ You can use MongoEngine and WTForms like so::
         text = db.StringField()
         lang = db.StringField(max_length=3)
 
-    class Post(Document):
+    class Post(db.Document):
         title = db.StringField(max_length=120, required=True)
         author = db.ReferenceField(User)
-        tags = db.ListField(StringField(max_length=30))
+        tags = db.ListField(db.StringField(max_length=30))
         content = db.EmbeddedDocumentField(Content)
 
     PostForm = model_form(Post)
