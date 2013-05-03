@@ -36,6 +36,7 @@ class MongoEngineSessionInterface(SessionInterface):
             data = db.DictField()
             expiration = db.DateTimeField()
             meta = {
+                'allow_inheritance': False,
                 'collection': collection,
                 'indexes': [{'fields': ['expiration'],
                              'expireAfterSeconds': 60 * 60 * 24 * 7 * 31}]
