@@ -154,7 +154,6 @@ class NoneStringField(StringField):
     """
     Custom StringField that counts "" as None
     """
-    widget = widgets.TextInput()
 
     def process_formdata(self, valuelist):
         if valuelist:
