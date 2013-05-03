@@ -261,6 +261,23 @@ class WTFormsAppTestCase(unittest.TestCase):
 
             self.assertEqual(form.title.description, "Some imaginative title to set the world on fire")
 
+    def test_embedded_model_form(self):
+        with self.app.test_request_context('/'):
+            db = self.db
+
+            class Content(db.EmbeddedDocument):
+                text = db.StringField()
+                lang = db.StringField(max_length=3)
+
+            class Post(db.Document):
+                title = db.StringField(max_length=120, required=True)
+                tags = db.ListField(db.StringField(max_length=30))
+                content = db.EmbeddedDocumentField("Content")
+
+            PostForm = model_form(Post)
+            form = PostForm()
+            self.assertTrue("content-text" in form.content.text)
+
 
 if __name__ == '__main__':
     unittest.main()
