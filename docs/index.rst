@@ -162,7 +162,19 @@ If you use the Flask-DebugToolbar you can add
 `'flask.ext.mongoengine.panels.MongoDebugPanel'` to the `DEBUG_TB_PANELS` config
 list and then it will automatically track your queries.
 
+Upgrading
+=========
 
+0.6 to 0.7
+----------
+
+`ListFieldPagination` order of arguments have been changed to be more logical::
+
+    # Old order
+    ListFieldPagination(self, queryset, field_name, doc_id, page, per_page, total)
+
+    # New order
+    ListFieldPagination(self, queryset, doc_id, field_name, page, per_page, total)
 
 
 Credits
