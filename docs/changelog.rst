@@ -4,7 +4,8 @@ Changelog
 
 Changes in 0.7
 ==============
-- Fixed EmailField rendering and validation (#44, #9)
+- Added automatic choices coerce for simple types (#34)
+- Fixed EmailField and URLField rendering and validation (#44, #9)
 - Use help_text for field description (#43)
 - Fixed Pagination and added Document.paginate_field() helper
 - Keep model_forms fields in order of creation

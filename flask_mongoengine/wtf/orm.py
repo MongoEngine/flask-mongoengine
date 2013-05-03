@@ -1,8 +1,10 @@
 """
 Tools for generating forms based on mongoengine Document schemas.
 """
-from operator import itemgetter
+import decimal
+from bson import ObjectId
 from collections import OrderedDict
+from operator import itemgetter
 
 from wtforms import fields as f, validators
 from mongoengine import ReferenceField
@@ -51,8 +53,13 @@ class ModelConverter(object):
         else:
             kwargs['validators'].append(validators.Optional())
 
+        ftype = type(field).__name__
+
         if field.choices:
             kwargs['choices'] = field.choices
+
+            if ftype in self.converters:
+                kwargs["coerce"] = self.coerce(ftype)
             if kwargs.pop('multiple', False):
                 return f.SelectMultipleField(**kwargs)
             return f.SelectField(**kwargs)
@@ -185,6 +192,16 @@ class ModelConverter(object):
     @converts('GenericReferenceField')
     def conv_GenericReference(self, model, field, kwargs):
         return
+
+    def coerce(self, field_type):
+        coercions = {
+            "IntField": int,
+            "BooleanField": bool,
+            "FloatField": float,
+            "DecimalField": decimal.Decimal,
+            "ObjectIdField": ObjectId
+        }
+        return coercions.get(field_type, unicode)
 
 
 def model_fields(model, only=None, exclude=None, field_args=None, converter=None):
