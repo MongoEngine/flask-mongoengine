@@ -4,6 +4,7 @@ Changelog
 
 Changes in 0.7
 ==============
+- Fixed Pagination and added Document.paginate_field() helper
 - Keep model_forms fields in order of creation
 - Added MongoEngineSessionInterface (#5)
 - Added customisation hooks for FieldList sub fields (#19)
