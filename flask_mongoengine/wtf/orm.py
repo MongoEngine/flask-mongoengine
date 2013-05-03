@@ -38,7 +38,7 @@ class ModelConverter(object):
     def convert(self, model, field, field_args):
         kwargs = {
             'label': getattr(field, 'verbose_name', field.name),
-            'description': '',
+            'description': field.help_text or '',
             'validators': [],
             'filters': [],
             'default': field.default,

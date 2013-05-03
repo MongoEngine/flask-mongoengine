@@ -247,5 +247,20 @@ class WTFormsAppTestCase(unittest.TestCase):
             self.assertIsNotNone(m, "Should have one selected option")
             self.assertEqual("fido", m.group(1))
 
+    def test_model_form_help_text(self):
+        with self.app.test_request_context('/'):
+            db = self.db
+
+            class BlogPost(db.Document):
+                title = db.StringField(required=True, help_text="Some imaginative title to set the world on fire")
+
+            post = BlogPost(title="hello world").save()
+
+            BlogPostForm = model_form(BlogPost)
+            form = BlogPostForm(instance=post)
+
+            self.assertEqual(form.title.description, "Some imaginative title to set the world on fire")
+
+
 if __name__ == '__main__':
     unittest.main()
