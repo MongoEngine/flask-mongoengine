@@ -161,3 +161,13 @@ class NoneStringField(StringField):
         if self.data == "":
             self.data = None
 
+class BinaryField(TextAreaField):
+    """
+    Custom TextAreaField that returns str (instead of unicode) data.
+    """
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = str( valuelist[0] )
+        if self.data == "":
+            self.data = None
