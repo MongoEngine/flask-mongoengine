@@ -32,6 +32,19 @@ class WTFormsAppTestCase(unittest.TestCase):
     def tearDown(self):
         self.db.connection.drop_database(self.db_name)
 
+    def test_binaryfield(self):
+
+        with self.app.test_request_context('/'):
+            db = self.db
+
+            class Binary(db.Document):
+                binary = db.BinaryField()
+
+            BinaryForm = model_form(Binary)
+            form = BinaryForm(MultiDict({'binary': '1'}))
+            self.assertTrue(form.validate())
+            form.save()
+
     def test_choices_coerce(self):
 
         with self.app.test_request_context('/'):
