@@ -14,7 +14,7 @@ except ImportError:
 from wtforms import fields as f, validators
 from mongoengine import ReferenceField
 
-from flask.ext.mongoengine.wtf.fields import ModelSelectField, ModelSelectMultipleField, DictField, NoneStringField
+from flask.ext.mongoengine.wtf.fields import ModelSelectField, ModelSelectMultipleField, DictField, NoneStringField, BinaryField
 from flask.ext.mongoengine.wtf.models import ModelForm
 
 __all__ = (
@@ -143,7 +143,7 @@ class ModelConverter(object):
         #TODO: may be set file field that will save file`s data to MongoDB
         if field.max_bytes:
             kwargs['validators'].append(validators.Length(max=field.max_bytes))
-        return f.TextAreaField(**kwargs)
+        return BinaryField(**kwargs)
 
     @converts('DictField')
     def conv_Dict(self, model, field, kwargs):

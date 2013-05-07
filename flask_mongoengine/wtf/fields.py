@@ -9,7 +9,7 @@ from wtforms.fields import SelectFieldBase, TextAreaField, StringField
 from wtforms.validators import ValidationError
 
 from mongoengine.queryset import DoesNotExist
-from mongoengine.python_support import txt_type
+from mongoengine.python_support import txt_type, bin_type
 
 __all__ = (
     'ModelSelectField', 'QuerySetSelectField',
@@ -161,3 +161,11 @@ class NoneStringField(StringField):
         if self.data == "":
             self.data = None
 
+class BinaryField(TextAreaField):
+    """
+    Custom TextAreaField that converts its value with bin_type.
+    """
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = bin_type( valuelist[0] )
