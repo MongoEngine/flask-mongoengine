@@ -4,6 +4,7 @@ Changelog
 
 Changes in 0.7
 ==============
+- Fixed only / exclude in model forms (#49)
 - Added automatic choices coerce for simple types (#34)
 - Fixed EmailField and URLField rendering and validation (#44, #9)
 - Use help_text for field description (#43)

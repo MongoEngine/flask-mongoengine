@@ -150,6 +150,27 @@ class WTFormsAppTestCase(unittest.TestCase):
 
             self.assertEqual(post.tags, ['flask', 'mongodb', 'mongoengine', 'flask-mongoengine'])
 
+    def test_model_form_only(self):
+        with self.app.test_request_context('/'):
+            db = self.db
+
+            class BlogPost(db.Document):
+                title = db.StringField(required=True, max_length=200)
+                posted = db.DateTimeField(default=datetime.datetime.now)
+                tags = db.ListField(db.StringField())
+
+            BlogPost.drop_collection()
+
+            BlogPostForm = model_form(BlogPost, only=['tags'])
+            form = BlogPostForm()
+            self.assertTrue(hasattr(form, 'tags'))
+            self.assertFalse(hasattr(form, 'posted'))
+
+            BlogPostForm = model_form(BlogPost, exclude=['posted'])
+            form = BlogPostForm()
+            self.assertTrue(hasattr(form, 'tags'))
+            self.assertFalse(hasattr(form, 'posted'))
+
     def test_model_form_with_custom_query_set(self):
         with self.app.test_request_context('/'):
             db = self.db
@@ -333,6 +354,7 @@ class WTFormsAppTestCase(unittest.TestCase):
             PostForm = model_form(Post)
             form = PostForm()
             self.assertTrue("content-text" in "%s" % form.content.text)
+
 
 
 if __name__ == '__main__':
