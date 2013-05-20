@@ -155,7 +155,7 @@ class ModelConverter(object):
             return ModelSelectMultipleField(model=field.field.document_type, **kwargs)
         if field.field.choices:
             kwargs['multiple'] = True
-            return self.convert(model, field.field, **kwargs)
+            return self.convert(model, field.field, kwargs)
         field_args = kwargs.pop("field_args", {})
         unbound_field = self.convert(model, field.field, field_args)
         unacceptable = {

@@ -61,6 +61,22 @@ class WTFormsAppTestCase(unittest.TestCase):
             form.save()
             self.assertEqual(MyChoices.objects.first().pill, 1)
 
+    def test_list_choices_coerce(self):
+
+        with self.app.test_request_context('/'):
+            db = self.db
+
+            CHOICES = ((1, "blue"), (2, "red"))
+
+            class MyChoices(db.Document):
+                pill = db.ListField(db.IntField(choices=CHOICES))
+
+            MyChoicesForm = model_form(MyChoices)
+            form = MyChoicesForm(MultiDict({"pill": "1"}))
+            self.assertTrue(form.validate())
+            form.save()
+            self.assertEqual(MyChoices.objects.first().pill[0], 1)
+
     def test_emailfield(self):
 
         with self.app.test_request_context('/'):
