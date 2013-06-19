@@ -106,7 +106,7 @@ class QuerySetSelectMultipleField(QuerySetSelectField):
                     self.data = None
 
     def _is_selected(self, item):
-        return item in self.data
+        return item in self.data if self.data else False
 
 
 class ModelSelectField(QuerySetSelectField):
