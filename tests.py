@@ -122,6 +122,10 @@ class WTFormsAppTestCase(unittest.TestCase):
                 posted = db.DateTimeField(default=datetime.datetime.now)
                 tags = db.ListField(db.StringField(max_length=50))
 
+                meta = {
+                    'allow_inheritance': True
+                }
+
             class TextPost(BlogPost):
                 email = db.EmailField(required=False)
                 content = db.StringField(required=True)
