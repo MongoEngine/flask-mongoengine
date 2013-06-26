@@ -207,28 +207,18 @@ def _cursor_refresh(cursor_self):
     return result
 
 def install_tracker():
-    if pymongo.collection.Collection.insert != _insert:
-        pymongo.collection.Collection.insert = _insert
-    if pymongo.collection.Collection.update != _update:
-        pymongo.collection.Collection.update = _update
-    if pymongo.collection.Collection.remove != _remove:
-        pymongo.collection.Collection.remove = _remove
-    if pymongo.cursor.Cursor._refresh != _cursor_refresh:
-        pymongo.cursor.Cursor._refresh = _cursor_refresh
-    if pymongo.helpers._unpack_response != _unpack_response:
-        pymongo.helpers._unpack_response = _unpack_response
+    pymongo.collection.Collection.insert = _insert
+    pymongo.collection.Collection.update = _update
+    pymongo.collection.Collection.remove = _remove
+    pymongo.cursor.Cursor._refresh = _cursor_refresh
+    pymongo.helpers._unpack_response = _unpack_response
 
 def uninstall_tracker():
-    if pymongo.collection.Collection.insert == _insert:
-        pymongo.collection.Collection.insert = _original_methods['insert']
-    if pymongo.collection.Collection.update == _update:
-        pymongo.collection.Collection.update = _original_methods['update']
-    if pymongo.collection.Collection.remove == _remove:
-        pymongo.collection.Collection.remove = _original_methods['remove']
-    if pymongo.cursor.Cursor._refresh == _cursor_refresh:
-        pymongo.cursor.Cursor._refresh = _original_methods['cursor_refresh']
-    if pymongo.helpers._unpack_response == _unpack_response:
-        pymongo.helpers._unpack_response = _original_methods['_unpack_response']
+    pymongo.collection.Collection.insert = _original_methods['insert']
+    pymongo.collection.Collection.update = _original_methods['update']
+    pymongo.collection.Collection.remove = _original_methods['remove']
+    pymongo.cursor.Cursor._refresh = _original_methods['refresh']
+    pymongo.helpers._unpack_response = _original_methods['_unpack_response']
 
 def reset():
     global queries, inserts, updates, removes, response_sizes
