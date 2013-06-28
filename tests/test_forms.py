@@ -202,18 +202,18 @@ class WTFormsAppTestCase(unittest.TestCase):
             BlogPostForm = model_form(BlogPost)
             form = BlogPostForm()
             field_names = [f.name for f in form if f.name != 'csrf_token']
-            self.assertSequenceEqual(field_names, ['title', 'content', 'posted', 'tags'])
+            self.assertEqual(field_names, ['title', 'content', 'posted', 'tags'])
 
             only = ['tags', 'title', 'posted', 'content']
             BlogPostForm = model_form(BlogPost, only=only)
             form = BlogPostForm()
             field_names = [f.name for f in form if f.name != 'csrf_token']
-            self.assertSequenceEqual(field_names, only)
+            self.assertEqual(field_names, only)
 
             BlogPostForm = model_form(BlogPost, exclude=['posted'])
             form = BlogPostForm()
             field_names = [f.name for f in form if f.name != 'csrf_token']
-            self.assertSequenceEqual(field_names, ['title', 'content', 'tags'])
+            self.assertEqual(field_names, ['title', 'content', 'tags'])
 
     def test_model_form_with_custom_query_set(self):
         with self.app.test_request_context('/'):
