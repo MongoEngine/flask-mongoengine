@@ -226,9 +226,9 @@ def model_fields(model, only=None, exclude=None, field_args=None, converter=None
     field_names = map(itemgetter(0), sorted(names, key=itemgetter(1)))
 
     if only:
-        field_names = set((x for x in only if x in set(field_names)))
+        field_names = [x for x in only if x in set(field_names)]
     elif exclude:
-        field_names = set((x for x in set(field_names) if x not in exclude))
+        field_names = [x for x in field_names if x not in set(exclude)]
 
     field_dict = OrderedDict()
     for name in field_names:
