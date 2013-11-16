@@ -20,12 +20,15 @@ class MongoEngineSession(CallbackDict, SessionMixin):
 class MongoEngineSessionInterface(SessionInterface):
     """SessionInterface for mongoengine"""
 
-    def __init__(self, db, collection='session'):
+    def __init__(self, db, collection='session', reap=False):
         """
         The MongoSessionInterface
 
         :param db: The app's db eg: MongoEngine()
         :param collection: The session collection name defaults to "session"
+        :param reap: If `True` reap all expired sessions on identifying an
+            expired session
+        :type reap: bool
         """
 
         if not isinstance(collection, basestring):
@@ -43,6 +46,7 @@ class MongoEngineSessionInterface(SessionInterface):
             }
 
         self.cls = DBSession
+        self.reap = reap
 
     def get_expiration_time(self, app, session):
         if session.permanent:
@@ -53,8 +57,14 @@ class MongoEngineSessionInterface(SessionInterface):
         sid = request.cookies.get(app.session_cookie_name)
         if sid:
             stored_session = self.cls.objects(sid=sid).first()
-            if stored_session and stored_session.expiration > datetime.datetime.utcnow():
-                return MongoEngineSession(initial=stored_session.data, sid=stored_session.sid)
+            if stored_session:
+                if stored_session.expiration > datetime.datetime.utcnow():
+                    return MongoEngineSession(
+                        initial=stored_session.data, sid=stored_session.sid)
+                elif self.reap:
+                    self.cls.objects(
+                        expiration__lt=datetime.datetime.utcnow()
+                    ).delete()
         return MongoEngineSession(sid=str(uuid.uuid4()))
 
     def save_session(self, app, session, response):
