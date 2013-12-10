@@ -24,7 +24,10 @@ class WTFormsAppTestCase(unittest.TestCase):
         app = flask.Flask(__name__)
         app.config['MONGODB_DB'] = self.db_name
         app.config['TESTING'] = True
+        # For Flask-WTF < 0.9
         app.config['CSRF_ENABLED'] = False
+        # For Flask-WTF >= 0.9
+        app.config['WTF_CSRF_ENABLED'] = False
         self.app = app
         self.db = MongoEngine()
         self.db.init_app(app)
