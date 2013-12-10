@@ -4,6 +4,7 @@ services: mongodb
 python:
     - "2.6"
     - "2.7"
+    - "3.3"
 env:
   - PYMONGO=dev MONGOENGINE=dev
   - PYMONGO=dev MONGOENGINE=0.7.10
