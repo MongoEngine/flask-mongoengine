@@ -1,10 +1,14 @@
 import datetime
+import sys
 import uuid
 
 from flask.sessions import SessionInterface, SessionMixin
 from werkzeug.datastructures import CallbackDict
 
 __all__ = ("MongoEngineSession", "MongoEngineSessionInterface")
+
+if sys.version_info >= (3, 0):
+    basestring = str
 
 
 class MongoEngineSession(CallbackDict, SessionMixin):

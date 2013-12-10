@@ -3,6 +3,7 @@ Useful form fields for use with the mongoengine.
 """
 from gettext import gettext as _
 import json
+import sys
 
 from wtforms import widgets
 from wtforms.fields import SelectFieldBase, TextAreaField, StringField
@@ -168,4 +169,7 @@ class BinaryField(TextAreaField):
 
     def process_formdata(self, valuelist):
         if valuelist:
-            self.data = bin_type( valuelist[0] )
+            if sys.version_info >= (3, 0):
+                self.data = bin_type( valuelist[0], 'utf-8' )
+            else:
+                self.data = bin_type( valuelist[0] )

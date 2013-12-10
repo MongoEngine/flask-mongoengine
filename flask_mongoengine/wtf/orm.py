@@ -1,6 +1,7 @@
 """
 Tools for generating forms based on mongoengine Document schemas.
 """
+import sys
 import decimal
 from bson import ObjectId
 from operator import itemgetter
@@ -206,7 +207,10 @@ class ModelConverter(object):
             "DecimalField": decimal.Decimal,
             "ObjectIdField": ObjectId
         }
-        return coercions.get(field_type, unicode)
+        if sys.version_info >= (3, 0):
+            return coercions.get(field_type, str)
+        else:
+            return coercions.get(field_type, unicode)
 
 
 def model_fields(model, only=None, exclude=None, field_args=None, converter=None):
@@ -222,7 +226,10 @@ def model_fields(model, only=None, exclude=None, field_args=None, converter=None
     converter = converter or ModelConverter()
     field_args = field_args or {}
 
-    names = ((k, v.creation_counter) for k, v in model._fields.iteritems())
+    if sys.version_info >= (3, 0):
+        names = ((k, v.creation_counter) for k, v in model._fields.items())
+    else:
+        names = ((k, v.creation_counter) for k, v in model._fields.iteritems())
     field_names = map(itemgetter(0), sorted(names, key=itemgetter(1)))
 
     if only:
