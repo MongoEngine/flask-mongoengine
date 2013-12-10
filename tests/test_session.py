@@ -43,15 +43,15 @@ class BasicAppTestCase(unittest.TestCase):
         c = self.app.test_client()
         resp = c.get('/')
         self.assertEqual(resp.status_code, 200)
-        self.assertEquals(resp.data, 'hello session')
+        self.assertEquals(resp.data.decode('utf-8'), 'hello session')
 
         resp = c.get('/check-session')
         self.assertEqual(resp.status_code, 200)
-        self.assertEquals(resp.data, 'session: hello session')
+        self.assertEquals(resp.data.decode('utf-8'), 'session: hello session')
 
         resp = c.get('/check-session-database')
         self.assertEqual(resp.status_code, 200)
-        self.assertEquals(resp.data, 'sessions: 1')
+        self.assertEquals(resp.data.decode('utf-8'), 'sessions: 1')
 
 if __name__ == '__main__':
     unittest.main()
