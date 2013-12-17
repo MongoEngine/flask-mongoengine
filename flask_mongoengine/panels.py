@@ -2,7 +2,7 @@ from flask import current_app
 
 from flask_debugtoolbar.panels import DebugPanel
 from jinja2 import PackageLoader, ChoiceLoader
-import operation_tracker
+from flask_mongoengine import operation_tracker
 
 _ = lambda x: x
 

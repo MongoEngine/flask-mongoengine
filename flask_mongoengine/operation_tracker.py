@@ -4,7 +4,10 @@ import inspect
 import copy
 import sys
 import os
-import SocketServer
+try:
+    import SocketServer
+except ImportError:
+    import socketserver as SocketServer
 
 import pymongo
 import pymongo.collection
@@ -258,7 +261,12 @@ def _tidy_stacktrace():
 
     # Check html templates
     fnames = []
-    for i in xrange(100):
+    _range = None
+    if sys.version_info >= (3, 0):
+        _range = range(100)
+    else:
+        _range = xrange(100)
+    for i in _range:
         try:
             fname = sys._getframe(i).f_code.co_filename
             if '.html' in fname:
@@ -294,6 +302,9 @@ def _tidy_stacktrace():
         if not text:
             text = ''
         else:
-            text = unicode(''.join(text).strip(), errors="ignore")
+            if sys.version_info >= (3, 0):
+                text = ''.join(text).strip()
+            else:
+                text = unicode(''.join(text).strip(), errors="ignore")
         trace.append((path, line_no, func_name, text, hidden))
     return trace, internal

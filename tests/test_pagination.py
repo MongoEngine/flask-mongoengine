@@ -31,7 +31,7 @@ class PaginationTestCase(unittest.TestCase):
             class Post(db.Document):
                 title = db.StringField(required=True, max_length=200)
 
-            for i in xrange(42):
+            for i in range(42):
                 Post(title="post: %s" % i).save()
 
         self.assertRaises(NotFound, Pagination, Post.objects, 0, 10)
@@ -58,7 +58,7 @@ class PaginationTestCase(unittest.TestCase):
                 comments = db.ListField(db.StringField())
                 comment_count = db.IntField()
 
-            comments = ["comment: %s" % i for i in xrange(42)]
+            comments = ["comment: %s" % i for i in range(42)]
             post = Post(title="post has comments", comments=comments,
                         comment_count=len(comments)).save()
 
