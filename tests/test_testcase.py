@@ -34,9 +34,11 @@ class RunningTestsBehaviour(unittest.TestCase):
 
     def setUp(self):
         self.db_name = 'testing'
+        self.test_db_name = "test_" + self.db_name
         self.db = create_flask_app(self.db_name)
         self.test_app = None
         self.TestCase = tc_factory(self.db)
+        self.db_connection = self.db.connection[self.test_db_name]
 
     def _running_a_test(self, test_function):
         function_name = test_function.__name__
@@ -58,6 +60,20 @@ class RunningTestsBehaviour(unittest.TestCase):
         self.assertTrue("MONGODB_SETTINGS" in test_app.config.keys())
         MONGODB_SETTINGS = test_app.config["MONGODB_SETTINGS"]['DB']
         self.assertEqual("test_" + self.db_name, MONGODB_SETTINGS)
+
+    def test_it_should_clean_up_data_after_test_was_executed(self):
+        def dirtying_test(*args):
+            class SimpleDocument(self.db.Document):
+                pass
+
+            simple_document = SimpleDocument()
+            simple_document.save()
+
+        self._running_a_test(dirtying_test)
+
+        collections = self.db_connection.collection_names()
+        self.assertFalse("simple_document" in collections)
+
 
 if __name__ == '__main__':
     unittest.main()
