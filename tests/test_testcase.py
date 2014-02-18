@@ -74,6 +74,27 @@ class RunningTestsBehaviour(unittest.TestCase):
         collections = self.db_connection.collection_names()
         self.assertFalse("simple_document" in collections)
 
+    def test_saving_on_test_database(self):
+        db_connection = self.db_connection
+        self.collections = None
+        self.count = None
+
+        def saving_test(*args):
+            class SimpleDocument(self.db.Document):
+                pass
+
+            simple_document = SimpleDocument()
+            simple_document.save()
+
+            self.collections = db_connection.collection_names()
+            a_document_collection = db_connection.simple_document
+            self.count = a_document_collection.count()
+
+        self._running_a_test(saving_test)
+
+        self.assertTrue("simple_document" in self.collections)
+        self.assertEqual(1, self.count)
+
 
 if __name__ == '__main__':
     unittest.main()
