@@ -230,7 +230,7 @@ def model_fields(model, only=None, exclude=None, field_args=None, converter=None
         names = ((k, v.creation_counter) for k, v in model._fields.items())
     else:
         names = ((k, v.creation_counter) for k, v in model._fields.iteritems())
-    field_names = map(itemgetter(0), sorted(names, key=itemgetter(1)))
+    field_names = list(map(itemgetter(0), sorted(names, key=itemgetter(1))))
 
     if only:
         field_names = set((x for x in only if x in set(field_names)))
