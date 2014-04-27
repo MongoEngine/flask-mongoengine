@@ -1,19 +1,21 @@
 from flask.json import JSONEncoder
 from bson import json_util
 from mongoengine.base import BaseDocument
-from mongoengine import QuerySet
-
+try:
+    from mongoengine.base import BaseQuerySet
+except ImportError as ie: # support mongoengine < 0.7
+    from mongoengine.queryset import QuerySet as BaseQuerySet
 
 def _make_encoder(superclass):
     class MongoEngineJSONEncoder(superclass):
         '''
         A JSONEncoder which provides serialization of MongoEngine
-        documents and querysets.
+        documents and queryset objects.
         '''
         def default(self, obj):
             if isinstance(obj, BaseDocument):
                 return json_util._json_convert(obj.to_mongo())
-            elif isinstance(obj, QuerySet):
+            elif isinstance(obj, BaseQuerySet):
                 return json_util._json_convert(obj.as_pymongo())
             return superclass.default(self, obj)
     return MongoEngineJSONEncoder
