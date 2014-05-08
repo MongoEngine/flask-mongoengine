@@ -44,18 +44,29 @@ class MongoEngine(object):
                 'port': int(app.config.get('MONGODB_PORT', 0)) or None
             }
 
-        conn_settings = dict([(k.lower(), v) for k, v in conn_settings.items() if v])
+        if isinstance(conn_settings, list):
+            self.connection = {}
+            for conn in conn_settings:
+                conn = dict([(k.lower(), v) for k, v in conn.items() if v])
 
-        if 'replicaset' in conn_settings:
-            conn_settings['replicaSet'] = conn_settings['replicaset']
-            del conn_settings['replicaset']
+                if 'replicaset' in conn:
+                    conn['replicaSet'] = conn['replicaset']
+                    del conn['replicaset']
 
-        self.connection = mongoengine.connect(**conn_settings)
+                self.connection[conn.get('alias')] = mongoengine.connect(**conn)
+
+        else:
+            conn_settings = dict([(k.lower(), v) for k, v in conn_settings.items() if v])
+
+            if 'replicaset' in conn_settings:
+                conn_settings['replicaSet'] = conn_settings['replicaset']
+                del conn_settings['replicaset']
+
+            self.connection = mongoengine.connect(**conn_settings)
 
         app.extensions = getattr(app, 'extensions', {})
         app.extensions['mongoengine'] = self
         self.app = app
-
 
 class BaseQuerySet(QuerySet):
     """
