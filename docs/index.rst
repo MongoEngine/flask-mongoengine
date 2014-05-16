@@ -30,7 +30,7 @@ Basic setup is easy, just fetch the extension::
 To configure the MongoDB connection settings set a key (DB, USERNAME, PASSWORD, HOST, PORT) in the
 `'MONGODB_SETTINGS'` dictionary wih `app.config`. For example :
 
-    app.config["MONGODB_SETTINGS"] = {"DB": "my_tumble_log"}
+    app.config["MONGODB_SETTINGS"] = {"DB": "my_tumble_log", "USERNAME" : "my_user_name", "PASSWORD" : "my_secret_password", "HOST" : "127.0.0.1", "PORT": 27017 }
 
 
 
