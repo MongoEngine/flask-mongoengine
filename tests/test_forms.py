@@ -190,6 +190,34 @@ class WTFormsAppTestCase(unittest.TestCase):
             self.assertTrue(hasattr(form, 'tags'))
             self.assertFalse(hasattr(form, 'posted'))
 
+    def test_model_form_fields_order(self):
+        with self.app.test_request_context('/'):
+            db = self.db
+
+            class BlogPost(db.Document):
+                title = db.StringField(required=True, max_length=200)
+                content = db.StringField()
+                posted = db.DateTimeField(default=datetime.datetime.now)
+                tags = db.ListField(db.StringField())
+
+            BlogPost.drop_collection()
+
+            BlogPostForm = model_form(BlogPost)
+            form = BlogPostForm()
+            field_names = [f.name for f in form if f.name != 'csrf_token']
+            self.assertEqual(field_names, ['title', 'content', 'posted', 'tags'])
+
+            only = ['tags', 'title', 'posted', 'content']
+            BlogPostForm = model_form(BlogPost, only=only)
+            form = BlogPostForm()
+            field_names = [f.name for f in form if f.name != 'csrf_token']
+            self.assertEqual(field_names, only)
+
+            BlogPostForm = model_form(BlogPost, exclude=['posted'])
+            form = BlogPostForm()
+            field_names = [f.name for f in form if f.name != 'csrf_token']
+            self.assertEqual(field_names, ['title', 'content', 'tags'])
+
     def test_model_form_with_custom_query_set(self):
         with self.app.test_request_context('/'):
             db = self.db
