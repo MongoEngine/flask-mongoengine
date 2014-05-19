@@ -68,7 +68,7 @@ class MongoEngineSessionInterface(SessionInterface):
                 response.delete_cookie(app.session_cookie_name, domain=domain)
             return
 
-        expiration = datetime.datetime.now() + self.get_expiration_time(app, session)
+        expiration = datetime.datetime.utcnow() + self.get_expiration_time(app, session)
 
         if session.modified:
             self.cls(sid=session.sid, data=session, expiration=expiration).save()
