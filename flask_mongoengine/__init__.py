@@ -10,6 +10,7 @@ from mongoengine.base import ValidationError
 
 from .sessions import *
 from .pagination import *
+from .json import overide_json_encoder
 
 
 def _include_mongoengine(obj):
@@ -67,6 +68,8 @@ class MongoEngine(object):
         app.extensions = getattr(app, 'extensions', {})
         app.extensions['mongoengine'] = self
         self.app = app
+        overide_json_encoder(app)
+
 
 class BaseQuerySet(QuerySet):
     """
