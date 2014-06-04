@@ -16,6 +16,8 @@ __all__ = (
     'ModelSelectField', 'QuerySetSelectField',
 )
 
+if sys.version_info >= (3, 0):
+    unicode = str
 
 class QuerySetSelectField(SelectFieldBase):
     """
