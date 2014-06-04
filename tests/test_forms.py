@@ -264,6 +264,34 @@ class WTFormsAppTestCase(unittest.TestCase):
             self.assertTrue(choices[0].checked)
             self.assertTrue(choices[1].checked)
 
+    def test_modelselectfield_multiple_initalvalue_None(self):
+        with self.app.test_request_context('/'):
+            db = self.db
+
+            class Dog(db.Document):
+                name = db.StringField()
+
+            class DogOwner(db.Document):
+                dogs = db.ListField(db.ReferenceField(Dog))
+
+            DogOwnerForm = model_form(DogOwner)
+
+            dogs = [Dog(name="fido"), Dog(name="rex")]
+            for dog in dogs:
+                dog.save()
+
+            form = DogOwnerForm(dogs=None)
+            self.assertTrue(form.validate())
+
+            self.assertEqual(wtforms.widgets.Select, type(form.dogs.widget))
+            self.assertEqual(True, form.dogs.widget.multiple)
+
+            # Validate if both dogs are selected
+            choices = list(form.dogs)
+            self.assertEqual(len(choices), 2)
+            self.assertFalse(choices[0].checked)
+            self.assertFalse(choices[1].checked)
+
     def test_passwordfield(self):
         with self.app.test_request_context('/'):
             db = self.db
