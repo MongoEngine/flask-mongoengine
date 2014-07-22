@@ -26,7 +26,16 @@ Basic setup is easy, just fetch the extension::
     app.config.from_pyfile('the-config.cfg')
     db = MongoEngine(app)
 
+Or, if you are setting up your database before your app is initialized, as is the case with application factories::
 
+    from flask import Flask
+    from flask.ext.mongoengine import MongoEngine
+    db = MongoEngine()
+    ...
+    app = Flask(__name__)
+    app.config.from_pyfile('the-config.cfg')
+    db.init_app(app)
+    
 To configure the MongoDB connection settings set a key (DB, USERNAME, PASSWORD, HOST, PORT) in the
 `'MONGODB_SETTINGS'` dictionary wih `app.config`. For example :
 
