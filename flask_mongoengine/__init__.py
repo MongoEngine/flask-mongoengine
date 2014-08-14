@@ -20,6 +20,15 @@ def _include_mongoengine(obj):
                 setattr(obj, key, getattr(module, key))
 
 
+def _create_connection(conn_settings):
+    conn = dict([(k.lower(), v) for k, v in conn_settings.items() if v])
+
+    if 'replicaset' in conn:
+        conn['replicaSet'] = conn.pop('replicaset')
+
+    return mongoengine.connect(**conn)
+
+
 class MongoEngine(object):
 
     def __init__(self, app=None):
@@ -48,22 +57,9 @@ class MongoEngine(object):
         if isinstance(conn_settings, list):
             self.connection = {}
             for conn in conn_settings:
-                conn = dict([(k.lower(), v) for k, v in conn.items() if v])
-
-                if 'replicaset' in conn:
-                    conn['replicaSet'] = conn['replicaset']
-                    del conn['replicaset']
-
-                self.connection[conn.get('alias')] = mongoengine.connect(**conn)
-
+                self.connection[conn.get('alias')] = _create_connection(conn)
         else:
-            conn_settings = dict([(k.lower(), v) for k, v in conn_settings.items() if v])
-
-            if 'replicaset' in conn_settings:
-                conn_settings['replicaSet'] = conn_settings['replicaset']
-                del conn_settings['replicaset']
-
-            self.connection = mongoengine.connect(**conn_settings)
+            self.connection = _create_connection(conn_settings)
 
         app.extensions = getattr(app, 'extensions', {})
         app.extensions['mongoengine'] = self
