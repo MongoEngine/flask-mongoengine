@@ -8,6 +8,8 @@ import mongoengine
 from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist, QuerySet
 from mongoengine.base import ValidationError
 
+from pymongo import uri_parser
+
 from .sessions import *
 from .pagination import *
 from .json import overide_json_encoder
@@ -18,6 +20,20 @@ def _include_mongoengine(obj):
         for key in module.__all__:
             if not hasattr(obj, key):
                 setattr(obj, key, getattr(module, key))
+
+
+def _create_connection(conn_settings):
+    conn = dict([(k.lower(), v) for k, v in conn_settings.items() if v])
+
+    if 'replicaset' in conn:
+        conn['replicaSet'] = conn.pop('replicaset')
+
+    # Handle uri style connections
+    if "://" in conn.get('host', ''):
+        uri_dict = uri_parser.parse_uri(conn_settings['host'])
+        conn['db'] = uri_dict['database']
+
+    return mongoengine.connect(conn.pop('db', 'test'), **conn)
 
 
 class MongoEngine(object):
@@ -48,22 +64,9 @@ class MongoEngine(object):
         if isinstance(conn_settings, list):
             self.connection = {}
             for conn in conn_settings:
-                conn = dict([(k.lower(), v) for k, v in conn.items() if v])
-
-                if 'replicaset' in conn:
-                    conn['replicaSet'] = conn['replicaset']
-                    del conn['replicaset']
-
-                self.connection[conn.get('alias')] = mongoengine.connect(**conn)
-
+                self.connection[conn.get('alias')] = _create_connection(conn)
         else:
-            conn_settings = dict([(k.lower(), v) for k, v in conn_settings.items() if v])
-
-            if 'replicaset' in conn_settings:
-                conn_settings['replicaSet'] = conn_settings['replicaset']
-                del conn_settings['replicaset']
-
-            self.connection = mongoengine.connect(**conn_settings)
+            self.connection = _create_connection(conn_settings)
 
         app.extensions = getattr(app, 'extensions', {})
         app.extensions['mongoengine'] = self

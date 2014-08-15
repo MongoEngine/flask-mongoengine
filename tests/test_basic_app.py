@@ -74,14 +74,26 @@ class BasicAppTestCase(unittest.TestCase):
             'TZ_AWARE': True
         }, {
             'DB': 'testing_tz_aware_off',
-            'alias' : 'tz_aware_false',
-            'TZ_AWARE' : False
+            'alias': 'tz_aware_false',
+            'TZ_AWARE': False
         }]
         app.config['TESTING'] = True
         db = MongoEngine()
         db.init_app(app)
         self.assertTrue(db.connection['tz_aware_true'].tz_aware)
         self.assertFalse(db.connection['tz_aware_false'].tz_aware)
+
+    def test_connection_default(self):
+        app = flask.Flask(__name__)
+        app.config['MONGODB_SETTINGS'] = {}
+        app.config['TESTING'] = True
+
+        db = MongoEngine()
+        db.init_app(app)
+
+        app.config['TESTING'] = True
+        db = MongoEngine()
+        db.init_app(app)
 
     def test_with_id(self):
         c = self.app.test_client()
