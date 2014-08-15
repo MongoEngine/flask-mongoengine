@@ -33,7 +33,7 @@ def _create_connection(conn_settings):
         uri_dict = uri_parser.parse_uri(conn_settings['host'])
         conn['db'] = uri_dict['database']
 
-    return mongoengine.connect(conn.pop('db'), **conn)
+    return mongoengine.connect(conn.pop('db', 'test'), **conn)
 
 
 class MongoEngine(object):
