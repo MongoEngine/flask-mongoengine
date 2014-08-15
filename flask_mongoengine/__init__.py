@@ -8,6 +8,8 @@ import mongoengine
 from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist, QuerySet
 from mongoengine.base import ValidationError
 
+from pymongo import uri_parser
+
 from .sessions import *
 from .pagination import *
 from .json import overide_json_encoder
@@ -26,7 +28,12 @@ def _create_connection(conn_settings):
     if 'replicaset' in conn:
         conn['replicaSet'] = conn.pop('replicaset')
 
-    return mongoengine.connect(**conn)
+    # Handle uri style connections
+    if "://" in conn.get('host', ''):
+        uri_dict = uri_parser.parse_uri(conn_settings['host'])
+        conn['db'] = uri_dict['database']
+
+    return mongoengine.connect(conn.pop('db'), **conn)
 
 
 class MongoEngine(object):
