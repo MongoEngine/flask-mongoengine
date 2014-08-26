@@ -63,6 +63,8 @@ class MongoEngineSessionInterface(SessionInterface):
 
     def save_session(self, app, session, response):
         domain = self.get_cookie_domain(app)
+        httponly = self.get_cookie_httponly(app)
+
         if not session:
             if session.modified:
                 response.delete_cookie(app.session_cookie_name, domain=domain)
@@ -74,4 +76,4 @@ class MongoEngineSessionInterface(SessionInterface):
             self.cls(sid=session.sid, data=session, expiration=expiration).save()
 
         response.set_cookie(app.session_cookie_name, session.sid,
-                            expires=expiration, httponly=True, domain=domain)
+                            expires=expiration, httponly=httponly, domain=domain)
