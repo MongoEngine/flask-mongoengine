@@ -70,7 +70,7 @@ class QuerySetSelectField(SelectFieldBase):
 
                 try:
                     # clone() because of https://github.com/MongoEngine/mongoengine/issues/56
-                    obj = self.queryset.clone().get(id=valuelist[0])
+                    obj = self.queryset.clone().get(pk=valuelist[0])
                     self.data = obj
                 except DoesNotExist:
                     self.data = None
