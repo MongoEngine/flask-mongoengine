@@ -60,18 +60,6 @@ class MongoEngine(object):
 
         app.extensions = getattr(app, 'extensions', {})
 
-        if not config:
-            config = {}
-
-        # Set default config
-        config.setdefault('db', app.config.get('MONGODB_DB', None))
-        config.setdefault('host', app.config.get('MONGODB_HOST', None))
-        config.setdefault('port', app.config.get('MONGODB_PORT', None))
-        config.setdefault('username',
-                            app.config.get('MONGODB_USERNAME', None))
-        config.setdefault('password',
-                            app.config.get('MONGODB_PASSWORD', None))
-
         # Make documents JSON serializable
         overide_json_encoder(app)
 
@@ -83,11 +71,26 @@ class MongoEngine(object):
             # potentially new configuration would not be loaded.
             raise Exception('Extension already initialized')
 
-        # Before using default config we check for MONGODB_SETTINGS
-        if 'MONGODB_SETTINGS' in app.config:
-            connection = _create_connection(app.config['MONGODB_SETTINGS'])
-        else:
+        if config:
+            # If passed an explicit config then we must make sure to ignore
+            # anything set in the application config.
             connection = _create_connection(config)
+        else:
+            # Set default config
+            config = {}
+            config.setdefault('db', app.config.get('MONGODB_DB', None))
+            config.setdefault('host', app.config.get('MONGODB_HOST', None))
+            config.setdefault('port', app.config.get('MONGODB_PORT', None))
+            config.setdefault('username',
+                                app.config.get('MONGODB_USERNAME', None))
+            config.setdefault('password',
+                                app.config.get('MONGODB_PASSWORD', None))
+
+            # Before using default config we check for MONGODB_SETTINGS
+            if 'MONGODB_SETTINGS' in app.config:
+                connection = _create_connection(app.config['MONGODB_SETTINGS'])
+            else:
+                connection = _create_connection(config)
 
         # Store objects in application instance so that multiple apps do
         # not end up accessing the same objects.
