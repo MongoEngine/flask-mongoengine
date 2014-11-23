@@ -46,7 +46,7 @@ def _create_connection(conn_settings):
 
 class MongoEngine(object):
 
-    def __init__(self, app=None):
+    def __init__(self, app=None, config=None):
 
         _include_mongoengine(self)
 
@@ -54,20 +54,22 @@ class MongoEngine(object):
         self.DynamicDocument = DynamicDocument
 
         if app is not None:
-            self.init_app(app)
+            self.init_app(app, config)
 
-    def init_app(self, app):
+    def init_app(self, app, config=None):
 
         app.extensions = getattr(app, 'extensions', {})
 
-        # Set default settings
-        settings = {}
-        settings.setdefault('db', app.config.get('MONGODB_DB', None))
-        settings.setdefault('host', app.config.get('MONGODB_HOST', None))
-        settings.setdefault('port', app.config.get('MONGODB_PORT', None))
-        settings.setdefault('username',
+        if not config:
+            config = {}
+
+        # Set default config
+        config.setdefault('db', app.config.get('MONGODB_DB', None))
+        config.setdefault('host', app.config.get('MONGODB_HOST', None))
+        config.setdefault('port', app.config.get('MONGODB_PORT', None))
+        config.setdefault('username',
                             app.config.get('MONGODB_USERNAME', None))
-        settings.setdefault('password',
+        config.setdefault('password',
                             app.config.get('MONGODB_PASSWORD', None))
 
         # Make documents JSON serializable
@@ -81,11 +83,11 @@ class MongoEngine(object):
             # potentially new configuration would not be loaded.
             raise Exception('Extension already initialized')
 
-        # Before using default settings we check for MONGODB_SETTINGS
+        # Before using default config we check for MONGODB_SETTINGS
         if 'MONGODB_SETTINGS' in app.config:
             connection = _create_connection(app.config['MONGODB_SETTINGS'])
         else:
-            connection = _create_connection(settings)
+            connection = _create_connection(config)
 
         # Store objects in application instance so that multiple apps do
         # not end up accessing the same objects.
