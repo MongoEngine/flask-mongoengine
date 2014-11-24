@@ -7,6 +7,7 @@ import flask
 
 from flask.ext.mongoengine import MongoEngine
 from flask.ext.mongoengine.json import MongoEngineJSONEncoder
+from . import FlaskMongoEngineTestCase
 
 
 class DummyEncoder(flask.json.JSONEncoder):
@@ -17,7 +18,7 @@ class DummyEncoder(flask.json.JSONEncoder):
     '''
 
 
-class JSONAppTestCase(unittest.TestCase):
+class JSONAppTestCase(FlaskMongoEngineTestCase):
 
     def dictContains(self,superset,subset):
         for k,v in subset.items():
@@ -29,14 +30,12 @@ class JSONAppTestCase(unittest.TestCase):
         return self.assertTrue(self.dictContains(superset,subset))
 
     def setUp(self):
-        app = flask.Flask(__name__)
-        app.config['MONGODB_DB'] = 'testing'
-        app.config['TESTING'] = True
-        app.json_encoder = DummyEncoder
+        super(JSONAppTestCase, self).setUp()
+        self.app.config['MONGODB_DB'] = 'testing'
+        self.app.config['TESTING'] = True
+        self.app.json_encoder = DummyEncoder
         db = MongoEngine()
-        db.init_app(app)
-
-        self.app = app
+        db.init_app(self.app)
         self.db = db
 
     def test_inheritance(self):

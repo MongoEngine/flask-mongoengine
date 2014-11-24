@@ -6,8 +6,9 @@ import datetime
 import flask
 
 from flask.ext.mongoengine import MongoEngine
+from . import FlaskMongoEngineTestCase
 
-class JSONAppTestCase(unittest.TestCase):
+class JSONAppTestCase(FlaskMongoEngineTestCase):
 
     def dictContains(self,superset,subset):
         for k,v in subset.items():
@@ -19,9 +20,9 @@ class JSONAppTestCase(unittest.TestCase):
         return self.assertTrue(self.dictContains(superset,subset))
 
     def setUp(self):
-        app = flask.Flask(__name__)
-        app.config['MONGODB_DB'] = 'testing'
-        app.config['TESTING'] = True
+        super(JSONAppTestCase, self).setUp()
+        self.app.config['MONGODB_DB'] = 'testing'
+        self.app.config['TESTING'] = True
         db = MongoEngine()
 
         class Todo(db.Document):
@@ -30,16 +31,16 @@ class JSONAppTestCase(unittest.TestCase):
             done = db.BooleanField(default=False)
             pub_date = db.DateTimeField(default=datetime.datetime.now)
 
-        db.init_app(app)
+        db.init_app(self.app)
 
         Todo.drop_collection()
         self.Todo = Todo
 
-        @app.route('/')
+        @self.app.route('/')
         def index():
             return flask.jsonify(result=self.Todo.objects())
 
-        @app.route('/add', methods=['POST'])
+        @self.app.route('/add', methods=['POST'])
         def add():
             form = flask.request.form
             todo = self.Todo(title=form['title'],
@@ -47,32 +48,30 @@ class JSONAppTestCase(unittest.TestCase):
             todo.save()
             return flask.jsonify(result=todo)
 
-        @app.route('/show/<id>/')
+        @self.app.route('/show/<id>/')
         def show(id):
             return flask.jsonify(result=self.Todo.objects.get_or_404(id=id))
 
-
-        self.app = app
         self.db = db
 
 
     def test_connection_kwargs(self):
-        app = flask.Flask(__name__)
-        app.config['MONGODB_SETTINGS'] = {
+        self.app.config['MONGODB_SETTINGS'] = {
             'DB': 'testing_tz_aware',
-            'alias': 'tz_aware_true',
+            'ALIAS': 'tz_aware_true',
             'TZ_AWARE': True,
         }
-        app.config['TESTING'] = True
+        self.app.config['TESTING'] = True
         db = MongoEngine()
-        db.init_app(app)
+        db.init_app(self.app)
         self.assertTrue(db.connection.tz_aware)
 
-        app.config['MONGODB_SETTINGS'] = {
+        db = MongoEngine()
+        self.app.config['MONGODB_SETTINGS'] = {
             'DB': 'testing',
             'alias': 'tz_aware_false',
         }
-        db.init_app(app)
+        db.init_app(self.app)
         self.assertFalse(db.connection.tz_aware)
 
     def test_with_id(self):

@@ -6,34 +6,33 @@ import flask
 
 from flask import session
 from flask.ext.mongoengine import MongoEngine, MongoEngineSessionInterface
+from . import FlaskMongoEngineTestCase
 
 
-class BasicAppTestCase(unittest.TestCase):
+class SessionTestCase(FlaskMongoEngineTestCase):
 
     def setUp(self):
+        super(SessionTestCase, self).setUp()
         self.db_name = 'testing'
+        self.app.config['MONGODB_DB'] = self.db_name
+        self.app.config['TESTING'] = True
+        db = MongoEngine(self.app)
+        self.app.session_interface = MongoEngineSessionInterface(db)
 
-        app = flask.Flask(__name__)
-        app.config['MONGODB_DB'] = self.db_name
-        app.config['TESTING'] = True
-        db = MongoEngine(app)
-        app.session_interface = MongoEngineSessionInterface(db)
-
-        @app.route('/')
+        @self.app.route('/')
         def index():
             session["a"] = "hello session"
             return session["a"]
 
-        @app.route('/check-session')
+        @self.app.route('/check-session')
         def check_session():
             return "session: %s" % session["a"]
 
-        @app.route('/check-session-database')
+        @self.app.route('/check-session-database')
         def check_session_database():
             sessions = self.app.session_interface.cls.objects.count()
             return "sessions: %s" % sessions
 
-        self.app = app
         self.db = db
 
     def tearDown(self):

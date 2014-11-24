@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-from flask import abort
+from flask import abort, current_app
 
 import mongoengine
 
@@ -23,6 +23,14 @@ def _include_mongoengine(obj):
 
 
 def _create_connection(conn_settings):
+
+    # Handle multiple connections recursively
+    if isinstance(conn_settings, list):
+        connections = {}
+        for conn in conn_settings:
+            connections[conn.get('alias')] = _create_connection(conn)
+        return connections
+
     conn = dict([(k.lower(), v) for k, v in conn_settings.items() if v])
 
     if 'replicaset' in conn:
@@ -38,7 +46,7 @@ def _create_connection(conn_settings):
 
 class MongoEngine(object):
 
-    def __init__(self, app=None):
+    def __init__(self, app=None, config=None):
 
         _include_mongoengine(self)
 
@@ -46,32 +54,52 @@ class MongoEngine(object):
         self.DynamicDocument = DynamicDocument
 
         if app is not None:
-            self.init_app(app)
+            self.init_app(app, config)
 
-    def init_app(self, app):
-
-        conn_settings = app.config.get('MONGODB_SETTINGS', None)
-
-        if not conn_settings:
-            conn_settings = {
-                'db': app.config.get('MONGODB_DB', None),
-                'username': app.config.get('MONGODB_USERNAME', None),
-                'password': app.config.get('MONGODB_PASSWORD', None),
-                'host': app.config.get('MONGODB_HOST', None),
-                'port': int(app.config.get('MONGODB_PORT', 0)) or None
-            }
-
-        if isinstance(conn_settings, list):
-            self.connection = {}
-            for conn in conn_settings:
-                self.connection[conn.get('alias')] = _create_connection(conn)
-        else:
-            self.connection = _create_connection(conn_settings)
+    def init_app(self, app, config=None):
 
         app.extensions = getattr(app, 'extensions', {})
-        app.extensions['mongoengine'] = self
-        self.app = app
+
+        # Make documents JSON serializable
         overide_json_encoder(app)
+
+        if not 'mongoengine' in app.extensions:
+            app.extensions['mongoengine'] = {}
+
+        if self in app.extensions['mongoengine']:
+            # Raise an exception if extension already initialized as
+            # potentially new configuration would not be loaded.
+            raise Exception('Extension already initialized')
+
+        if config:
+            # If passed an explicit config then we must make sure to ignore
+            # anything set in the application config.
+            connection = _create_connection(config)
+        else:
+            # Set default config
+            config = {}
+            config.setdefault('db', app.config.get('MONGODB_DB', None))
+            config.setdefault('host', app.config.get('MONGODB_HOST', None))
+            config.setdefault('port', app.config.get('MONGODB_PORT', None))
+            config.setdefault('username',
+                                app.config.get('MONGODB_USERNAME', None))
+            config.setdefault('password',
+                                app.config.get('MONGODB_PASSWORD', None))
+
+            # Before using default config we check for MONGODB_SETTINGS
+            if 'MONGODB_SETTINGS' in app.config:
+                connection = _create_connection(app.config['MONGODB_SETTINGS'])
+            else:
+                connection = _create_connection(config)
+
+        # Store objects in application instance so that multiple apps do
+        # not end up accessing the same objects.
+        app.extensions['mongoengine'] = {self: {'app': app,
+                                                'conn': connection}}
+
+    @property
+    def connection(self):
+        return current_app.extensions['mongoengine'][self]['conn']
 
 
 class BaseQuerySet(QuerySet):
