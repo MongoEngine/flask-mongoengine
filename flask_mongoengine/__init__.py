@@ -94,8 +94,8 @@ class MongoEngine(object):
 
         # Store objects in application instance so that multiple apps do
         # not end up accessing the same objects.
-        app.extensions['mongoengine'] = {self: {'app': app,
-                                                'conn': connection}}
+        app.extensions['mongoengine'][self] = {'app': app,
+                                               'conn': connection}
 
     @property
     def connection(self):
