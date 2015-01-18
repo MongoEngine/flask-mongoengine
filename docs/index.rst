@@ -73,7 +73,7 @@ Connection settings may also be provided individually by prefixing the setting w
     app.config['MONGODB_HOST'] = '192.168.1.35'
     app.config['MONGODB_PORT'] = 12345
     app.config['MONGODB_USERNAME'] = 'webapp'
-    app.config['PASSWORD'] = 'pwd123'
+    app.config['MONGODB_PASSWORD'] = 'pwd123'
 
 
 Custom Queryset
