@@ -9,7 +9,7 @@ from wtforms import widgets
 from wtforms.fields import SelectFieldBase, TextAreaField, StringField
 from wtforms.validators import ValidationError
 
-from mongoengine.queryset import DoesNotExist
+from mongoengine.queryset import DoesNotExist, ValidationError as MongoValidationError
 from mongoengine.python_support import txt_type, bin_type
 
 __all__ = (
@@ -74,8 +74,12 @@ class QuerySetSelectField(SelectFieldBase):
                     self.data = obj
                 except DoesNotExist:
                     self.data = None
+		except MongoValidationError:
+		    self.invalid = True
 
     def pre_validate(self, form):
+	if self.invalid:
+            raise ValidationError(_(u'Not a valid choice'))
         if not self.allow_blank or self.data is not None:
             if not self.data:
                 raise ValidationError(_(u'Not a valid choice'))
