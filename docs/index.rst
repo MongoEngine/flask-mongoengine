@@ -154,7 +154,7 @@ You can use MongoEngine and WTForms like so::
         if request.method == 'POST' and form.validate():
             # do something
             redirect('done')
-        return render_response('add_post.html', form=form)
+        return render_template('add_post.html', form=form)
 
 
 Supported fields
