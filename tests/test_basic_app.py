@@ -13,14 +13,13 @@ class BasicAppTestCase(FlaskMongoEngineTestCase):
     def setUp(self):
         super(BasicAppTestCase, self).setUp()
         db = MongoEngine()
+        db.init_app(self.app)
 
         class Todo(db.Document):
             title = db.StringField(max_length=60)
             text = db.StringField()
             done = db.BooleanField(default=False)
             pub_date = db.DateTimeField(default=datetime.datetime.now)
-
-        db.init_app(self.app)
 
         Todo.drop_collection()
         self.Todo = Todo

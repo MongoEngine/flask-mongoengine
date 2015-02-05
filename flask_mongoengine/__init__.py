@@ -56,7 +56,7 @@ class MongoEngine(object):
         if app is not None:
             self.init_app(app, config)
 
-    def init_app(self, app, config=None):
+    def init_app(self, app, config=None, lazy_connection=False):
 
         app.extensions = getattr(app, 'extensions', {})
 
@@ -78,7 +78,7 @@ class MongoEngine(object):
 
         if 'MONGODB_SETTINGS' in config:
             # Connection settings provided as a dictionary.
-            connection = _create_connection(config['MONGODB_SETTINGS'])
+            settings = config['MONGODB_SETTINGS']
         else:
             # Connection settings provided in standard format.
             settings = {'alias': config.get('MONGODB_ALIAS', None),
@@ -87,15 +87,23 @@ class MongoEngine(object):
                         'password': config.get('MONGODB_PASSWORD', None),
                         'port': config.get('MONGODB_PORT', None),
                         'username': config.get('MONGODB_USERNAME', None)}
-            connection = _create_connection(settings)
 
         # Store objects in application instance so that multiple apps do
         # not end up accessing the same objects.
         app.extensions['mongoengine'][self] = {'app': app,
-                                               'conn': connection}
+                                               'settings': settings}
+
+        # Accessing the connection property will establish a connection if not
+        # already connected.
+        if not lazy_connection:
+            assert self.connection
 
     @property
     def connection(self):
+        if not 'conn' in current_app.extensions['mongoengine'][self]:
+            settings = current_app.extensions['mongoengine'][self]['settings']
+            current_app.extensions['mongoengine'][self]['conn'] = \
+                _create_connection(settings)
         return current_app.extensions['mongoengine'][self]['conn']
 
 
