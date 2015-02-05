@@ -4,6 +4,8 @@ from __future__ import absolute_import
 from flask import abort, current_app
 
 import mongoengine
+import mongoengine.connection
+from mongoengine.connection import DEFAULT_CONNECTION_NAME
 
 from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist, QuerySet
 from mongoengine.base import ValidationError
@@ -15,6 +17,11 @@ from .pagination import *
 from .json import overide_json_encoder
 
 
+# Dictionary to hold connection settings until `get_db` is executed. This
+# allows creation of lazy connection objects.
+pending_lazy_connections = {}
+
+
 def _include_mongoengine(obj):
     for module in mongoengine, mongoengine.fields:
         for key in module.__all__:
@@ -22,7 +29,7 @@ def _include_mongoengine(obj):
                 setattr(obj, key, getattr(module, key))
 
 
-def _create_connection(conn_settings):
+def _create_connection(conn_settings, lazy=False):
 
     # Handle multiple connections recursively
     if isinstance(conn_settings, list):
@@ -41,7 +48,18 @@ def _create_connection(conn_settings):
         uri_dict = uri_parser.parse_uri(conn_settings['host'])
         conn['db'] = uri_dict['database']
 
-    return mongoengine.connect(conn.pop('db', 'test'), **conn)
+    if lazy:
+        pending_lazy_connections[conn.get('alias')] = conn
+    else:
+        return mongoengine.connect(conn.pop('db', 'test'), **conn)
+
+
+def get_db(db_alias):
+    """Gets db after ensuring lazy connection is connected."""
+    if db_alias in pending_lazy_connections:
+        conn = pending_lazy_connections.get(db_alias)
+        mongoengine.connect(conn.pop('db', 'test'), **conn)
+    return mongoengine.connection.get_db(db_alias)
 
 
 class MongoEngine(object):
@@ -88,31 +106,21 @@ class MongoEngine(object):
                         'port': config.get('MONGODB_PORT', None),
                         'username': config.get('MONGODB_USERNAME', None)}
 
+        # If the alias isn't set then use the default connection name,
+        if not settings.get('alias'):
+            settings['alias'] = DEFAULT_CONNECTION_NAME
+
         # Store objects in application instance so that multiple apps do
         # not end up accessing the same objects.
         app.extensions['mongoengine'][self] = {'app': app,
                                                'settings': settings}
 
-        # Accessing the connection property will establish a connection if not
-        # already connected.
-        lazy_connection = bool(config.get('MONGODB_LAZY_CONNECTION', False))
-        if not lazy_connection:
-            assert self.get_connection(app=app)
-
-    @property
-    def connection(self):
-        return self.get_connection(app=current_app)
-
-    def get_connection(self, app=None):
-        """Gets or creates a connection for a specific app instance"""
-        if not app:
-            app = current_app
-
-        if not 'conn' in app.extensions['mongoengine'][self]:
-            settings = app.extensions['mongoengine'][self]['settings']
-            app.extensions['mongoengine'][self]['conn'] = \
-                _create_connection(settings)
-        return app.extensions['mongoengine'][self]['conn']
+        # Creating a lazy connection requires that your documents inherit from
+        # the Document class defined in this extension. Otherwise mongoengine
+        # will not have an initialized connection on first attempt to access
+        # data.
+        lazy = bool(config.get('MONGODB_LAZY_CONNECTION', False))
+        _create_connection(settings, lazy=lazy)
 
 
 class BaseQuerySet(QuerySet):
@@ -157,6 +165,11 @@ class Document(mongoengine.Document):
         total = total or count or len(getattr(self, field_name))
         return ListFieldPagination(self.__class__.objects, self.pk, field_name,
                                    page, per_page, total=total)
+
+    @classmethod
+    def _get_db(cls):
+        """Override so we can establish connections inside flask-mongoengine"""
+        return get_db(cls._meta.get("db_alias", DEFAULT_CONNECTION_NAME))
 
 
 class DynamicDocument(mongoengine.DynamicDocument):
