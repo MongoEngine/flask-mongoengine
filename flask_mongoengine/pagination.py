@@ -21,7 +21,7 @@ class Pagination(object):
         self.per_page = per_page
 
         if isinstance(iterable, QuerySet):
-            self.total = iterable.count()
+            self.total = iterable.count(with_limit_and_skip=True)
         else:
             self.total = len(iterable)
 
