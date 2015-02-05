@@ -73,7 +73,7 @@ Connection settings may also be provided individually by prefixing the setting w
     app.config['MONGODB_HOST'] = '192.168.1.35'
     app.config['MONGODB_PORT'] = 12345
     app.config['MONGODB_USERNAME'] = 'webapp'
-    app.config['PASSWORD'] = 'pwd123'
+    app.config['MONGODB_PASSWORD'] = 'pwd123'
 
 
 Custom Queryset
@@ -154,7 +154,7 @@ You can use MongoEngine and WTForms like so::
         if request.method == 'POST' and form.validate():
             # do something
             redirect('done')
-        return render_response('add_post.html', form=form)
+        return render_template('add_post.html', form=form)
 
 
 Supported fields
