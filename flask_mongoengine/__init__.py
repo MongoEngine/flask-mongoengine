@@ -56,7 +56,7 @@ class MongoEngine(object):
         if app is not None:
             self.init_app(app, config)
 
-    def init_app(self, app, config=None, lazy_connection=False):
+    def init_app(self, app, config=None):
 
         app.extensions = getattr(app, 'extensions', {})
 
@@ -95,16 +95,24 @@ class MongoEngine(object):
 
         # Accessing the connection property will establish a connection if not
         # already connected.
+        lazy_connection = bool(config.get('MONGODB_LAZY_CONNECTION', False))
         if not lazy_connection:
-            assert self.connection
+            assert self.get_connection(app=app)
 
     @property
     def connection(self):
-        if not 'conn' in current_app.extensions['mongoengine'][self]:
-            settings = current_app.extensions['mongoengine'][self]['settings']
-            current_app.extensions['mongoengine'][self]['conn'] = \
+        return self.get_connection(app=current_app)
+
+    def get_connection(self, app=None):
+        """Gets or creates a connection for a specific app instance"""
+        if not app:
+            app = current_app
+
+        if not 'conn' in app.extensions['mongoengine'][self]:
+            settings = app.extensions['mongoengine'][self]['settings']
+            app.extensions['mongoengine'][self]['conn'] = \
                 _create_connection(settings)
-        return current_app.extensions['mongoengine'][self]['conn']
+        return app.extensions['mongoengine'][self]['conn']
 
 
 class BaseQuerySet(QuerySet):
