@@ -16,7 +16,8 @@ class SessionTestCase(FlaskMongoEngineTestCase):
         self.db_name = 'testing'
         self.app.config['MONGODB_DB'] = self.db_name
         self.app.config['TESTING'] = True
-        db = MongoEngine(self.app)
+        db = MongoEngine()
+        db.init_app(self.app)
         self.app.session_interface = MongoEngineSessionInterface(db)
 
         @self.app.route('/')

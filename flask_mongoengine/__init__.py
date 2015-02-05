@@ -4,6 +4,8 @@ from __future__ import absolute_import
 from flask import abort, current_app
 
 import mongoengine
+import mongoengine.connection
+from mongoengine.connection import DEFAULT_CONNECTION_NAME
 
 from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist, QuerySet
 from mongoengine.base import ValidationError
@@ -15,6 +17,11 @@ from .pagination import *
 from .json import overide_json_encoder
 
 
+# Dictionary to hold connection settings until `get_db` is executed. This
+# allows creation of lazy connection objects.
+pending_lazy_connections = {}
+
+
 def _include_mongoengine(obj):
     for module in mongoengine, mongoengine.fields:
         for key in module.__all__:
@@ -22,7 +29,7 @@ def _include_mongoengine(obj):
                 setattr(obj, key, getattr(module, key))
 
 
-def _create_connection(conn_settings):
+def _create_connection(conn_settings, lazy=False):
 
     # Handle multiple connections recursively
     if isinstance(conn_settings, list):
@@ -41,7 +48,18 @@ def _create_connection(conn_settings):
         uri_dict = uri_parser.parse_uri(conn_settings['host'])
         conn['db'] = uri_dict['database']
 
-    return mongoengine.connect(conn.pop('db', 'test'), **conn)
+    if lazy:
+        pending_lazy_connections[conn.get('alias')] = conn
+    else:
+        return mongoengine.connect(conn.pop('db', 'test'), **conn)
+
+
+def get_db(db_alias):
+    """Gets db after ensuring lazy connection is connected."""
+    if db_alias in pending_lazy_connections:
+        conn = pending_lazy_connections.get(db_alias)
+        mongoengine.connect(conn.pop('db', 'test'), **conn)
+    return mongoengine.connection.get_db(db_alias)
 
 
 class MongoEngine(object):
@@ -71,35 +89,38 @@ class MongoEngine(object):
             # potentially new configuration would not be loaded.
             raise Exception('Extension already initialized')
 
-        if config:
-            # If passed an explicit config then we must make sure to ignore
-            # anything set in the application config.
-            connection = _create_connection(config)
-        else:
-            # Set default config
-            config = {}
-            config.setdefault('db', app.config.get('MONGODB_DB', None))
-            config.setdefault('host', app.config.get('MONGODB_HOST', None))
-            config.setdefault('port', app.config.get('MONGODB_PORT', None))
-            config.setdefault('username',
-                                app.config.get('MONGODB_USERNAME', None))
-            config.setdefault('password',
-                                app.config.get('MONGODB_PASSWORD', None))
+        if not config:
+            # If not passed a config then we read the connection settings
+            # from the app config.
+            config = app.config
 
-            # Before using default config we check for MONGODB_SETTINGS
-            if 'MONGODB_SETTINGS' in app.config:
-                connection = _create_connection(app.config['MONGODB_SETTINGS'])
-            else:
-                connection = _create_connection(config)
+        if 'MONGODB_SETTINGS' in config:
+            # Connection settings provided as a dictionary.
+            settings = config['MONGODB_SETTINGS']
+        else:
+            # Connection settings provided in standard format.
+            settings = {'alias': config.get('MONGODB_ALIAS', None),
+                        'db': config.get('MONGODB_DB', None),
+                        'host': config.get('MONGODB_HOST', None),
+                        'password': config.get('MONGODB_PASSWORD', None),
+                        'port': config.get('MONGODB_PORT', None),
+                        'username': config.get('MONGODB_USERNAME', None)}
+
+        # If the alias isn't set then use the default connection name,
+        if not settings.get('alias'):
+            settings['alias'] = DEFAULT_CONNECTION_NAME
 
         # Store objects in application instance so that multiple apps do
         # not end up accessing the same objects.
         app.extensions['mongoengine'][self] = {'app': app,
-                                               'conn': connection}
+                                               'settings': settings}
 
-    @property
-    def connection(self):
-        return current_app.extensions['mongoengine'][self]['conn']
+        # Creating a lazy connection requires that your documents inherit from
+        # the Document class defined in this extension. Otherwise mongoengine
+        # will not have an initialized connection on first attempt to access
+        # data.
+        lazy = bool(config.get('MONGODB_LAZY_CONNECTION', False))
+        _create_connection(settings, lazy=lazy)
 
 
 class BaseQuerySet(QuerySet):
@@ -144,6 +165,11 @@ class Document(mongoengine.Document):
         total = total or count or len(getattr(self, field_name))
         return ListFieldPagination(self.__class__.objects, self.pk, field_name,
                                    page, per_page, total=total)
+
+    @classmethod
+    def _get_db(cls):
+        """Override so we can establish connections inside flask-mongoengine"""
+        return get_db(cls._meta.get("db_alias", DEFAULT_CONNECTION_NAME))
 
 
 class DynamicDocument(mongoengine.DynamicDocument):
