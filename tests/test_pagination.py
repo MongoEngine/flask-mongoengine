@@ -6,20 +6,19 @@ import flask
 from werkzeug.exceptions import NotFound
 
 from flask.ext.mongoengine import MongoEngine, Pagination, ListFieldPagination
+from . import FlaskMongoEngineTestCase
 
 
-class PaginationTestCase(unittest.TestCase):
+class PaginationTestCase(FlaskMongoEngineTestCase):
 
     def setUp(self):
+        super(PaginationTestCase, self).setUp()
         self.db_name = 'testing'
-
-        app = flask.Flask(__name__)
-        app.config['MONGODB_DB'] = self.db_name
-        app.config['TESTING'] = True
-        app.config['CSRF_ENABLED'] = False
-        self.app = app
+        self.app.config['MONGODB_DB'] = self.db_name
+        self.app.config['TESTING'] = True
+        self.app.config['CSRF_ENABLED'] = False
         self.db = MongoEngine()
-        self.db.init_app(app)
+        self.db.init_app(self.app)
 
     def tearDown(self):
         self.db.connection.drop_database(self.db_name)

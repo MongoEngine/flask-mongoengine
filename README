@@ -17,3 +17,6 @@ You can find the documentation at http://readthedocs.org/docs/flask-mongoengine/
 
 You can install this package using pypi, $ pip install flask-mongoengine
 
+~ What about the license?
+
+Flask-MongoEngine is distributed under MIT license, see LICENSE for more details 

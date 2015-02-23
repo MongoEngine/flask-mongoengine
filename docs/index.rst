@@ -35,12 +35,45 @@ Or, if you are setting up your database before your app is initialized, as is th
     app = Flask(__name__)
     app.config.from_pyfile('the-config.cfg')
     db.init_app(app)
-    
-To configure the MongoDB connection settings set a key (DB, USERNAME, PASSWORD, HOST, PORT) in the
-`'MONGODB_SETTINGS'` dictionary wih `app.config`. For example :
 
-    app.config["MONGODB_SETTINGS"] = {"DB": "my_tumble_log", "USERNAME" : "my_user_name", "PASSWORD" : "my_secret_password", "HOST" : "127.0.0.1", "PORT": 27017 }
 
+By default, Flask-MongoEngine assumes that the :program:`mongod` instance is running
+on **localhost** on port **27017**, and you wish to connect to the database named **test**.
+
+If MongoDB is running elsewhere, you should provide the :attr:`host` and :attr:`port` settings
+in  the `'MONGODB_SETTINGS'` dictionary wih `app.config`.::
+
+    app.config['MONGODB_SETTINGS'] = {
+        'db': 'project1',
+        'host': '192.168.1.35',
+        'port': 12345
+    }
+
+If the database requires authentication, the :attr:`username` and :attr:`password`
+arguments should be provided `'MONGODB_SETTINGS'` dictionary wih `app.config`.::
+
+    app.config['MONGODB_SETTINGS'] = {
+        'db': 'project1',
+        'username':'webapp',
+        'password':'pwd123'
+    }
+
+Uri style connections are also supported, just supply the uri as the :attr:`host`
+in the `'MONGODB_SETTINGS'` dictionary with `app.config`. **Note that database name from uri has priority over name.** ::
+
+    app.config['MONGODB_SETTINGS'] = {
+        'db': 'project1',
+        'host': 'mongodb://localhost/database_name'
+    }
+
+
+Connection settings may also be provided individually by prefixing the setting with `'MONGODB_'` in the `app.config`.::
+
+    app.config['MONGODB_DB'] = 'project1'
+    app.config['MONGODB_HOST'] = '192.168.1.35'
+    app.config['MONGODB_PORT'] = 12345
+    app.config['MONGODB_USERNAME'] = 'webapp'
+    app.config['MONGODB_PASSWORD'] = 'pwd123'
 
 
 Custom Queryset
@@ -121,7 +154,7 @@ You can use MongoEngine and WTForms like so::
         if request.method == 'POST' and form.validate():
             # do something
             redirect('done')
-        return render_response('add_post.html', form=form)
+        return render_template('add_post.html', form=form)
 
 
 Supported fields

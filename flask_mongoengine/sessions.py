@@ -4,6 +4,7 @@ import uuid
 
 from flask.sessions import SessionInterface, SessionMixin
 from werkzeug.datastructures import CallbackDict
+from bson.tz_util import utc
 
 __all__ = ("MongoEngineSession", "MongoEngineSessionInterface")
 
@@ -57,21 +58,31 @@ class MongoEngineSessionInterface(SessionInterface):
         sid = request.cookies.get(app.session_cookie_name)
         if sid:
             stored_session = self.cls.objects(sid=sid).first()
-            if stored_session and stored_session.expiration > datetime.datetime.utcnow():
-                return MongoEngineSession(initial=stored_session.data, sid=stored_session.sid)
+
+            if stored_session:
+                expiration = stored_session.expiration
+
+                if not expiration.tzinfo:
+                    expiration = expiration.replace(tzinfo=utc)
+
+                if expiration > datetime.datetime.utcnow().replace(tzinfo=utc):
+                    return MongoEngineSession(initial=stored_session.data, sid=stored_session.sid)
+
         return MongoEngineSession(sid=str(uuid.uuid4()))
 
     def save_session(self, app, session, response):
         domain = self.get_cookie_domain(app)
+        httponly = self.get_cookie_httponly(app)
+
         if not session:
             if session.modified:
                 response.delete_cookie(app.session_cookie_name, domain=domain)
             return
 
-        expiration = datetime.datetime.now() + self.get_expiration_time(app, session)
+        expiration = datetime.datetime.utcnow().replace(tzinfo=utc) + self.get_expiration_time(app, session)
 
         if session.modified:
             self.cls(sid=session.sid, data=session, expiration=expiration).save()
 
         response.set_cookie(app.session_cookie_name, session.sid,
-                            expires=expiration, httponly=True, domain=domain)
+                            expires=expiration, httponly=httponly, domain=domain)
