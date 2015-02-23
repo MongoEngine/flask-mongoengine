@@ -75,6 +75,18 @@ class JSONAppTestCase(unittest.TestCase):
         db.init_app(app)
         self.assertFalse(db.connection.tz_aware)
 
+    def test_connection_kwargs_with_false_values(self):
+        app = flask.Flask(__name__)
+        app.config['MONGODB_SETTINGS'] = {
+            'DB': 'testing',
+            'alias': 'test',
+            'ssl_validate_hostname': False
+        }
+        app.config['TESTING'] = True
+        db = MongoEngine()
+        db.init_app(app)
+        self.assertFalse(db.connection.ssl_validate_hostname)
+
     def test_with_id(self):
         c = self.app.test_client()
         resp = c.get('/show/38783728378090/')

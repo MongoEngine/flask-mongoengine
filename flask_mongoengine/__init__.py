@@ -48,7 +48,7 @@ class MongoEngine(object):
         if isinstance(conn_settings, list):
             self.connection = {}
             for conn in conn_settings:
-                conn = dict([(k.lower(), v) for k, v in conn.items() if v])
+                conn = dict((k.lower(), v) for k, v in conn.items() if v is not None)
 
                 if 'replicaset' in conn:
                     conn['replicaSet'] = conn['replicaset']
