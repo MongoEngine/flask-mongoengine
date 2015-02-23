@@ -79,12 +79,12 @@ class JSONAppTestCase(FlaskMongoEngineTestCase):
         app.config['MONGODB_SETTINGS'] = {
             'DB': 'testing',
             'alias': 'test',
-            'ssl_validate_hostname': False
+            'use_greenlets': False
         }
         app.config['TESTING'] = True
         db = MongoEngine()
         db.init_app(app)
-        self.assertFalse(db.connection.ssl_validate_hostname)
+        self.assertFalse(db.connection.use_greenlets)
 
     def test_with_id(self):
         c = self.app.test_client()
