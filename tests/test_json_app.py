@@ -75,15 +75,14 @@ class JSONAppTestCase(FlaskMongoEngineTestCase):
         self.assertFalse(db.connection.tz_aware)
 
     def test_connection_kwargs_with_false_values(self):
-        app = flask.Flask(__name__)
-        app.config['MONGODB_SETTINGS'] = {
+        self.app.config['MONGODB_SETTINGS'] = {
             'DB': 'testing',
             'alias': 'test',
             'use_greenlets': False
         }
-        app.config['TESTING'] = True
+        self.app.config['TESTING'] = True
         db = MongoEngine()
-        db.init_app(app)
+        db.init_app(self.app)
         self.assertFalse(db.connection.use_greenlets)
 
     def test_with_id(self):
