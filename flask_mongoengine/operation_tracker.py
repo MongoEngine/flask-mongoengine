@@ -50,7 +50,7 @@ def _unpack_response(response, *args, **kwargs):
 # Wrap Cursor.insert for getting queries
 @functools.wraps(_original_methods['insert'])
 def _insert(collection_self, doc_or_docs, manipulate=True,
-           safe=False, check_keys=True, **kwargs):
+            safe=None, check_keys=True, **kwargs):
     start_time = time.time()
     result = _original_methods['insert'](
         collection_self,
@@ -76,7 +76,7 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
 # Wrap Cursor.update for getting queries
 @functools.wraps(_original_methods['update'])
 def _update(collection_self, spec, document, upsert=False,
-           maniuplate=False, safe=False, multi=False, **kwargs):
+            maniuplate=False, safe=None, multi=False, **kwargs):
     start_time = time.time()
     result = _original_methods['update'](
         collection_self,
@@ -106,7 +106,7 @@ def _update(collection_self, spec, document, upsert=False,
 
 # Wrap Cursor.remove for getting queries
 @functools.wraps(_original_methods['remove'])
-def _remove(collection_self, spec_or_id, safe=False, **kwargs):
+def _remove(collection_self, spec_or_id, safe=None, **kwargs):
     start_time = time.time()
     result = _original_methods['remove'](
         collection_self,
