@@ -1,32 +1,30 @@
 # http://travis-ci.org/#!/MongoEngine/flask_mongoengine
 language: python
-services: mongodb
 python:
     - "2.6"
     - "2.7"
     - "3.3"
+    - '3.4'
+    - pypy
+    - pypy3
 env:
-  - PYMONGO=dev MONGOENGINE=dev
-  - PYMONGO=dev MONGOENGINE=0.7.10
-  - PYMONGO=dev MONGOENGINE=0.8.0
-  - PYMONGO=dev MONGOENGINE=0.8.7
-  - PYMONGO=2.5 MONGOENGINE=dev
-  - PYMONGO=2.5 MONGOENGINE=0.7.10
-  - PYMONGO=2.5 MONGOENGINE=0.8.0
-  - PYMONGO=2.5 MONGOENGINE=0.8.7
-  - PYMONGO=2.7 MONGOENGINE=dev
-  - PYMONGO=2.7 MONGOENGINE=0.7.10
-  - PYMONGO=2.7 MONGOENGINE=0.8.0
-  - PYMONGO=2.7 MONGOENGINE=0.8.7
+  - MONGOENGINE=0.7
+  - MONGOENGINE=0.8
+  - MONGOENGINE=0.9
+  - MONGOENGINE=dev
+before_install:
+- travis_retry sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+- echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' |
+  sudo tee /etc/apt/sources.list.d/mongodb.list
+- travis_retry sudo apt-get update
+- travis_retry sudo apt-get install mongodb-org-server
 
 install:
-    - if [[ $PYMONGO == 'dev' ]]; then pip install https://github.com/mongodb/mongo-python-driver/tarball/master; true; fi
-    - if [[ $PYMONGO != 'dev' ]]; then pip install pymongo==$PYMONGO --use-mirrors; true; fi
-    - if [[ $MONGOENGINE == 'dev' ]]; then pip install https://github.com/mongoengine/mongoengine/tarball/master; true; fi
-    - if [[ $MONGOENGINE != 'dev' ]]; then pip install mongoengine==$MONGOENGINE --use-mirrors; true; fi
-    - python setup.py install
+- travis_retry pip install tox>=1.9
+- travis_retry tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- -e test
 script:
-    - python setup.py nosetests
+- tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage
+
 notifications:
   irc: "irc.freenode.org#mongoengine"
 branches:

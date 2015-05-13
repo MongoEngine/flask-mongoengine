@@ -20,6 +20,8 @@ try:
 except:
     pass
 
+test_requirements = ['nose', 'rednose', 'coverage']
+
 setup(
     name='flask-mongoengine',
     version='0.7.1',
@@ -40,7 +42,8 @@ setup(
     packages=['flask_mongoengine',
               'flask_mongoengine.wtf'],
     include_package_data=True,
-    tests_require=['nose', 'coverage'],
+    tests_require=test_requirements,
+    setup_requires=test_requirements,  # Allow proper nose usage with setuptools and tox
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
