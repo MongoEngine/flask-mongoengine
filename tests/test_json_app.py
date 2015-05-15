@@ -74,6 +74,17 @@ class JSONAppTestCase(FlaskMongoEngineTestCase):
         db.init_app(self.app)
         self.assertFalse(db.connection.tz_aware)
 
+    def test_connection_kwargs_with_false_values(self):
+        self.app.config['MONGODB_SETTINGS'] = {
+            'DB': 'testing',
+            'alias': 'test',
+            'use_greenlets': False
+        }
+        self.app.config['TESTING'] = True
+        db = MongoEngine()
+        db.init_app(self.app)
+        self.assertFalse(db.connection.use_greenlets)
+
     def test_with_id(self):
         c = self.app.test_client()
         resp = c.get('/show/38783728378090/')

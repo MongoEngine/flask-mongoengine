@@ -31,7 +31,7 @@ def _create_connection(conn_settings):
             connections[conn.get('alias')] = _create_connection(conn)
         return connections
 
-    conn = dict([(k.lower(), v) for k, v in conn_settings.items() if v])
+    conn = {k.lower(): v for k, v in conn_settings.items() if v is not None}
 
     if 'replicaset' in conn:
         conn['replicaSet'] = conn.pop('replicaset')
