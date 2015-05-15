@@ -12,3 +12,5 @@ env/
 .coverage
 .project
 .pydevproject
+.tox
+.eggs
