@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
+import inspect
 
 from flask import abort, current_app
 
@@ -13,6 +14,45 @@ from pymongo import uri_parser
 from .sessions import *
 from .pagination import *
 from .json import overide_json_encoder
+from .wtf import WtfBaseField
+
+
+def _patch_base_field(object, name):
+    """
+    If the object submitted has a class whose base class is
+    mongoengine.base.fields.BaseField, then monkey patch to
+    replace it with flask_mongoengine.wtf.WtfBaseField.
+
+    @note:  WtfBaseField is an instance of BaseField - but
+            gives us the flexibility to extend field parameters
+            and settings required of WTForm via model form generator.
+
+    @see: flask_mongoengine.wtf.base.WtfBaseField.
+    @see: model_form in flask_mongoengine.wtf.orm
+
+    @param object:  The object whose footprint to locate the class.
+    @param name:    Name of the class to locate.
+
+    """
+    # locate class
+    cls = getattr(object, name)
+    if not inspect.isclass(cls):
+        return
+
+    # fetch class base classes
+    cls_bases = list(cls.__bases__)
+
+    # replace BaseField with WtfBaseField
+    for index, base in enumerate(cls_bases):
+        if base == mongoengine.base.fields.BaseField:
+            cls_bases[index] = WtfBaseField
+            cls.__bases__ = tuple(cls_bases)
+            break
+
+    # re-assign class back to
+    # object footprint
+    delattr(object, name)
+    setattr(object, name, cls)
 
 
 def _include_mongoengine(obj):
@@ -20,6 +60,9 @@ def _include_mongoengine(obj):
         for key in module.__all__:
             if not hasattr(obj, key):
                 setattr(obj, key, getattr(module, key))
+
+                # patch BaseField if available
+                _patch_base_field(obj, key)
 
 
 def _create_connection(conn_settings):
@@ -44,10 +87,10 @@ def _create_connection(conn_settings):
     return mongoengine.connect(conn.pop('db', 'test'), **conn)
 
 
+
 class MongoEngine(object):
 
     def __init__(self, app=None, config=None):
-
         _include_mongoengine(self)
 
         self.Document = Document
