@@ -125,6 +125,7 @@ class ModelSelectMultipleField(QuerySetSelectMultipleField):
     Allows multiple select
     """
     def __init__(self, label=u'', validators=None, model=None, **kwargs):
+        kwargs.setdefault('allow_blank', True)
         queryset = kwargs.pop('queryset', model.objects)
         super(ModelSelectMultipleField, self).__init__(label, validators, queryset=queryset, **kwargs)
 
