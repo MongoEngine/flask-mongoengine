@@ -370,6 +370,30 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertTrue(m is not None, "Should have one selected option")
             self.assertEqual("fido", m.group(1))
 
+    def test_modelselectfield_elements_must_be_cleared(self):
+        with self.app.test_request_context('/'):
+            db = self.db
+
+            class Dog(db.Document):
+                name = db.StringField()
+
+                def __unicode__(self):
+                    return self.name
+
+            class DogOwner(db.Document):
+                name = db.StringField()
+                dogs = db.ListField(db.ReferenceField(Dog))
+
+            DogOwnerForm = model_form(DogOwner)
+
+            fido = Dog(name="fido").save()
+
+            dogOwner = DogOwner(name='Bob', dogs=[fido])
+            form = DogOwnerForm(formdata=MultiDict({'name': 'Bob'}), obj=dogOwner)
+            form.populate_obj(dogOwner)
+
+            self.assertEqual(dogOwner.dogs, [], 'Items list should be cleared')
+
     def test_model_form_help_text(self):
         with self.app.test_request_context('/'):
             db = self.db

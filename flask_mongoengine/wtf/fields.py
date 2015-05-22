@@ -128,6 +128,11 @@ class ModelSelectMultipleField(QuerySetSelectMultipleField):
         queryset = kwargs.pop('queryset', model.objects)
         super(ModelSelectMultipleField, self).__init__(label, validators, queryset=queryset, **kwargs)
 
+    def process_formdata(self, valuelist):
+        if not valuelist:
+            self.data = None
+        else:
+            super(ModelSelectMultipleField, self).process_formdata(valuelist)
 
 class JSONField(TextAreaField):
     def _value(self):
