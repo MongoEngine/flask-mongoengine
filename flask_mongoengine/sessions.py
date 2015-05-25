@@ -52,6 +52,8 @@ class MongoEngineSessionInterface(SessionInterface):
     def get_expiration_time(self, app, session):
         if session.permanent:
             return app.permanent_session_lifetime
+        if 'SESSION_TTL' in app.config:
+          return datetime.timedelta(**app.config['SESSION_TTL'])
         return datetime.timedelta(days=1)
 
     def open_session(self, app, request):
