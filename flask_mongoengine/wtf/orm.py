@@ -68,8 +68,6 @@ class ModelConverter(object):
                 kwargs["coerce"] = self.coerce(ftype)
             if kwargs.pop('multiple', False):
                 return f.SelectMultipleField(**kwargs)
-            if kwargs.pop('radio', False):
-              return f.RadioField(**kwargs)
             return f.SelectField(**kwargs)
 
         ftype = type(field).__name__
@@ -99,7 +97,6 @@ class ModelConverter(object):
         if field.regex:
             kwargs['validators'].append(validators.Regexp(regex=field.regex))
         self._string_common(model, field, kwargs)
-        
         if 'password' in kwargs:
             if kwargs.pop('password'):
                 return f.PasswordField(**kwargs)
