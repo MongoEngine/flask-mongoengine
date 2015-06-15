@@ -68,6 +68,8 @@ class ModelConverter(object):
                 kwargs["coerce"] = self.coerce(ftype)
             if kwargs.pop('multiple', False):
                 return f.SelectMultipleField(**kwargs)
+            if kwargs.pop('radio', False):
+                return f.RadioField(**kwargs)
             return f.SelectField(**kwargs)
 
         ftype = type(field).__name__

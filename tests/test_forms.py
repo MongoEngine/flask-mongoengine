@@ -290,6 +290,23 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertEqual(len(choices), 2)
             self.assertFalse(choices[0].checked)
             self.assertFalse(choices[1].checked)
+            
+    def test_modelradiofield(self):
+        with self.app.test_request_context('/'):
+            db = self.db
+        
+            choices = (('male', 'Male'), ('female', 'Female'), ('other', 'Other'))
+        
+            class Poll(db.Document):
+                answer = db.StringField(choices=choices)
+    
+            PollForm = model_form(Poll, field_args={'answer': {'radio': True}})
+        
+            form = PollForm(answer=None)
+            self.assertTrue(form.validate())
+        
+            self.assertEqual(form.answer.type, 'RadioField')
+            self.assertEqual(form.answer.choices, choices)
 
     def test_passwordfield(self):
         with self.app.test_request_context('/'):
