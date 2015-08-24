@@ -44,19 +44,11 @@ class ModelConverter(object):
         self.converters = converters
 
     def convert(self, model, field, field_args):
-        validators = []
-        try:
-            if hasattr(field, 'validators') and\
-                field.validators is not None:
-                    validators = field.validators
-        except:
-            pass
-
         kwargs = {
             'label': getattr(field, 'verbose_name', field.name),
             'description': field.help_text or '',
-            'validators': validators,
-            'filters': [] if not field.filters else field.filters,
+            'validators': getattr(field, 'validators', []),
+            'filters': getattr(field, 'filters', []),
             'default': field.default,
         }
         if field_args:
