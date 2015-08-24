@@ -133,7 +133,7 @@ def _remove(collection_self, spec_or_id, safe=None, **kwargs):
 def _cursor_refresh(cursor_self):
     # Look up __ private instance variables
     def privar(name):
-        return getattr(cursor_self, '_Cursor__{0}'.format(name))
+        return getattr(cursor_self, '_Cursor__{0}'.format(name), None)
 
     if privar('id') is not None:
         # getMore not query - move on
