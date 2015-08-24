@@ -44,10 +44,18 @@ class ModelConverter(object):
         self.converters = converters
 
     def convert(self, model, field, field_args):
+        validators = []
+        try:
+            if hasattr(field, 'validators') and\
+                field.validators is not None:
+                    validators = field.validators
+        except:
+            pass
+
         kwargs = {
             'label': getattr(field, 'verbose_name', field.name),
             'description': field.help_text or '',
-            'validators': [] if not field.validators else field.validators,
+            'validators': validators,
             'filters': [] if not field.filters else field.filters,
             'default': field.default,
         }
@@ -82,8 +90,8 @@ class ModelConverter(object):
     def _string_common(cls, model, field, kwargs):
         if field.max_length or field.min_length:
             kwargs['validators'].append(
-                validators.Length(max=field.max_length or - 1,
-                                  min=field.min_length or - 1))
+                validators.Length(max=field.max_length or -1,
+                                  min=field.min_length or -1))
 
     @classmethod
     def _number_common(cls, model, field, kwargs):
@@ -141,7 +149,7 @@ class ModelConverter(object):
 
     @converts('BinaryField')
     def conv_Binary(self, model, field, kwargs):
-        #TODO: may be set file field that will save file`s data to MongoDB
+        # TODO: may be set file field that will save file`s data to MongoDB
         if field.max_bytes:
             kwargs['validators'].append(validators.Length(max=field.max_bytes))
         return BinaryField(**kwargs)
@@ -169,12 +177,12 @@ class ModelConverter(object):
 
     @converts('SortedListField')
     def conv_SortedList(self, model, field, kwargs):
-        #TODO: sort functionality, may be need sortable widget
+        # TODO: sort functionality, may be need sortable widget
         return self.conv_List(model, field, kwargs)
 
     @converts('GeoLocationField')
     def conv_GeoLocation(self, model, field, kwargs):
-        #TODO: create geo field and widget (also GoogleMaps)
+        # TODO: create geo field and widget (also GoogleMaps)
         return
 
     @converts('ObjectIdField')
