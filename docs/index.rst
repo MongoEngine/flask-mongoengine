@@ -202,7 +202,7 @@ Debug Toolbar Panel
 
 If you use the Flask-DebugToolbar you can add
 `'flask.ext.mongoengine.panels.MongoDebugPanel'` to the `DEBUG_TB_PANELS` config
-list and then it will automatically track your queries.
+list and then it will automatically track your queries::
 
     from flask import Flask
     from flask_debugtoolbar import DebugToolbarExtension
