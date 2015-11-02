@@ -1,5 +1,3 @@
-import sys
-
 import unittest
 import datetime
 import flask

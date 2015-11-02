@@ -1,5 +1,3 @@
-import sys
-
 import flask
 
 from flask.ext.mongoengine import MongoEngine

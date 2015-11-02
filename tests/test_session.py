@@ -1,5 +1,3 @@
-import sys
-
 import unittest
 
 from flask import session
