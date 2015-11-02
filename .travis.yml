@@ -5,12 +5,14 @@ python:
     - "2.7"
     - "3.3"
     - '3.4'
+    - '3.5'
     - pypy
     - pypy3
 env:
   - MONGOENGINE=0.7
   - MONGOENGINE=0.8
   - MONGOENGINE=0.9
+  - MONGOENGINE=0.10.0
   - MONGOENGINE=dev
 before_install:
 - travis_retry sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
