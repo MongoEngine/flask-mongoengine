@@ -1,12 +1,10 @@
 import sys
-sys.path[0:0] = [""]
 
 import unittest
-import flask
 from werkzeug.exceptions import NotFound
 
 from flask.ext.mongoengine import MongoEngine, Pagination, ListFieldPagination
-from . import FlaskMongoEngineTestCase
+from tests import FlaskMongoEngineTestCase
 
 
 class PaginationTestCase(FlaskMongoEngineTestCase):

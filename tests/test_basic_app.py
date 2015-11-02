@@ -1,11 +1,8 @@
-import sys
-
-import unittest
 import datetime
 import flask
 
 from flask.ext.mongoengine import MongoEngine
-from . import FlaskMongoEngineTestCase
+from tests import FlaskMongoEngineTestCase
 
 
 class BasicAppTestCase(FlaskMongoEngineTestCase):

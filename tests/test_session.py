@@ -1,12 +1,10 @@
 import sys
-sys.path[0:0] = [""]
 
 import unittest
-import flask
 
 from flask import session
 from flask.ext.mongoengine import MongoEngine, MongoEngineSessionInterface
-from . import FlaskMongoEngineTestCase
+from tests import FlaskMongoEngineTestCase
 
 
 class SessionTestCase(FlaskMongoEngineTestCase):

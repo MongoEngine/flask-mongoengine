@@ -1,13 +1,9 @@
 import sys
-sys.path[0:0] = [""]
 
-import unittest
-import datetime
 import flask
 
 from flask.ext.mongoengine import MongoEngine
-from flask.ext.mongoengine.json import MongoEngineJSONEncoder
-from . import FlaskMongoEngineTestCase
+from tests import FlaskMongoEngineTestCase
 
 
 class DummyEncoder(flask.json.JSONEncoder):
