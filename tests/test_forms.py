@@ -1,6 +1,3 @@
-import sys
-sys.path[0:0] = [""]
-
 import unittest
 import datetime
 import flask
@@ -14,7 +11,7 @@ from flask.ext.mongoengine import MongoEngine
 from flask.ext.mongoengine.wtf import model_form
 
 from mongoengine import queryset_manager
-from . import FlaskMongoEngineTestCase
+from tests import FlaskMongoEngineTestCase
 
 
 class WTFormsAppTestCase(FlaskMongoEngineTestCase):
