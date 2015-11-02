@@ -16,6 +16,8 @@ __all__ = (
     'ModelSelectField', 'QuerySetSelectField',
 )
 
+if sys.version_info >= (3, 0):
+    unicode = str
 
 class QuerySetSelectField(SelectFieldBase):
     """
@@ -170,6 +172,6 @@ class BinaryField(TextAreaField):
     def process_formdata(self, valuelist):
         if valuelist:
             if sys.version_info >= (3, 0):
-                self.data = bin_type( valuelist[0], 'utf-8' )
+                self.data = bin_type(valuelist[0], 'utf-8')
             else:
-                self.data = bin_type( valuelist[0] )
+                self.data = bin_type(valuelist[0])
