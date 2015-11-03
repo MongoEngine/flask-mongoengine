@@ -6,6 +6,12 @@ from flask import abort, current_app
 
 import mongoengine
 
+if mongoengine.__version__ == '0.7.10':
+    from mongoengine.base import BaseField
+else:
+    from mongoengine.base.fields import BaseField
+
+
 from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist, QuerySet
 from mongoengine.base import ValidationError
 
@@ -44,7 +50,7 @@ def _patch_base_field(object, name):
 
     # replace BaseField with WtfBaseField
     for index, base in enumerate(cls_bases):
-        if base == mongoengine.base.fields.BaseField:
+        if base == BaseField:
             cls_bases[index] = WtfBaseField
             cls.__bases__ = tuple(cls_bases)
             break
