@@ -1,4 +1,4 @@
-import unittest, os, sys
+import unittest, os, sys, imp
 from tests import FlaskMongoEngineTestCase
 
 class MetaDataTestCase(FlaskMongoEngineTestCase):
@@ -15,12 +15,7 @@ class MetaDataTestCase(FlaskMongoEngineTestCase):
         self.assertTrue(metadata_script is not None)
 
         self.assertTrue(self.metadata is None)
-        if sys.version_info >= (3, 0):
-            from importlib.machinery import SourceFileLoader
-            self.metadata = SourceFileLoader("metadata", metadata_script).load_module()
-        else:
-            import imp
-            self.metadata = imp.load_source('metadata', metadata_script)
+        self.metadata = imp.load_source('metadata', metadata_script)
 
         self.assertTrue(self.metadata is not None)
         self.assertTrue(self.metadata.__version__ is not None)
