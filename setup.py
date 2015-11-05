@@ -1,4 +1,4 @@
-import os, sys
+import os, imp
 from setuptools import setup
 
 def load_module(module_name, script_file):
@@ -11,12 +11,7 @@ def load_module(module_name, script_file):
     '''
     module = None
     try:
-        if sys.version_info >= (3, 0):
-            from importlib.machinery import SourceFileLoader
-            module = SourceFileLoader(module_name, script_file).load_module()
-        else:
-            import imp
-            module = imp.load_source(module_name, script_file)
+        module = imp.load_source(module_name, script_file)
     except:
         pass
     return module
@@ -42,7 +37,6 @@ try:
 except:
     pass
 
-print(metadata.__version__)
 test_requirements = ['nose', 'rednose', 'coverage']
 
 setup(
