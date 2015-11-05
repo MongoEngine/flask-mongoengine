@@ -19,9 +19,9 @@ from pymongo import uri_parser
 
 from .sessions import *
 from .pagination import *
+from .metadata import *
 from .json import overide_json_encoder
 from .wtf import WtfBaseField
-
 
 def _patch_base_field(object, name):
     """
@@ -81,7 +81,7 @@ def _create_connection(conn_settings):
         return connections
 
     # Ugly dict comprehention in order to support python 2.6
-    conn = dict((k.lower(), v) for k,v in conn_settings.items() if v is not None)
+    conn = dict((k.lower(), v) for k, v in conn_settings.items() if v is not None)
 
     if 'replicaset' in conn:
         conn['replicaSet'] = conn.pop('replicaset')
