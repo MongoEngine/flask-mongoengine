@@ -41,44 +41,6 @@ class BasicAppTestCase(FlaskMongoEngineTestCase):
 
         self.db = db
 
-    def test_connection_kwargs(self):
-        self.app.config['MONGODB_SETTINGS'] = {
-            'DB': 'testing_tz_aware',
-            'ALIAS': 'tz_aware_true',
-            'TZ_AWARE': True
-        }
-        self.app.config['TESTING'] = True
-        db = MongoEngine()
-        db.init_app(self.app)
-        self.assertTrue(db.connection.tz_aware)
-
-        # PyMongo defaults to tz_aware = True so we have to explicitly turn
-        # it off.
-        self.app.config['MONGODB_SETTINGS'] = {
-            'DB': 'testing',
-            'ALIAS': 'tz_aware_false',
-            'TZ_AWARE': False
-        }
-        db = MongoEngine()
-        db.init_app(self.app)
-        self.assertFalse(db.connection.tz_aware)
-
-    def test_connection_kwargs_as_list(self):
-        self.app.config['MONGODB_SETTINGS'] = [{
-            'DB': 'testing_tz_aware',
-            'alias': 'tz_aware_true',
-            'TZ_AWARE': True
-        }, {
-            'DB': 'testing_tz_aware_off',
-            'alias': 'tz_aware_false',
-            'TZ_AWARE': False
-        }]
-        self.app.config['TESTING'] = True
-        db = MongoEngine()
-        db.init_app(self.app)
-        self.assertTrue(db.connection['tz_aware_true'].tz_aware)
-        self.assertFalse(db.connection['tz_aware_false'].tz_aware)
-
     def test_connection_default(self):
         self.app.config['MONGODB_SETTINGS'] = {}
         self.app.config['TESTING'] = True
