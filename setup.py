@@ -42,6 +42,7 @@ try:
 except:
     pass
 
+print(metadata.__version__)
 test_requirements = ['nose', 'rednose', 'coverage']
 
 setup(
@@ -59,6 +60,8 @@ setup(
         'mongoengine>=0.7.10',
         'flask-wtf',
     ],
+    packages=['flask_mongoengine',
+              'flask_mongoengine.wtf'],
     include_package_data=True,
     tests_require=test_requirements,
     setup_requires=test_requirements,  # Allow proper nose usage with setuptools and tox
