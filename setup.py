@@ -1,5 +1,11 @@
-import os, imp
-from setuptools import setup
+import os, imp, sys
+
+# Avoid configparsar issues on Python3
+# and PyPy3
+if sys.version_info >= (3, 0):
+    from distutils.core import setup
+else:
+    from setuptools import setup
 
 def load_module(module_name, script_file):
     '''
