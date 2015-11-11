@@ -88,7 +88,7 @@ def _create_connection(conn_settings):
 
     # Handle uri style connections
     if "://" in conn.get('host', ''):
-        uri_dict = uri_parser.parse_uri(conn_settings['host'])
+        uri_dict = uri_parser.parse_uri(conn['host'])
         conn['db'] = uri_dict['database']
 
     return mongoengine.connect(conn.pop('db', 'test'), **conn)
