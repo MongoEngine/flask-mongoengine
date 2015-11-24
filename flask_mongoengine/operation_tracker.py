@@ -58,7 +58,6 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
     result = _original_methods['insert'](
         collection_self,
         doc_or_docs,
-        safe=safe,
         check_keys=check_keys,
         **kwargs
     )
@@ -68,7 +67,6 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
     stack_trace, internal = _tidy_stacktrace()
     inserts.append({
         'document': doc_or_docs,
-        'safe': safe,
         'time': total_time,
         'stack_trace': stack_trace,
         'size': response_sizes[-1] if response_sizes else 0,
@@ -86,7 +84,6 @@ def _update(collection_self, spec, document, upsert=False,
         spec,
         document,
         upsert=upsert,
-        safe=safe,
         multi=multi,
         **kwargs
     )
@@ -99,7 +96,6 @@ def _update(collection_self, spec, document, upsert=False,
         'upsert': upsert,
         'multi': multi,
         'spec': spec,
-        'safe': safe,
         'time': total_time,
         'stack_trace': stack_trace,
         'size': response_sizes[-1] if response_sizes else 0,
@@ -114,7 +110,6 @@ def _remove(collection_self, spec_or_id, safe=None, **kwargs):
     result = _original_methods['remove'](
         collection_self,
         spec_or_id,
-        safe=safe,
         **kwargs
     )
     total_time = (time.time() - start_time) * 1000
@@ -123,7 +118,6 @@ def _remove(collection_self, spec_or_id, safe=None, **kwargs):
     stack_trace, internal = _tidy_stacktrace()
     removes.append({
         'spec_or_id': spec_or_id,
-        'safe': safe,
         'time': total_time,
         '   ': stack_trace,
         'size': response_sizes[-1] if response_sizes else 0,
