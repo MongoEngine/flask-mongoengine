@@ -381,6 +381,29 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
 
             self.assertEqual(form.title.description, "Some imaginative title to set the world on fire")
 
+    def test_shared_field_args(self):
+        with self.app.test_request_context('/'):
+            db = self.db
+
+            class BlogPost(db.Document):
+                title = db.StringField(required=True)
+                content = db.StringField(required=False)
+
+            shared_field_args = {'title': {'validators': [
+                wtforms.validators.Regexp('test')
+            ]}}
+
+            TitleOnlyForm = model_form(BlogPost, field_args=shared_field_args,
+                                       exclude=['content'])
+            BlogPostForm = model_form(BlogPost, field_args=shared_field_args)
+
+            # ensure shared field_args don't create duplicate validators
+            title_only_form = TitleOnlyForm()
+            self.assertEqual(len(title_only_form.title.validators), 2)
+
+            blog_post_form = BlogPostForm()
+            self.assertEqual(len(blog_post_form.title.validators), 2)
+
     def test_embedded_model_form(self):
         with self.app.test_request_context('/'):
             db = self.db

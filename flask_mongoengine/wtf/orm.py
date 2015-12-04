@@ -54,6 +54,10 @@ class ModelConverter(object):
         if field_args:
             kwargs.update(field_args)
 
+        if kwargs['validators']:
+            # Create a copy of the list since we will be modifying it.
+            kwargs['validators'] = list(kwargs['validators'])
+
         if field.required:
             kwargs['validators'].append(validators.Required())
         else:
