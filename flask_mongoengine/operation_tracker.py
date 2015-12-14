@@ -47,7 +47,7 @@ def _unpack_response(response, *args, **kwargs):
         *args,
         **kwargs
     )
-    response_sizes.append(sys.getsizeof(response) / 1024.0)
+    response_sizes.append(sys.getsizeof(response, len(response)) / 1024.0)
     return result
 
 # Wrap Cursor.insert for getting queries
