@@ -1,6 +1,6 @@
 import sys
 
-VERSION = (0, 7, 4)
+VERSION = (0, 7, 5)
 if sys.version_info >= (3, 0):
     unicode = str
     basestring = (str, bytes)
