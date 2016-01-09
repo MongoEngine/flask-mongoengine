@@ -142,7 +142,7 @@ You can use MongoEngine and WTForms like so::
         lang = db.StringField(max_length=3)
 
     class Post(db.Document):
-        title = db.StringField(max_length=120, required=True)
+        title = db.StringField(max_length=120, required=True, validators=[validators.InputRequired(message=u'Missing title.'),])
         author = db.ReferenceField(User)
         tags = db.ListField(db.StringField(max_length=30))
         content = db.EmbeddedDocumentField(Content)
@@ -211,7 +211,7 @@ list and then it will automatically track your queries::
     app.config['DEBUG_TB_PANELS'] = ['flask.ext.mongoengine.panels.MongoDebugPanel']
     db = MongoEngine(app)
     toolbar = DebugToolbarExtension(app)
-    
+
 
 
 Upgrading
