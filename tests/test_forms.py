@@ -123,16 +123,16 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             # Create a text-based post
             TextPostForm = model_form(TextPost)
 
-            form = TextPostForm(**{
+            form = TextPostForm(MultiDict({
                 'title': 'Using MongoEngine',
-                'tags': ['mongodb', 'mongoengine']})
+                'tags': ['mongodb', 'mongoengine']}))
 
             self.assertFalse(form.validate())
 
-            form = TextPostForm(**{
+            form = TextPostForm(MultiDict({
                 'title': 'Using MongoEngine',
                 'content': 'See the tutorial',
-                'tags': ['mongodb', 'mongoengine']})
+                'tags': ['mongodb', 'mongoengine']}))
 
             self.assertTrue(form.validate())
             form.save()
@@ -140,10 +140,10 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertEquals(BlogPost.objects.first().title, 'Using MongoEngine')
             self.assertEquals(BlogPost.objects.count(), 1)
 
-            form = TextPostForm(**{
+            form = TextPostForm(MultiDict({
                 'title': 'Using Flask-MongoEngine',
                 'content': 'See the tutorial',
-                'tags': ['flask', 'mongodb', 'mongoengine']})
+                'tags': ['flask', 'mongodb', 'mongoengine']}))
 
             self.assertTrue(form.validate())
             form.save()
