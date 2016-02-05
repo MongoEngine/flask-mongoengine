@@ -119,6 +119,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
 
             class LinkPost(BlogPost):
                 url = db.StringField(required=True)
+                interest =  db.DecimalField(required=True)
 
             # Create a text-based post
             TextPostForm = model_form(TextPost)
@@ -164,6 +165,17 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             post = post.reload()
 
             self.assertEqual(post.tags, ['flask', 'mongodb', 'mongoengine', 'flask-mongoengine'])
+
+            # Create a link post
+            LinkPostForm = model_form(LinkPost)
+
+            form = LinkPostForm(MultiDict({
+                'title': 'Using Flask-MongoEngine',
+                'url': 'http://flask-mongoengine.org',
+                'interest': '0',
+            }))
+            form.validate()
+            self.assertTrue(form.validate())
 
     def test_model_form_only(self):
         with self.app.test_request_context('/'):
