@@ -88,6 +88,10 @@ class PaginationTestCase(FlaskMongoEngineTestCase):
                 else:
                     self.assertTrue(paginator.has_next)
 
+                if i == 3:
+                    self.assertEqual([None, 2, 3, 4, None],
+                                     list(paginator.iter_pages(0, 1, 1, 0)))
+
                 self.assertEqual(i, paginator.page)
                 self.assertEqual(i-1, paginator.prev_num)
                 self.assertEqual(i+1, paginator.next_num)
