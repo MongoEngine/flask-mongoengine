@@ -108,14 +108,16 @@ class Pagination(object):
         """
         last = 0
         for num in range(1, self.pages + 1) if sys.version_info >= (3, 0) else xrange(1, self.pages + 1):
-            if num <= left_edge or \
-               (num > self.page - left_current - 1 and
-                num < self.page + right_current) or \
-               num > self.pages - right_edge:
+            if (num <= left_edge or
+                (num >= self.page - left_current and
+                 num <= self.page + right_current) or
+                num > self.pages - right_edge):
                 if last + 1 != num:
                     yield None
                 yield num
                 last = num
+        if last != self.pages:
+            yield None
 
 
 class ListFieldPagination(Pagination):
