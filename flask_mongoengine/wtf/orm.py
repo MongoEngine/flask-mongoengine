@@ -59,7 +59,7 @@ class ModelConverter(object):
             kwargs['validators'] = list(kwargs['validators'])
 
         if field.required:
-            kwargs['validators'].append(validators.Required())
+            kwargs['validators'].append(validators.InputRequired())
         else:
             kwargs['validators'].append(validators.Optional())
 

@@ -119,20 +119,21 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
 
             class LinkPost(BlogPost):
                 url = db.StringField(required=True)
+                interest =  db.DecimalField(required=True)
 
             # Create a text-based post
             TextPostForm = model_form(TextPost)
 
-            form = TextPostForm(**{
+            form = TextPostForm(MultiDict({
                 'title': 'Using MongoEngine',
-                'tags': ['mongodb', 'mongoengine']})
+                'tags': ['mongodb', 'mongoengine']}))
 
             self.assertFalse(form.validate())
 
-            form = TextPostForm(**{
+            form = TextPostForm(MultiDict({
                 'title': 'Using MongoEngine',
                 'content': 'See the tutorial',
-                'tags': ['mongodb', 'mongoengine']})
+                'tags': ['mongodb', 'mongoengine']}))
 
             self.assertTrue(form.validate())
             form.save()
@@ -140,10 +141,10 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertEquals(BlogPost.objects.first().title, 'Using MongoEngine')
             self.assertEquals(BlogPost.objects.count(), 1)
 
-            form = TextPostForm(**{
+            form = TextPostForm(MultiDict({
                 'title': 'Using Flask-MongoEngine',
                 'content': 'See the tutorial',
-                'tags': ['flask', 'mongodb', 'mongoengine']})
+                'tags': ['flask', 'mongodb', 'mongoengine']}))
 
             self.assertTrue(form.validate())
             form.save()
@@ -164,6 +165,17 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             post = post.reload()
 
             self.assertEqual(post.tags, ['flask', 'mongodb', 'mongoengine', 'flask-mongoengine'])
+
+            # Create a link post
+            LinkPostForm = model_form(LinkPost)
+
+            form = LinkPostForm(MultiDict({
+                'title': 'Using Flask-MongoEngine',
+                'url': 'http://flask-mongoengine.org',
+                'interest': '0',
+            }))
+            form.validate()
+            self.assertTrue(form.validate())
 
     def test_model_form_only(self):
         with self.app.test_request_context('/'):
