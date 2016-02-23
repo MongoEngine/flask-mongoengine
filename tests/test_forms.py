@@ -242,7 +242,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertTrue(form.validate())
 
             self.assertEqual(wtforms.widgets.Select, type(form.dog.widget))
-            self.assertEqual(False, form.dog.widget.multiple)
+            self.assertFalse(form.dog.widget.multiple)
 
     def test_modelselectfield_multiple(self):
         with self.app.test_request_context('/'):
@@ -264,7 +264,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertTrue(form.validate())
 
             self.assertEqual(wtforms.widgets.Select, type(form.dogs.widget))
-            self.assertEqual(True, form.dogs.widget.multiple)
+            self.assertTrue(form.dogs.widget.multiple)
 
             # Validate if both dogs are selected
             choices = list(form.dogs)
@@ -292,7 +292,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertTrue(form.validate())
 
             self.assertEqual(wtforms.widgets.Select, type(form.dogs.widget))
-            self.assertEqual(True, form.dogs.widget.multiple)
+            self.assertTrue(form.dogs.widget.multiple)
 
             # Validate if both dogs are selected
             choices = list(form.dogs)
