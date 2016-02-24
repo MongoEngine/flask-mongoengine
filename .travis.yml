@@ -10,7 +10,6 @@ python:
     - pypy3
 
 env:
-  - MONGOENGINE=0.7
   - MONGOENGINE=0.8
   - MONGOENGINE=0.9
   - MONGOENGINE=0.10.0
