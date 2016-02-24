@@ -242,7 +242,19 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertTrue(form.validate())
 
             self.assertEqual(wtforms.widgets.Select, type(form.dog.widget))
-            self.assertEqual(False, form.dog.widget.multiple)
+            self.assertFalse(form.dog.widget.multiple)
+
+            # Validate selecting one item
+            form = DogOwnerForm(MultiDict({
+                'dog': dog.id,
+                }))
+            self.assertEqual(form.dog.data, dog)
+
+            # Validate selecting no item
+            form = DogOwnerForm(MultiDict({
+                'dog': u'__None',
+                }), dog=dog)
+            self.assertEqual(form.dog.data, None)
 
     def test_modelselectfield_multiple(self):
         with self.app.test_request_context('/'):
@@ -264,13 +276,25 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertTrue(form.validate())
 
             self.assertEqual(wtforms.widgets.Select, type(form.dogs.widget))
-            self.assertEqual(True, form.dogs.widget.multiple)
+            self.assertTrue(form.dogs.widget.multiple)
 
             # Validate if both dogs are selected
             choices = list(form.dogs)
             self.assertEqual(len(choices), 2)
             self.assertTrue(choices[0].checked)
             self.assertTrue(choices[1].checked)
+
+            # Validate selecting two items
+            form = DogOwnerForm(MultiDict({
+                'dogs': [dog.id for dog in dogs],
+                }))
+            self.assertEqual(form.dogs.data, dogs)
+
+            # Validate selecting none actually empties the list
+            form = DogOwnerForm(MultiDict({
+                'dogs': [],
+                }), dogs=dogs)
+            self.assertEqual(form.dogs.data, None)
 
     def test_modelselectfield_multiple_initalvalue_None(self):
         with self.app.test_request_context('/'):
@@ -292,7 +316,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertTrue(form.validate())
 
             self.assertEqual(wtforms.widgets.Select, type(form.dogs.widget))
-            self.assertEqual(True, form.dogs.widget.multiple)
+            self.assertTrue(form.dogs.widget.multiple)
 
             # Validate if both dogs are selected
             choices = list(form.dogs)
