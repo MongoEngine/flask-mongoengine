@@ -31,6 +31,7 @@ install:
 - travis_retry pip install --upgrade setuptools
 - travis_retry pip install tox>=1.9
 - travis_retry tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- -e test
+
 script:
 - tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage
 
