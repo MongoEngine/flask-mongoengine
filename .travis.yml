@@ -29,7 +29,7 @@ script:
 - tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage
 
 notifications:
-  irc: "irc.freenode.org#mongoengine"
+  irc: "irc.freenode.org#flask-mongoengine"
 branches:
   only:
     - master
