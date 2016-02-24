@@ -8,12 +8,14 @@ python:
     - '3.5'
     - pypy
     - pypy3
+
 env:
   - MONGOENGINE=0.7
   - MONGOENGINE=0.8
   - MONGOENGINE=0.9
   - MONGOENGINE=0.10.0
   - MONGOENGINE=dev
+
 before_install:
 - travis_retry sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
 - echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' |
@@ -24,13 +26,17 @@ before_install:
 - travis_retry sudo apt-get install mongodb-org-server
 
 install:
+- travis_retry pip install --upgrade pip
+- travis_retry pip install --upgrade nose
+- travis_retry pip install --upgrade setuptools
 - travis_retry pip install tox>=1.9
 - travis_retry tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- -e test
+
 script:
 - tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage
 
 notifications:
-  irc: "irc.freenode.org#mongoengine"
+  irc: "irc.freenode.org#flask-mongoengine"
 branches:
   only:
     - master
