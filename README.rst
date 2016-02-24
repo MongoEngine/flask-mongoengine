@@ -45,6 +45,10 @@ Contributing
 ============
 We welcome contributions! see  the `Contribution guidelines <https://github.com/MongoEngine/flask-mongoengine/blob/master/CONTRIBUTING.rst>`_
 
+Community
+=========
+- `#flask-mongoengine IRC channel <http://webchat.freenode.net/?channels=flask-mongoengine>`_
+
 License
 =======
 Flask-MongoEngine is distributed under MIT license, see LICENSE for more details.
