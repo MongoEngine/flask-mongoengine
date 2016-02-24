@@ -37,8 +37,10 @@ class QuerySetSelectField(SelectFieldBase):
     """
     widget = widgets.Select()
 
-    def __init__(self, label=u'', validators=None, queryset=None, label_attr='',
-                 allow_blank=False, blank_text=u'---', **kwargs):
+    def __init__(self, label=u'', validators=None, queryset=None,
+                 label_attr='', allow_blank=False, blank_text=u'---',
+                 **kwargs):
+
         super(QuerySetSelectField, self).__init__(label, validators, **kwargs)
         self.label_attr = label_attr
         self.allow_blank = allow_blank
@@ -71,8 +73,7 @@ class QuerySetSelectField(SelectFieldBase):
                     return
 
                 try:
-                    # clone() because of https://github.com/MongoEngine/mongoengine/issues/56
-                    obj = self.queryset.clone().get(pk=valuelist[0])
+                    obj = self.queryset.get(pk=valuelist[0])
                     self.data = obj
                 except DoesNotExist:
                     self.data = None
@@ -90,11 +91,16 @@ class QuerySetSelectMultipleField(QuerySetSelectField):
 
     widget = widgets.Select(multiple=True)
 
-    def  __init__(self, label=u'', validators=None, queryset=None, label_attr='',
-                  allow_blank=False, blank_text=u'---', **kwargs):
-        super(QuerySetSelectMultipleField, self).__init__(label, validators, queryset, label_attr, allow_blank, blank_text, **kwargs)
+    def __init__(self, label=u'', validators=None, queryset=None,
+                 label_attr='', allow_blank=False, blank_text=u'---',
+                 **kwargs):
+
+        super(QuerySetSelectMultipleField, self).__init__(
+            label, validators, queryset, label_attr, allow_blank, blank_text,
+            **kwargs)
 
     def process_formdata(self, valuelist):
+
         if valuelist:
             if valuelist[0] == '__None':
                 self.data = None
@@ -104,9 +110,13 @@ class QuerySetSelectMultipleField(QuerySetSelectField):
                     return
 
                 self.queryset.rewind()
-                self.data = [obj for obj in self.queryset if str(obj.id) in valuelist]
+                self.data = list(self.queryset(pk__in=valuelist))
                 if not len(self.data):
                     self.data = None
+
+        # If no value passed, empty the list
+        else:
+            self.data = None
 
     def _is_selected(self, item):
         return item in self.data if self.data else False

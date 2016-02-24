@@ -244,6 +244,18 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertEqual(wtforms.widgets.Select, type(form.dog.widget))
             self.assertFalse(form.dog.widget.multiple)
 
+            # Validate selecting one item
+            form = DogOwnerForm(MultiDict({
+                'dog': dog.id,
+                }))
+            self.assertEqual(form.dog.data, dog)
+
+            # Validate selecting no item
+            form = DogOwnerForm(MultiDict({
+                'dog': u'__None',
+                }), dog=dog)
+            self.assertEqual(form.dog.data, None)
+
     def test_modelselectfield_multiple(self):
         with self.app.test_request_context('/'):
             db = self.db
@@ -271,6 +283,18 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertEqual(len(choices), 2)
             self.assertTrue(choices[0].checked)
             self.assertTrue(choices[1].checked)
+
+            # Validate selecting two items
+            form = DogOwnerForm(MultiDict({
+                'dogs': [dog.id for dog in dogs],
+                }))
+            self.assertEqual(form.dogs.data, dogs)
+
+            # Validate selecting none actually empties the list
+            form = DogOwnerForm(MultiDict({
+                'dogs': [],
+                }), dogs=dogs)
+            self.assertEqual(form.dogs.data, None)
 
     def test_modelselectfield_multiple_initalvalue_None(self):
         with self.app.test_request_context('/'):
