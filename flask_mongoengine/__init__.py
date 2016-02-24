@@ -86,8 +86,12 @@ def _create_connection(conn_settings):
     if 'replicaset' in conn:
         conn['replicaSet'] = conn.pop('replicaset')
 
+    if (mongoengine.__version__ >= '0.10.6' and
+        current_app.config['TESTING'] == True and
+        conn.get('host', '').startswith('mongomock://')):
+        pass
     # Handle uri style connections
-    if "://" in conn.get('host', ''):
+    elif "://" in conn.get('host', ''):
         uri_dict = uri_parser.parse_uri(conn['host'])
         conn['db'] = uri_dict['database']
 
