@@ -37,7 +37,7 @@ try:
 except:
     pass
 
-test_requirements = ['nose', 'rednose', 'coverage']
+test_requirements = ['nose', 'rednose', 'coverage', 'mongomock']
 
 setup(
     name='flask-mongoengine',
