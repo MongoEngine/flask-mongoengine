@@ -21,7 +21,7 @@ def _make_encoder(superclass):
 MongoEngineJSONEncoder = _make_encoder(JSONEncoder)
 
 
-def overide_json_encoder(app):
+def override_json_encoder(app):
     '''
     A function to dynamically create a new MongoEngineJSONEncoder class
     based upon a custom base class.

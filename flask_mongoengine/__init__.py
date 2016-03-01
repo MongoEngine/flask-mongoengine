@@ -18,7 +18,7 @@ from pymongo import uri_parser
 from .sessions import *
 from .pagination import *
 from .metadata import *
-from .json import overide_json_encoder
+from .json import override_json_encoder
 from .wtf import WtfBaseField
 
 def _patch_base_field(object, name):
@@ -113,7 +113,7 @@ class MongoEngine(object):
         app.extensions = getattr(app, 'extensions', {})
 
         # Make documents JSON serializable
-        overide_json_encoder(app)
+        override_json_encoder(app)
 
         if not 'mongoengine' in app.extensions:
             app.extensions['mongoengine'] = {}
