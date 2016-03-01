@@ -7,10 +7,7 @@ from flask import abort, current_app
 import mongoengine
 from distutils.version import StrictVersion
 
-if mongoengine.__version__ == '0.7.10':
-    from mongoengine.base import BaseField
-else:
-    from mongoengine.base.fields import BaseField
+from mongoengine.base.fields import BaseField
 
 
 from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist, QuerySet
