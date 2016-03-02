@@ -7,10 +7,7 @@ from flask import abort, current_app
 import mongoengine
 from distutils.version import StrictVersion
 
-if mongoengine.__version__ == '0.7.10':
-    from mongoengine.base import BaseField
-else:
-    from mongoengine.base.fields import BaseField
+from mongoengine.base.fields import BaseField
 
 
 from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist, QuerySet
@@ -21,7 +18,7 @@ from pymongo import uri_parser
 from .sessions import *
 from .pagination import *
 from .metadata import *
-from .json import overide_json_encoder
+from .json import override_json_encoder
 from .wtf import WtfBaseField
 
 def _patch_base_field(object, name):
@@ -116,7 +113,7 @@ class MongoEngine(object):
         app.extensions = getattr(app, 'extensions', {})
 
         # Make documents JSON serializable
-        overide_json_encoder(app)
+        override_json_encoder(app)
 
         if not 'mongoengine' in app.extensions:
             app.extensions['mongoengine'] = {}

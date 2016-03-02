@@ -1,10 +1,8 @@
 from flask.json import JSONEncoder
 from bson import json_util
 from mongoengine.base import BaseDocument
-try:
-    from mongoengine.base import BaseQuerySet
-except ImportError as ie: # support mongoengine < 0.7
-    from mongoengine.queryset import QuerySet as BaseQuerySet
+from mongoengine.queryset import QuerySet
+
 
 def _make_encoder(superclass):
     class MongoEngineJSONEncoder(superclass):
@@ -15,7 +13,7 @@ def _make_encoder(superclass):
         def default(self, obj):
             if isinstance(obj, BaseDocument):
                 return json_util._json_convert(obj.to_mongo())
-            elif isinstance(obj, BaseQuerySet):
+            elif isinstance(obj, QuerySet):
                 return json_util._json_convert(obj.as_pymongo())
             return superclass.default(self, obj)
     return MongoEngineJSONEncoder
@@ -23,7 +21,7 @@ def _make_encoder(superclass):
 MongoEngineJSONEncoder = _make_encoder(JSONEncoder)
 
 
-def overide_json_encoder(app):
+def override_json_encoder(app):
     '''
     A function to dynamically create a new MongoEngineJSONEncoder class
     based upon a custom base class.
