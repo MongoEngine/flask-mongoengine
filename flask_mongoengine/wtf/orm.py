@@ -103,12 +103,11 @@ class ModelConverter(object):
         if field.regex:
             kwargs['validators'].append(validators.Regexp(regex=field.regex))
         self._string_common(model, field, kwargs)
-        if 'password' in kwargs:
-            if kwargs.pop('password'):
-                return f.PasswordField(**kwargs)
-        if field.max_length:
-            return f.StringField(**kwargs)
-        return f.TextAreaField(**kwargs)
+        if kwargs.pop('password', False):
+            return f.PasswordField(**kwargs)
+        if kwargs.pop('textarea', False) or not field.max_length:
+            return f.TextAreaField(**kwargs)
+        return f.StringField(**kwargs)
 
     @converts('URLField')
     def conv_URL(self, model, field, kwargs):
