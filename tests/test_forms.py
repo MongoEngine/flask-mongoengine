@@ -119,7 +119,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
                 content = db.StringField(required=True)
 
             class LinkPost(BlogPost):
-                url = db.StringField(required=True, max_length=200)
+                url = db.URLField(required=True, max_length=100)
                 interest = db.DecimalField(required=True)
 
             # Create a text-based post
@@ -145,7 +145,8 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertEqual(form.content.type, 'TextAreaField')
             self.assertEqual(form.lead_paragraph.type, 'TextAreaField')
 
-            self.assertEquals(BlogPost.objects.first().title, 'Using MongoEngine')
+            self.assertEquals(BlogPost.objects.first().title,
+                              'Using MongoEngine')
             self.assertEquals(BlogPost.objects.count(), 1)
 
             form = TextPostForm(MultiDict({
@@ -171,7 +172,13 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             form.save()
             post = post.reload()
 
-            self.assertEqual(post.tags, ['flask', 'mongodb', 'mongoengine', 'flask-mongoengine'])
+            self.assertEqual(
+                post.tags,
+                ['flask', 'mongodb', 'mongoengine', 'flask-mongoengine'])
+
+            self.assertEqual(form.title.max_length, 200)
+            self.assertEqual(form.lead_paragraph.max_length, 200)
+            self.assertEqual(form.email.max_length, None)
 
             # Create a link post
             LinkPostForm = model_form(LinkPost)
@@ -183,6 +190,9 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             }))
             form.validate()
             self.assertTrue(form.validate())
+
+            self.assertEqual(form.title.max_length, 200)
+            self.assertEqual(form.url.max_length, 100)
 
     def test_model_form_only(self):
         with self.app.test_request_context('/'):
@@ -353,11 +363,12 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             db = self.db
 
             class User(db.Document):
-                password = db.StringField()
+                password = db.StringField(max_length=100)
 
             UserForm = model_form(User, field_args={'password': {'password': True}})
             form = UserForm(password='12345')
             self.assertEqual(wtforms.widgets.PasswordInput, type(form.password.widget))
+            self.assertEqual(form.password.max_length, 100)
 
     def test_unique_with(self):
 

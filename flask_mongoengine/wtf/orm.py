@@ -15,7 +15,7 @@ except ImportError:
 from wtforms import fields as f, validators
 from mongoengine import ReferenceField
 
-from flask.ext.mongoengine.wtf.fields import ModelSelectField, ModelSelectMultipleField, DictField, NoneStringField, BinaryField
+from flask.ext.mongoengine.wtf import fields as fmf
 from flask.ext.mongoengine.wtf.models import ModelForm
 
 __all__ = (
@@ -90,6 +90,8 @@ class ModelConverter(object):
             kwargs['validators'].append(
                 validators.Length(max=field.max_length or -1,
                                   min=field.min_length or -1))
+        if field.max_length:
+            kwargs['max_length'] = field.max_length
 
     @classmethod
     def _number_common(cls, model, field, kwargs):
@@ -104,22 +106,22 @@ class ModelConverter(object):
             kwargs['validators'].append(validators.Regexp(regex=field.regex))
         self._string_common(model, field, kwargs)
         if kwargs.pop('password', False):
-            return f.PasswordField(**kwargs)
+            return fmf.PasswordField(**kwargs)
         if kwargs.pop('textarea', False) or not field.max_length:
-            return f.TextAreaField(**kwargs)
-        return f.StringField(**kwargs)
+            return fmf.TextAreaField(**kwargs)
+        return fmf.StringField(**kwargs)
 
     @converts('URLField')
     def conv_URL(self, model, field, kwargs):
         kwargs['validators'].append(validators.URL())
         self._string_common(model, field, kwargs)
-        return NoneStringField(**kwargs)
+        return fmf.NoneStringField(**kwargs)
 
     @converts('EmailField')
     def conv_Email(self, model, field, kwargs):
         kwargs['validators'].append(validators.Email())
         self._string_common(model, field, kwargs)
-        return NoneStringField(**kwargs)
+        return fmf.NoneStringField(**kwargs)
 
     @converts('IntField')
     def conv_Int(self, model, field, kwargs):
@@ -149,16 +151,16 @@ class ModelConverter(object):
         # TODO: may be set file field that will save file`s data to MongoDB
         if field.max_bytes:
             kwargs['validators'].append(validators.Length(max=field.max_bytes))
-        return BinaryField(**kwargs)
+        return fmf.BinaryField(**kwargs)
 
     @converts('DictField')
     def conv_Dict(self, model, field, kwargs):
-        return DictField(**kwargs)
+        return fmf.DictField(**kwargs)
 
     @converts('ListField')
     def conv_List(self, model, field, kwargs):
         if isinstance(field.field, ReferenceField):
-            return ModelSelectMultipleField(model=field.field.document_type, **kwargs)
+            return fmf.ModelSelectMultipleField(model=field.field.document_type, **kwargs)
         if field.field.choices:
             kwargs['multiple'] = True
             return self.convert(model, field.field, kwargs)
@@ -198,7 +200,7 @@ class ModelConverter(object):
 
     @converts('ReferenceField')
     def conv_Reference(self, model, field, kwargs):
-        return ModelSelectField(model=field.document_type, **kwargs)
+        return fmf.ModelSelectField(model=field.document_type, **kwargs)
 
     @converts('GenericReferenceField')
     def conv_GenericReference(self, model, field, kwargs):
