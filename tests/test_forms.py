@@ -115,14 +115,17 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
 
             class TextPost(BlogPost):
                 email = db.EmailField(required=False)
+                lead_paragraph = db.StringField(max_length=200)
                 content = db.StringField(required=True)
 
             class LinkPost(BlogPost):
-                url = db.StringField(required=True)
-                interest =  db.DecimalField(required=True)
+                url = db.StringField(required=True, max_length=200)
+                interest = db.DecimalField(required=True)
 
             # Create a text-based post
-            TextPostForm = model_form(TextPost)
+            TextPostForm = model_form(
+                TextPost,
+                field_args={'lead_paragraph': {'textarea': True}})
 
             form = TextPostForm(MultiDict({
                 'title': 'Using MongoEngine',
@@ -137,6 +140,10 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
 
             self.assertTrue(form.validate())
             form.save()
+
+            self.assertEqual(form.title.type, 'StringField')
+            self.assertEqual(form.content.type, 'TextAreaField')
+            self.assertEqual(form.lead_paragraph.type, 'TextAreaField')
 
             self.assertEquals(BlogPost.objects.first().title, 'Using MongoEngine')
             self.assertEquals(BlogPost.objects.count(), 1)
