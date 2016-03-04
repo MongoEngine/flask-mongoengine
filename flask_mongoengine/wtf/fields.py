@@ -6,11 +6,11 @@ import json
 import sys
 
 from wtforms import widgets
-from wtforms.fields import SelectFieldBase, TextAreaField, StringField
+from wtforms import fields as f
 from wtforms.validators import ValidationError
 
 from mongoengine.queryset import DoesNotExist
-from mongoengine.python_support import txt_type, bin_type
+from mongoengine.python_support import bin_type
 
 __all__ = (
     'ModelSelectField', 'QuerySetSelectField',
@@ -19,7 +19,8 @@ __all__ = (
 if sys.version_info >= (3, 0):
     unicode = str
 
-class QuerySetSelectField(SelectFieldBase):
+
+class QuerySetSelectField(f.SelectFieldBase):
     """
     Given a QuerySet either at initialization or inside a view, will display a
     select drop-down field of choices. The `data` property actually will
@@ -129,7 +130,8 @@ class ModelSelectField(QuerySetSelectField):
     """
     def __init__(self, label=u'', validators=None, model=None, **kwargs):
         queryset = kwargs.pop('queryset', model.objects)
-        super(ModelSelectField, self).__init__(label, validators, queryset=queryset, **kwargs)
+        super(ModelSelectField, self).__init__(
+            label, validators, queryset=queryset, **kwargs)
 
 
 class ModelSelectMultipleField(QuerySetSelectMultipleField):
@@ -138,10 +140,11 @@ class ModelSelectMultipleField(QuerySetSelectMultipleField):
     """
     def __init__(self, label=u'', validators=None, model=None, **kwargs):
         queryset = kwargs.pop('queryset', model.objects)
-        super(ModelSelectMultipleField, self).__init__(label, validators, queryset=queryset, **kwargs)
+        super(ModelSelectMultipleField, self).__init__(
+            label, validators, queryset=queryset, **kwargs)
 
 
-class JSONField(TextAreaField):
+class JSONField(f.TextAreaField):
     def _value(self):
         if self.raw_data:
             return self.raw_data[0]
@@ -163,7 +166,7 @@ class DictField(JSONField):
             raise ValueError(self.gettext(u'Not a valid dictionary.'))
 
 
-class NoneStringField(StringField):
+class NoneStringField(f.StringField):
     """
     Custom StringField that counts "" as None
     """
@@ -174,7 +177,8 @@ class NoneStringField(StringField):
         if self.data == "":
             self.data = None
 
-class BinaryField(TextAreaField):
+
+class BinaryField(f.TextAreaField):
     """
     Custom TextAreaField that converts its value with bin_type.
     """
