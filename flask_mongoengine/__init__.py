@@ -92,6 +92,8 @@ def _create_connection(conn_settings):
     elif "://" in conn.get('host', ''):
         uri_dict = uri_parser.parse_uri(conn['host'])
         conn['db'] = uri_dict['database']
+        if conn['db'] is None:
+            raise ValueError('Mongo host URI must contain database name')
 
     return mongoengine.connect(conn.pop('db', 'test'), **conn)
 
