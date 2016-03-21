@@ -32,5 +32,11 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
 
         self.assertRaises(InvalidURI, MongoEngine, self.app)
 
+    def test_parse_uri_without_database_name(self):
+        self.app.config['TESTING'] = False
+        self.app.config['MONGODB_HOST'] = 'mongodb://localhost'
+
+        self.assertRaises(ValueError, MongoEngine, self.app)
+
 if __name__ == '__main__':
     unittest.main()
