@@ -6,20 +6,24 @@ import json
 import sys
 
 from wtforms import widgets
-from wtforms.fields import SelectFieldBase, TextAreaField, StringField
+from wtforms import fields as f
 from wtforms.validators import ValidationError
 
 from mongoengine.queryset import DoesNotExist
-from mongoengine.python_support import txt_type, bin_type
+from mongoengine.python_support import bin_type
 
 __all__ = (
     'ModelSelectField', 'QuerySetSelectField',
+    'ModelSelectMultipleField', 'QuerySetSelectMultipleField',
+    'JSONField', 'DictField', 'StringField', 'TextAreaField', 'PasswordField',
+    'NoneStringField', 'BinaryField'
 )
 
 if sys.version_info >= (3, 0):
     unicode = str
 
-class QuerySetSelectField(SelectFieldBase):
+
+class QuerySetSelectField(f.SelectFieldBase):
     """
     Given a QuerySet either at initialization or inside a view, will display a
     select drop-down field of choices. The `data` property actually will
@@ -129,7 +133,8 @@ class ModelSelectField(QuerySetSelectField):
     """
     def __init__(self, label=u'', validators=None, model=None, **kwargs):
         queryset = kwargs.pop('queryset', model.objects)
-        super(ModelSelectField, self).__init__(label, validators, queryset=queryset, **kwargs)
+        super(ModelSelectField, self).__init__(
+            label, validators, queryset=queryset, **kwargs)
 
 
 class ModelSelectMultipleField(QuerySetSelectMultipleField):
@@ -138,10 +143,11 @@ class ModelSelectMultipleField(QuerySetSelectMultipleField):
     """
     def __init__(self, label=u'', validators=None, model=None, **kwargs):
         queryset = kwargs.pop('queryset', model.objects)
-        super(ModelSelectMultipleField, self).__init__(label, validators, queryset=queryset, **kwargs)
+        super(ModelSelectMultipleField, self).__init__(
+            label, validators, queryset=queryset, **kwargs)
 
 
-class JSONField(TextAreaField):
+class JSONField(f.TextAreaField):
     def _value(self):
         if self.raw_data:
             return self.raw_data[0]
@@ -163,6 +169,34 @@ class DictField(JSONField):
             raise ValueError(self.gettext(u'Not a valid dictionary.'))
 
 
+def add_max_length(field_class):
+    """Patches a WTF StringField-like to add max_length feature
+
+       Adds "max_length=..." attribute to the HTML input field
+    """
+
+    class Field(field_class):
+
+        def __init__(self, **kwargs):
+
+            self.max_length = kwargs.pop('max_length', None)
+            super(field_class, self).__init__(**kwargs)
+
+        def __call__(self, **kwargs):
+
+            if self.max_length is not None:
+                kwargs['max_length'] = self.max_length
+            return super(field_class, self).__call__(**kwargs)
+
+    Field.__name__ = field_class.__name__
+
+    return Field
+
+StringField = add_max_length(f.StringField)
+TextAreaField = add_max_length(f.TextAreaField)
+PasswordField = add_max_length(f.PasswordField)
+
+
 class NoneStringField(StringField):
     """
     Custom StringField that counts "" as None
@@ -174,7 +208,8 @@ class NoneStringField(StringField):
         if self.data == "":
             self.data = None
 
-class BinaryField(TextAreaField):
+
+class BinaryField(f.TextAreaField):
     """
     Custom TextAreaField that converts its value with bin_type.
     """
