@@ -21,6 +21,7 @@ Changes in 0.8
 - Support arbitrary primary key fields (not "id")
 - Configurable httponly flag for MongoEngineSessionInterface
 - Various bugfixes, code cleanup and documentation improvements
+- Move from deprecated flask.ext.* to flask_* syntax in imports
 
 Changes in 0.7
 ==============
