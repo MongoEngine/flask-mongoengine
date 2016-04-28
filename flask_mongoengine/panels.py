@@ -7,7 +7,7 @@ from flask_mongoengine import operation_tracker
 _ = lambda x: x
 
 
-package_loader = PackageLoader('flask.ext.mongoengine', 'templates')
+package_loader = PackageLoader('flask_mongoengine', 'templates')
 
 
 def _maybe_patch_jinja_loader(jinja_env):
