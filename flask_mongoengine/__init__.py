@@ -69,13 +69,13 @@ def _include_mongoengine(obj):
                 _patch_base_field(obj, key)
 
 
-def _create_connection(conn_settings):
+def _create_connection(conn_settings, testing=False):
 
     # Handle multiple connections recursively
     if isinstance(conn_settings, list):
         connections = {}
         for conn in conn_settings:
-            connections[conn.get('alias')] = _create_connection(conn)
+            connections[conn.get('alias')] = _create_connection(conn, testing)
         return connections
 
     # Ugly dict comprehention in order to support python 2.6
@@ -85,8 +85,7 @@ def _create_connection(conn_settings):
         conn['replicaSet'] = conn.pop('replicaset')
 
     if (StrictVersion(mongoengine.__version__) >= StrictVersion('0.10.6') and
-        current_app.config['TESTING'] == True and
-        conn.get('host', '').startswith('mongomock://')):
+        testing and conn.get('host', '').startswith('mongomock://')):
         pass
     # Handle uri style connections
     elif "://" in conn.get('host', ''):
@@ -132,7 +131,7 @@ class MongoEngine(object):
 
         if 'MONGODB_SETTINGS' in config:
             # Connection settings provided as a dictionary.
-            connection = _create_connection(config['MONGODB_SETTINGS'])
+            connection = _create_connection(config['MONGODB_SETTINGS'], testing=app.config['TESTING'])
         else:
             # Connection settings provided in standard format.
             settings = {'alias': config.get('MONGODB_ALIAS', None),
@@ -141,7 +140,7 @@ class MongoEngine(object):
                         'password': config.get('MONGODB_PASSWORD', None),
                         'port': config.get('MONGODB_PORT', None),
                         'username': config.get('MONGODB_USERNAME', None)}
-            connection = _create_connection(settings)
+            connection = _create_connection(settings, testing=app.config['TESTING'])
 
         # Store objects in application instance so that multiple apps do
         # not end up accessing the same objects.
