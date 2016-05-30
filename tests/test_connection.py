@@ -3,7 +3,7 @@ import mongomock
 import mongoengine
 from pymongo.errors import InvalidURI
 from distutils.version import StrictVersion
-from flask.ext.mongoengine import MongoEngine
+from flask_mongoengine import MongoEngine
 from tests import FlaskMongoEngineTestCase
 
 
