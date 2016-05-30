@@ -14,7 +14,7 @@ You can also use WTForms as model forms for your models.
 
 Documentation
 =============
-You can find the documentation at https://flask-mongoengine.readthedocs.org
+You can find the documentation at https://flask-mongoengine.readthedocs.io
 
 Installation
 ============
