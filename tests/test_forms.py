@@ -7,8 +7,8 @@ import re
 
 from bson import ObjectId
 from werkzeug.datastructures import MultiDict
-from flask.ext.mongoengine import MongoEngine
-from flask.ext.mongoengine.wtf import model_form
+from flask_mongoengine import MongoEngine
+from flask_mongoengine.wtf import model_form
 
 from mongoengine import queryset_manager
 from tests import FlaskMongoEngineTestCase
