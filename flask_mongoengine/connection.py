@@ -1,8 +1,7 @@
 import atexit, os.path, time, mongoengine, sys
-import shutil, subprocess, tempfile
+import shutil, subprocess, tempfile, pymongo
 from flask import current_app
 from pymongo import MongoClient, ReadPreference, errors, uri_parser
-from mongoengine.python_support import IS_PYMONGO_3
 from subprocess import Popen, PIPE
 from pymongo.errors import InvalidURI
 from mongoengine import connection
@@ -14,6 +13,10 @@ __all__ = (
 )
 
 DEFAULT_CONNECTION_NAME = 'default-mongodb-connection'
+if pymongo.version_tuple[0] < 3:
+    IS_PYMONGO_3 = False
+else:
+    IS_PYMONGO_3 = True
 
 _connection_settings = {}
 _connections = {}
