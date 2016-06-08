@@ -30,6 +30,30 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         if mongoengine.VERSION < (0, 10, 6):
             self.ensure_mongomock_connection()
 
+    def test_live_connection(self):
+        db = MongoEngine()
+        self.app.config['TEMP_DB'] = True
+        self.app.config['MONGODB_SETTINGS'] = {
+            'host' : 'localhost',
+            'port' : 27017
+        }
+        class Todo(db.Document):
+            title = db.StringField(max_length=60)
+            text = db.StringField()
+            done = db.BooleanField(default=False)
+
+        db.init_app(self.app)
+
+        # Test persist
+        todo = Todo()
+        todo.text = "Sample"
+        todo.title = "Testing"
+        todo.done = True
+        s_todo = todo.save()
+
+        f_to = Todo.objects().first()
+        self.assertEqual(s_todo.title, f_to.title)
+
     def test_mongodb_temp_instance(self):
         # String value used instead of boolean
         self.app.config['TESTING'] = True

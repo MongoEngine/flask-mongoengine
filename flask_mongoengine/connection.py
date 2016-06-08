@@ -241,17 +241,29 @@ def _register_test_connection(port, db_alias, preserved):
 def _resolve_settings(conn_setting, removePass=True):
     if conn_setting and isinstance(conn_setting, dict):
         read_preference = False
+        alias = conn_setting.get('MONGODB_ALIAS',
+                conn_setting.get('alias', DEFAULT_CONNECTION_NAME))
+        db = conn_setting.get('MONGODB_DB', conn_setting.get('db', 'test'))
+        host = conn_setting.get('MONGODB_HOST', conn_setting.get('host', 'localhost'))
+        port = conn_setting.get('MONGODB_PORT', conn_setting.get('port', 27017))
+        username = conn_setting.get('MONGODB_USERNAME', conn_setting.get('username', None))
+        password = conn_setting.get('MONGODB_PASSWORD', conn_setting.get('password', None))
+
+        if (not current_app.config.get('TESTING', False)
+                and alias == DEFAULT_CONNECTION_NAME):
+            alias = "{0}_{1}".format(db, port)
+
         if IS_PYMONGO_3:
             read_preference = ReadPreference.PRIMARY
 
         resolved = {}
         resolved['read_preference'] = read_preference
-        resolved['alias'] = conn_setting.get('MONGODB_ALIAS', DEFAULT_CONNECTION_NAME)
-        resolved['name'] = conn_setting.get('MONGODB_DB', 'test')
-        resolved['host'] = conn_setting.get('MONGODB_HOST', 'localhost')
-        resolved['password'] = conn_setting.get('MONGODB_PASSWORD', None)
-        resolved['port'] = conn_setting.get('MONGODB_PORT', 27017)
-        resolved['username'] = conn_setting.get('MONGODB_USERNAME', None)
+        resolved['alias'] = alias
+        resolved['name'] = db
+        resolved['host'] = host
+        resolved['password'] = password
+        resolved['port'] = port
+        resolved['username'] = username
         resolved['replicaSet'] = conn_setting.pop('replicaset', None)
 
         host = resolved['host']
