@@ -1,8 +1,7 @@
 import flask
 
-from flask.ext.mongoengine import MongoEngine
+from flask_mongoengine import MongoEngine
 from tests import FlaskMongoEngineTestCase
-
 
 class DummyEncoder(flask.json.JSONEncoder):
     '''
@@ -11,17 +10,16 @@ class DummyEncoder(flask.json.JSONEncoder):
     This class is a NO-OP, but used to test proper inheritance.
     '''
 
-
 class JSONAppTestCase(FlaskMongoEngineTestCase):
 
-    def dictContains(self,superset,subset):
-        for k,v in subset.items():
+    def dictContains(self, superset, subset):
+        for k, v in subset.items():
             if not superset[k] == v:
                 return False
         return True
 
-    def assertDictContains(self,superset,subset):
-        return self.assertTrue(self.dictContains(superset,subset))
+    def assertDictContains(self, superset, subset):
+        return self.assertTrue(self.dictContains(superset, subset))
 
     def setUp(self):
         super(JSONAppTestCase, self).setUp()

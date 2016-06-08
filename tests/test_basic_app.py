@@ -1,9 +1,8 @@
 import datetime
 import flask
 
-from flask.ext.mongoengine import MongoEngine
+from flask_mongoengine import MongoEngine
 from tests import FlaskMongoEngineTestCase
-
 
 class BasicAppTestCase(FlaskMongoEngineTestCase):
 

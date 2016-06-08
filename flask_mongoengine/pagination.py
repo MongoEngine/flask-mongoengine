@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 import math
 import sys
-
 from flask import abort
-
 from mongoengine.queryset import QuerySet
 
 __all__ = ("Pagination", "ListFieldPagination")
-
 
 class Pagination(object):
 
@@ -47,7 +44,6 @@ class Pagination(object):
         if isinstance(iterable, QuerySet):
             iterable._skip = None
             iterable._limit = None
-            iterable = iterable.clone()
         return self.__class__(iterable, self.page - 1, self.per_page)
 
     @property
@@ -68,7 +64,6 @@ class Pagination(object):
         if isinstance(iterable, QuerySet):
             iterable._skip = None
             iterable._limit = None
-            iterable = iterable.clone()
         return self.__class__(iterable, self.page + 1, self.per_page)
 
     @property
@@ -147,10 +142,9 @@ class ListFieldPagination(Pagination):
 
         field_attrs = {field_name: {"$slice": [start_index, per_page]}}
 
-        # Clone for mongoengine 0.7
-        qs = queryset.clone().filter(pk=doc_id)
-        self.items = getattr(qs.clone().fields(**field_attrs).first(), field_name)
-        self.total = total or len(getattr(qs.clone().fields(**{field_name: 1}).first(),
+        qs = queryset(pk=doc_id)
+        self.items = getattr(qs.fields(**field_attrs).first(), field_name)
+        self.total = total or len(getattr(qs.fields(**{field_name: 1}).first(),
                                           field_name))
 
         if not self.items and page != 1:

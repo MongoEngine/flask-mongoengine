@@ -20,7 +20,7 @@ Configuration
 Basic setup is easy, just fetch the extension::
 
     from flask import Flask
-    from flask.ext.mongoengine import MongoEngine
+    from flask_mongoengine import MongoEngine
 
     app = Flask(__name__)
     app.config.from_pyfile('the-config.cfg')
@@ -29,7 +29,7 @@ Basic setup is easy, just fetch the extension::
 Or, if you are setting up your database before your app is initialized, as is the case with application factories::
 
     from flask import Flask
-    from flask.ext.mongoengine import MongoEngine
+    from flask_mongoengine import MongoEngine
     db = MongoEngine()
     ...
     app = Flask(__name__)
@@ -130,7 +130,7 @@ MongoEngine and WTForms
 
 You can use MongoEngine and WTForms like so::
 
-    from flask.ext.mongoengine.wtf import model_form
+    from flask_mongoengine.wtf import model_form
 
     class User(db.Document):
         email = db.StringField(required=True)
@@ -187,7 +187,7 @@ Session Interface
 
 To use MongoEngine as your session store simple configure the session interface::
 
-    from flask.ext.mongoengine import MongoEngine, MongoEngineSessionInterface
+    from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 
     app = Flask(__name__)
     db = MongoEngine(app)
@@ -201,14 +201,14 @@ Debug Toolbar Panel
   :target: #debug-toolbar-panel
 
 If you use the Flask-DebugToolbar you can add
-`'flask.ext.mongoengine.panels.MongoDebugPanel'` to the `DEBUG_TB_PANELS` config
+`'flask_mongoengine.panels.MongoDebugPanel'` to the `DEBUG_TB_PANELS` config
 list and then it will automatically track your queries::
 
     from flask import Flask
     from flask_debugtoolbar import DebugToolbarExtension
 
     app = Flask(__name__)
-    app.config['DEBUG_TB_PANELS'] = ['flask.ext.mongoengine.panels.MongoDebugPanel']
+    app.config['DEBUG_TB_PANELS'] = ['flask_mongoengine.panels.MongoDebugPanel']
     db = MongoEngine(app)
     toolbar = DebugToolbarExtension(app)
 

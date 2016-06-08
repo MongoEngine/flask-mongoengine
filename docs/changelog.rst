@@ -2,6 +2,27 @@
 Changelog
 =========
 
+Changes in 0.8
+==============
+
+- Dropped MongoEngine 0.7 support
+- Added MongoEngine 0.10 support
+- Added PyMongo 3 support
+- Added Python3 support up to 3.5
+- Allowed empying value list in SelectMultipleField
+- Fixed paginator issues
+- Use InputRequired validator to allow 0 in required field
+- Made help_text Field attribute optional
+- Added RadioField
+- Added field parameters (validators, filters...)
+- Fixed 'False' connection settings ignored
+- Fixed bug to allow multiple instances of extension
+- Added MongoEngineSessionInterface support for PyMongo's tz_aware option
+- Support arbitrary primary key fields (not "id")
+- Configurable httponly flag for MongoEngineSessionInterface
+- Various bugfixes, code cleanup and documentation improvements
+- Move from deprecated flask.ext.* to flask_* syntax in imports
+
 Changes in 0.7
 ==============
 - Fixed only / exclude in model forms (#49)

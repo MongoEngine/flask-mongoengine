@@ -16,10 +16,8 @@ import pymongo.helpers
 
 from bson import SON
 
-
 __all__ = ['queries', 'inserts', 'updates', 'removes', 'install_tracker',
            'uninstall_tracker', 'reset', 'response_sizes']
-
 
 _original_methods = {
     'insert': pymongo.collection.Collection.insert,

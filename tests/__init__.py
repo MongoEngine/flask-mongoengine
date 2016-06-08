@@ -1,5 +1,7 @@
 import flask
 import unittest
+from flask import current_app
+from flask_mongoengine import current_mongoengine_instance
 
 class FlaskMongoEngineTestCase(unittest.TestCase):
     """Parent class of all test cases"""
@@ -12,4 +14,7 @@ class FlaskMongoEngineTestCase(unittest.TestCase):
         self.ctx.push()
 
     def tearDown(self):
+        me_instance = current_mongoengine_instance()
+        if me_instance:
+            me_instance.disconnect()
         self.ctx.pop()

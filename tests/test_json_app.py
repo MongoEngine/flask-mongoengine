@@ -1,9 +1,8 @@
 import datetime
 import flask
 
-from flask.ext.mongoengine import MongoEngine
+from flask_mongoengine import MongoEngine
 from tests import FlaskMongoEngineTestCase
-
 
 class JSONAppTestCase(FlaskMongoEngineTestCase):
 
@@ -20,6 +19,7 @@ class JSONAppTestCase(FlaskMongoEngineTestCase):
         super(JSONAppTestCase, self).setUp()
         self.app.config['MONGODB_DB'] = 'testing'
         self.app.config['TESTING'] = True
+        self.app.config['TEMP_DB'] = True
         db = MongoEngine()
 
         class Todo(db.Document):

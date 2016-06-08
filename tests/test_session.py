@@ -1,9 +1,8 @@
 import unittest
 
 from flask import session
-from flask.ext.mongoengine import MongoEngine, MongoEngineSessionInterface
+from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from tests import FlaskMongoEngineTestCase
-
 
 class SessionTestCase(FlaskMongoEngineTestCase):
 
@@ -32,7 +31,10 @@ class SessionTestCase(FlaskMongoEngineTestCase):
         self.db = db
 
     def tearDown(self):
-        self.db.connection.drop_database(self.db_name)
+        try:
+            self.db.connection.drop_database(self.db_name)
+        except:
+            self.db.connection.client.drop_database(self.db_name)
 
     def test_setting_session(self):
         c = self.app.test_client()

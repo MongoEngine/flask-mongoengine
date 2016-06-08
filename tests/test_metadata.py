@@ -1,4 +1,4 @@
-import unittest, os, sys, imp
+import unittest, os, imp
 from tests import FlaskMongoEngineTestCase
 
 class MetaDataTestCase(FlaskMongoEngineTestCase):
@@ -23,7 +23,7 @@ class MetaDataTestCase(FlaskMongoEngineTestCase):
         # Ensures change in version is legitimate
         msg = "Version do not match value in metadata.py `VERSION`"
 
-        self.assertEqual("0.7.5", self.metadata.__version__, msg)
+        self.assertEqual("0.8", self.metadata.__version__, msg)
 
 if __name__ == '__main__':
     unittest.main()

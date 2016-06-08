@@ -16,12 +16,11 @@ class WtfBaseField(BaseField):
 
     def __init__(self, validators=None, filters=None, **kwargs):
 
-        self.validators =\
+        self.validators = \
             self._ensure_callable_or_list(validators, 'validators')
         self.filters = self._ensure_callable_or_list(filters, 'filters')
 
         BaseField.__init__(self, **kwargs)
-
 
     def _ensure_callable_or_list(self, field, msg_flag):
         """

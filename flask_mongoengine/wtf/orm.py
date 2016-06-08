@@ -15,20 +15,18 @@ except ImportError:
 from wtforms import fields as f, validators
 from mongoengine import ReferenceField
 
-from flask.ext.mongoengine.wtf.fields import ModelSelectField, ModelSelectMultipleField, DictField, NoneStringField, BinaryField
-from flask.ext.mongoengine.wtf.models import ModelForm
+from flask_mongoengine.wtf.fields import ModelSelectField, ModelSelectMultipleField, DictField, NoneStringField, BinaryField
+from flask_mongoengine.wtf.models import ModelForm
 
 __all__ = (
     'model_fields', 'model_form',
 )
-
 
 def converts(*args):
     def _inner(func):
         func._converter_for = frozenset(args)
         return func
     return _inner
-
 
 class ModelConverter(object):
     def __init__(self, converters=None):
@@ -103,12 +101,11 @@ class ModelConverter(object):
         if field.regex:
             kwargs['validators'].append(validators.Regexp(regex=field.regex))
         self._string_common(model, field, kwargs)
-        if 'password' in kwargs:
-            if kwargs.pop('password'):
-                return f.PasswordField(**kwargs)
-        if field.max_length:
-            return f.StringField(**kwargs)
-        return f.TextAreaField(**kwargs)
+        if kwargs.pop('password', False):
+            return f.PasswordField(**kwargs)
+        if kwargs.pop('textarea', False) or not field.max_length:
+            return f.TextAreaField(**kwargs)
+        return f.StringField(**kwargs)
 
     @converts('URLField')
     def conv_URL(self, model, field, kwargs):
@@ -257,7 +254,7 @@ def model_form(model, base_class=ModelForm, only=None, exclude=None, field_args=
     """
     Create a wtforms Form for a given mongoengine Document schema::
 
-        from flask.ext.mongoengine.wtf import model_form
+        from flask_mongoengine.wtf import model_form
         from myproject.myapp.schemas import Article
         ArticleForm = model_form(Article)
 

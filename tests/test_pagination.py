@@ -1,9 +1,8 @@
 import unittest
 from werkzeug.exceptions import NotFound
 
-from flask.ext.mongoengine import MongoEngine, Pagination, ListFieldPagination
+from flask_mongoengine import MongoEngine, Pagination, ListFieldPagination
 from tests import FlaskMongoEngineTestCase
-
 
 class PaginationTestCase(FlaskMongoEngineTestCase):
 
@@ -17,7 +16,10 @@ class PaginationTestCase(FlaskMongoEngineTestCase):
         self.db.init_app(self.app)
 
     def tearDown(self):
-        self.db.connection.drop_database(self.db_name)
+        try:
+            self.db.connection.drop_database(self.db_name)
+        except:
+            self.db.connection.client.drop_database(self.db_name)
 
     def test_queryset_paginator(self):
         with self.app.test_request_context('/'):
@@ -93,8 +95,8 @@ class PaginationTestCase(FlaskMongoEngineTestCase):
                                      list(paginator.iter_pages(0, 1, 1, 0)))
 
                 self.assertEqual(i, paginator.page)
-                self.assertEqual(i-1, paginator.prev_num)
-                self.assertEqual(i+1, paginator.next_num)
+                self.assertEqual(i - 1, paginator.prev_num)
+                self.assertEqual(i + 1, paginator.next_num)
 
                 # Paginate to the next page
                 if i < 5:

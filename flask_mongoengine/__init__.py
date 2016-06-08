@@ -1,29 +1,44 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
-import inspect
+import mongoengine, inspect
 
 from flask import abort, current_app
+from mongoengine.base.fields import BaseField
+from mongoengine.queryset import (MultipleObjectsReturned,
+    DoesNotExist, QuerySet)
 
-import mongoengine
-
-if mongoengine.__version__ == '0.7.10':
-    from mongoengine.base import BaseField
-else:
-    from mongoengine.base.fields import BaseField
-
-
-from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist, QuerySet
 from mongoengine.base import ValidationError
-
 from pymongo import uri_parser
-
 from .sessions import *
 from .pagination import *
 from .metadata import *
-from .json import overide_json_encoder
+from .json import override_json_encoder
 from .wtf import WtfBaseField
+from .connection import *
+import flask_mongoengine
 
-def _patch_base_field(object, name):
+def redirect_connection_calls(cls):
+    """
+    Redirect mongonengine.connection
+    calls via flask_mongoengine.connection
+    """
+
+    # Proxy all 'mongoengine.connection'
+    # specific attr via 'flask_mongoengine'
+    connection_methods = {
+        'get_db' : get_db,
+        'DEFAULT_CONNECTION_NAME' : DEFAULT_CONNECTION_NAME,
+        'get_connection' : get_connection
+    }
+
+    cls_module = inspect.getmodule(cls)
+    if cls_module != mongoengine.connection:
+        for attr in inspect.getmembers(cls_module):
+            n = attr[0]
+            if connection_methods.get(n, None):
+                setattr(cls_module, n, connection_methods.get(n, None))
+
+def _patch_base_field(obj, name):
     """
     If the object submitted has a class whose base class is
     mongoengine.base.fields.BaseField, then monkey patch to
@@ -36,12 +51,12 @@ def _patch_base_field(object, name):
     @see: flask_mongoengine.wtf.base.WtfBaseField.
     @see: model_form in flask_mongoengine.wtf.orm
 
-    @param object:  The object whose footprint to locate the class.
+    @param obj:     The object whose footprint to locate the class.
     @param name:    Name of the class to locate.
 
     """
     # locate class
-    cls = getattr(object, name)
+    cls = getattr(obj, name)
     if not inspect.isclass(cls):
         return
 
@@ -57,9 +72,9 @@ def _patch_base_field(object, name):
 
     # re-assign class back to
     # object footprint
-    delattr(object, name)
-    setattr(object, name, cls)
-
+    delattr(obj, name)
+    setattr(obj, name, cls)
+    redirect_connection_calls(cls)
 
 def _include_mongoengine(obj):
     for module in mongoengine, mongoengine.fields:
@@ -70,30 +85,19 @@ def _include_mongoengine(obj):
                 # patch BaseField if available
                 _patch_base_field(obj, key)
 
-
-def _create_connection(conn_settings):
-
-    # Handle multiple connections recursively
-    if isinstance(conn_settings, list):
-        connections = {}
-        for conn in conn_settings:
-            connections[conn.get('alias')] = _create_connection(conn)
-        return connections
-
-    # Ugly dict comprehention in order to support python 2.6
-    conn = dict((k.lower(), v) for k, v in conn_settings.items() if v is not None)
-
-    if 'replicaset' in conn:
-        conn['replicaSet'] = conn.pop('replicaset')
-
-    # Handle uri style connections
-    if "://" in conn.get('host', ''):
-        uri_dict = uri_parser.parse_uri(conn['host'])
-        conn['db'] = uri_dict['database']
-
-    return mongoengine.connect(conn.pop('db', 'test'), **conn)
-
-
+def current_mongoengine_instance():
+    """
+    Obtain instance of MongoEngine in the
+    current working app instance.
+    """
+    me = current_app.extensions.get('mongoengine', None)
+    if current_app and me:
+        instance_dict = me.items()\
+            if (sys.version_info >= (3, 0)) else me.iteritems()
+        for k, v in instance_dict:
+            if isinstance(k, MongoEngine):
+                return k
+    return None
 
 class MongoEngine(object):
 
@@ -107,11 +111,10 @@ class MongoEngine(object):
             self.init_app(app, config)
 
     def init_app(self, app, config=None):
-
         app.extensions = getattr(app, 'extensions', {})
 
         # Make documents JSON serializable
-        overide_json_encoder(app)
+        override_json_encoder(app)
 
         if not 'mongoengine' in app.extensions:
             app.extensions['mongoengine'] = {}
@@ -122,27 +125,30 @@ class MongoEngine(object):
             raise Exception('Extension already initialized')
 
         if not config:
-            # If not passed a config then we read the connection settings
-            # from the app config.
+            # If not passed a config then we
+            # read the connection settings from
+            # the app config.
             config = app.config
 
-        if 'MONGODB_SETTINGS' in config:
-            # Connection settings provided as a dictionary.
-            connection = _create_connection(config['MONGODB_SETTINGS'])
-        else:
-            # Connection settings provided in standard format.
-            settings = {'alias': config.get('MONGODB_ALIAS', None),
-                        'db': config.get('MONGODB_DB', None),
-                        'host': config.get('MONGODB_HOST', None),
-                        'password': config.get('MONGODB_PASSWORD', None),
-                        'port': config.get('MONGODB_PORT', None),
-                        'username': config.get('MONGODB_USERNAME', None)}
-            connection = _create_connection(settings)
+        # Obtain db connection
+        connection = create_connection(config)
 
-        # Store objects in application instance so that multiple apps do
-        # not end up accessing the same objects.
-        app.extensions['mongoengine'][self] = {'app': app,
-                                               'conn': connection}
+        # Store objects in application instance
+        # so that multiple apps do not end up
+        # accessing the same objects.
+        s = {'app': app, 'conn': connection}
+        app.extensions['mongoengine'][self] = s
+
+    def disconnect(self):
+        conn_settings = fetch_connection_settings(current_app.config)
+        if isinstance(conn_settings, list):
+            for setting in conn_settings:
+                alias = setting.get('alias', DEFAULT_CONNECTION_NAME)
+                disconnect(alias, setting.get('preserve_temp_db', False))
+        else:
+            alias = conn_settings.get('alias', DEFAULT_CONNECTION_NAME)
+            disconnect(alias, conn_settings.get('preserve_temp_db', False))
+        return True
 
     @property
     def connection(self):
@@ -178,7 +184,6 @@ class BaseQuerySet(QuerySet):
         total = total or count or len(getattr(item, field_name))
         return ListFieldPagination(self, doc_id, field_name, page, per_page,
                                    total=total)
-
 
 class Document(mongoengine.Document):
     """Abstract document with extra helpers in the queryset class"""
