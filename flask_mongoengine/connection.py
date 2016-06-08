@@ -276,7 +276,7 @@ def _resolve_settings(conn_setting, removePass=True):
             if uri_dict['options'] and uri_dict['options']['replicaset']:
                 resolved['replicaSet'] = uri_dict['options']['replicaset']
 
-        if removePass:
+        if removePass and password:
             resolved.pop('password')
 
         return resolved
