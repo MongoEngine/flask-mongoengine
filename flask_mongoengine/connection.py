@@ -13,7 +13,7 @@ __all__ = (
     'InvalidSettingsError', 'get_db'
 )
 
-DEFAULT_CONNECTION_NAME = 'default-mongodb-sandbox'
+DEFAULT_CONNECTION_NAME = 'default-mongodb-connection'
 
 _connection_settings = {}
 _connections = {}
@@ -239,6 +239,7 @@ def _register_test_connection(port, db_alias, preserved):
         return _conn
 
 def _resolve_settings(conn_setting, removePass=True):
+
     if conn_setting and isinstance(conn_setting, dict):
         read_preference = False
         alias = conn_setting.get('MONGODB_ALIAS',
@@ -248,10 +249,6 @@ def _resolve_settings(conn_setting, removePass=True):
         port = conn_setting.get('MONGODB_PORT', conn_setting.get('port', 27017))
         username = conn_setting.get('MONGODB_USERNAME', conn_setting.get('username', None))
         password = conn_setting.get('MONGODB_PASSWORD', conn_setting.get('password', None))
-
-        if (not current_app.config.get('TESTING', False)
-                and alias == DEFAULT_CONNECTION_NAME):
-            alias = "{0}_{1}".format(db, port)
 
         if IS_PYMONGO_3:
             read_preference = ReadPreference.PRIMARY
