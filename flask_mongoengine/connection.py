@@ -255,11 +255,11 @@ def _resolve_settings(conn_setting, removePass=True):
         resolved = {}
         resolved['read_preference'] = read_preference
         resolved['alias'] = alias
-        if db: resolved['name'] = db
-        if host: resolved['host'] = host
-        if password: resolved['password'] = password
-        if port: resolved['port'] = port
-        if username: resolved['username'] = username
+        resolved['name'] = db
+        resolved['host'] = host
+        resolved['password'] = password
+        resolved['port'] = port
+        resolved['username'] = username
         if conn_setting.pop('replicaset', None):
             resolved['replicaSet'] = conn_setting.pop('replicaset', None)
 
