@@ -13,10 +13,6 @@ __all__ = (
 )
 
 DEFAULT_CONNECTION_NAME = 'default-mongodb-connection'
-if pymongo.version_tuple[0] < 3:
-    IS_PYMONGO_3 = False
-else:
-    IS_PYMONGO_3 = True
 
 _connection_settings = {}
 _connections = {}
@@ -253,18 +249,19 @@ def _resolve_settings(conn_setting, removePass=True):
         username = conn_setting.get('MONGODB_USERNAME', conn_setting.get('username', None))
         password = conn_setting.get('MONGODB_PASSWORD', conn_setting.get('password', None))
 
-        if IS_PYMONGO_3:
+        if pymongo.version_tuple[0] < 3:
             read_preference = ReadPreference.PRIMARY
 
         resolved = {}
         resolved['read_preference'] = read_preference
         resolved['alias'] = alias
-        resolved['name'] = db
-        resolved['host'] = host
-        resolved['password'] = password
-        resolved['port'] = port
-        resolved['username'] = username
-        resolved['replicaSet'] = conn_setting.pop('replicaset', None)
+        if db: resolved['name'] = db
+        if host: resolved['host'] = host
+        if password: resolved['password'] = password
+        if port: resolved['port'] = port
+        if username: resolved['username'] = username
+        if conn_setting.pop('replicaset', None):
+            resolved['replicaSet'] = conn_setting.pop('replicaset', None)
 
         host = resolved['host']
         # Handle uri style connections
