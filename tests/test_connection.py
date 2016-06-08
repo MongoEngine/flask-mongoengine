@@ -43,6 +43,7 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
             done = db.BooleanField(default=False)
 
         db.init_app(self.app)
+        Todo.drop_collection()
 
         # Test persist
         todo = Todo()
