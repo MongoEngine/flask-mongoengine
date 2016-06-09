@@ -13,6 +13,10 @@ __all__ = (
 )
 
 DEFAULT_CONNECTION_NAME = 'default-mongodb-connection'
+IS_PYMONGO_3 = (pymongo.version_tuple[0] < 3)
+if IS_PYMONGO_3:
+    READ_PREFERENCE = ReadPreference.PRIMARY
+else: READ_PREFERENCE = False
 
 _connection_settings = {}
 _connections = {}
@@ -240,7 +244,6 @@ def _register_test_connection(port, db_alias, preserved):
 def _resolve_settings(conn_setting, removePass=True):
 
     if conn_setting and isinstance(conn_setting, dict):
-        read_preference = False
         alias = conn_setting.get('MONGODB_ALIAS',
                 conn_setting.get('alias', DEFAULT_CONNECTION_NAME))
         db = conn_setting.get('MONGODB_DB', conn_setting.get('db', 'test'))
@@ -249,8 +252,8 @@ def _resolve_settings(conn_setting, removePass=True):
         username = conn_setting.get('MONGODB_USERNAME', conn_setting.get('username', None))
         password = conn_setting.get('MONGODB_PASSWORD', conn_setting.get('password', None))
 
-        if pymongo.version_tuple[0] < 3:
-            read_preference = ReadPreference.PRIMARY
+        read_preference = conn_setting.get('MONGODB_READ_PREFERENCE',
+                                           conn_setting.get('read_preference', READ_PREFERENCE))
 
         resolved = {}
         resolved['read_preference'] = read_preference
