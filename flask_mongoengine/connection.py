@@ -253,10 +253,11 @@ def _resolve_settings(conn_setting, removePass=True):
         password = conn_setting.get('MONGODB_PASSWORD', conn_setting.get('password', None))
 
         read_preference = conn_setting.get('MONGODB_READ_PREFERENCE',
-                                           conn_setting.get('read_preference', READ_PREFERENCE))
+                    conn_setting.get('read_preference', READ_PREFERENCE))
 
         resolved = {}
-        resolved['read_preference'] = read_preference
+        if read_preference:
+            resolved['read_preference'] = read_preference
         resolved['alias'] = alias
         resolved['name'] = db
         resolved['host'] = host
