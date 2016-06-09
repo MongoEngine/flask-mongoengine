@@ -233,8 +233,7 @@ def _register_test_connection(port, db_alias, preserved):
                     _conn = MongoClient('localhost', port)
                 except errors.ConnectionFailure:
                     continue
-                else:
-                    break
+                else: break
             else:
                 msg = 'Cannot connect to the mongodb test instance'
                 raise mongoengine.ConnectionError(msg)
