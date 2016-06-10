@@ -1,5 +1,5 @@
 import atexit, os.path, time, mongoengine, sys
-import shutil, subprocess, tempfile, pymongo
+import shutil, subprocess, tempfile
 from flask import current_app
 from pymongo import MongoClient, ReadPreference, errors, uri_parser
 from subprocess import Popen, PIPE
@@ -13,10 +13,6 @@ __all__ = (
 )
 
 DEFAULT_CONNECTION_NAME = 'default-mongodb-connection'
-IS_PYMONGO_3 = (pymongo.version_tuple[0] < 3)
-if IS_PYMONGO_3:
-    READ_PREFERENCE = ReadPreference.PRIMARY
-else: READ_PREFERENCE = False
 
 _connection_settings = {}
 _connections = {}
@@ -250,13 +246,12 @@ def _resolve_settings(conn_setting, removePass=True):
         port = conn_setting.get('MONGODB_PORT', conn_setting.get('port', 27017))
         username = conn_setting.get('MONGODB_USERNAME', conn_setting.get('username', None))
         password = conn_setting.get('MONGODB_PASSWORD', conn_setting.get('password', None))
-
+        # Default to ReadPreference.PRIMARY if no read_preference is supplied
         read_preference = conn_setting.get('MONGODB_READ_PREFERENCE',
-                    conn_setting.get('read_preference', READ_PREFERENCE))
+                    conn_setting.get('read_preference', ReadPreference.PRIMARY))
 
         resolved = {}
-        if read_preference:
-            resolved['read_preference'] = read_preference
+        resolved['read_preference'] = read_preference
         resolved['alias'] = alias
         resolved['name'] = db
         resolved['host'] = host
