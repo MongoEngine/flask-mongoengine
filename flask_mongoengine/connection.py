@@ -19,6 +19,7 @@ _connections = {}
 _tmpdir = None
 _conn = None
 _process = None
+_app_instance = current_app
 
 class InvalidSettingsError(Exception):
     pass
@@ -97,9 +98,9 @@ def get_connection(alias=DEFAULT_CONNECTION_NAME, reconnect=False):
         conn_settings.pop('password', None)
         conn_settings.pop('authentication_source', None)
 
-        is_test = current_app.config.get('TESTING', False)
-        temp_db = current_app.config.get('TEMP_DB', False)
-        preserved = current_app.config.get('PRESERVE_TEMP_DB', False)
+        is_test = _app_instance.config.get('TESTING', False)
+        temp_db = _app_instance.config.get('TEMP_DB', False)
+        preserved = _app_instance.config.get('PRESERVE_TEMP_DB', False)
 
         # Validation
         _validate_settings(is_test, temp_db, preserved, conn_host)
@@ -313,7 +314,7 @@ def fetch_connection_settings(config, removePass=True):
         # Connection settings provided in standard format.
         return _resolve_settings(config, removePass)
 
-def create_connection(config):
+def create_connection(config, app):
     """
     Connection is created based on application configuration
     setting. Application settings which is enabled as TESTING
@@ -346,9 +347,10 @@ def create_connection(config):
         >> app.config['TEMP_DB_LOC'] = '/path/to/temp_dir/'
 
     @param config: Flask-MongoEngine application configuration.
-
+    @param app: instance of flask.Flask
     """
-    global _connection_settings
+    global _connection_settings, _app_instance
+    _app_instance = app
 
     if config is None or not isinstance(config, dict):
         raise Exception("Invalid application configuration");

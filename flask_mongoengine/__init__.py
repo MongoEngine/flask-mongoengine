@@ -54,7 +54,7 @@ def _patch_base_field(obj, name):
     @param obj:     The object whose footprint to locate the class.
     @param name:    Name of the class to locate.
     """
-    
+
     # locate class
     cls = getattr(obj, name)
     if not inspect.isclass(cls):
@@ -111,6 +111,10 @@ class MongoEngine(object):
             self.init_app(app, config)
 
     def init_app(self, app, config=None):
+        from flask import Flask
+        if not app or not isinstance(app, Flask):
+            raise Exception('Invalid Flask application instance')
+
         app.extensions = getattr(app, 'extensions', {})
 
         # Make documents JSON serializable
@@ -131,7 +135,7 @@ class MongoEngine(object):
             config = app.config
 
         # Obtain db connection
-        connection = create_connection(config)
+        connection = create_connection(config, app)
 
         # Store objects in application instance
         # so that multiple apps do not end up
