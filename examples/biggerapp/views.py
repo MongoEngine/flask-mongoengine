@@ -1,5 +1,4 @@
 import flask
-
 from models import Todo
 
 def index():

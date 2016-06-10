@@ -9,7 +9,6 @@ try:
 except ImportError:
     import socketserver as SocketServer
 
-import pymongo
 import pymongo.collection
 import pymongo.cursor
 import pymongo.helpers

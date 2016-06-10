@@ -11,7 +11,6 @@ __all__ = ("MongoEngineSession", "MongoEngineSessionInterface")
 if sys.version_info >= (3, 0):
     basestring = str
 
-
 class MongoEngineSession(CallbackDict, SessionMixin):
 
     def __init__(self, initial=None, sid=None):
@@ -20,7 +19,6 @@ class MongoEngineSession(CallbackDict, SessionMixin):
         CallbackDict.__init__(self, initial, on_update)
         self.sid = sid
         self.modified = False
-
 
 class MongoEngineSessionInterface(SessionInterface):
     """SessionInterface for mongoengine"""

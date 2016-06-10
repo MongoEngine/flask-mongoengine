@@ -10,7 +10,7 @@ from wtforms.fields import SelectFieldBase, TextAreaField, StringField
 from wtforms.validators import ValidationError
 
 from mongoengine.queryset import DoesNotExist
-from mongoengine.python_support import txt_type, bin_type
+from mongoengine.python_support import bin_type
 
 __all__ = (
     'ModelSelectField', 'QuerySetSelectField',
@@ -86,7 +86,6 @@ class QuerySetSelectField(SelectFieldBase):
     def _is_selected(self, item):
         return item == self.data
 
-
 class QuerySetSelectMultipleField(QuerySetSelectField):
 
     widget = widgets.Select(multiple=True)
@@ -121,7 +120,6 @@ class QuerySetSelectMultipleField(QuerySetSelectField):
     def _is_selected(self, item):
         return item in self.data if self.data else False
 
-
 class ModelSelectField(QuerySetSelectField):
     """
     Like a QuerySetSelectField, except takes a model class instead of a
@@ -131,7 +129,6 @@ class ModelSelectField(QuerySetSelectField):
         queryset = kwargs.pop('queryset', model.objects)
         super(ModelSelectField, self).__init__(label, validators, queryset=queryset, **kwargs)
 
-
 class ModelSelectMultipleField(QuerySetSelectMultipleField):
     """
     Allows multiple select
@@ -139,7 +136,6 @@ class ModelSelectMultipleField(QuerySetSelectMultipleField):
     def __init__(self, label=u'', validators=None, model=None, **kwargs):
         queryset = kwargs.pop('queryset', model.objects)
         super(ModelSelectMultipleField, self).__init__(label, validators, queryset=queryset, **kwargs)
-
 
 class JSONField(TextAreaField):
     def _value(self):
@@ -155,19 +151,16 @@ class JSONField(TextAreaField):
             except ValueError:
                 raise ValueError(self.gettext(u'Invalid JSON data.'))
 
-
 class DictField(JSONField):
     def process_formdata(self, value):
         super(DictField, self).process_formdata(value)
         if value and not isinstance(self.data, dict):
             raise ValueError(self.gettext(u'Not a valid dictionary.'))
 
-
 class NoneStringField(StringField):
     """
     Custom StringField that counts "" as None
     """
-
     def process_formdata(self, valuelist):
         if valuelist:
             self.data = valuelist[0]
@@ -178,7 +171,6 @@ class BinaryField(TextAreaField):
     """
     Custom TextAreaField that converts its value with bin_type.
     """
-
     def process_formdata(self, valuelist):
         if valuelist:
             if sys.version_info >= (3, 0):
