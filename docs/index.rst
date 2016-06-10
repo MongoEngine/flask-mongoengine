@@ -66,7 +66,6 @@ in the `'MONGODB_SETTINGS'` dictionary with `app.config`. **Note that database n
         'host': 'mongodb://localhost/database_name'
     }
 
-
 Connection settings may also be provided individually by prefixing the setting with `'MONGODB_'` in the `app.config`.::
 
     app.config['MONGODB_DB'] = 'project1'

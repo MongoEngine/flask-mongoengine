@@ -53,8 +53,8 @@ def _patch_base_field(obj, name):
 
     @param obj:     The object whose footprint to locate the class.
     @param name:    Name of the class to locate.
-
     """
+    
     # locate class
     cls = getattr(obj, name)
     if not inspect.isclass(cls):

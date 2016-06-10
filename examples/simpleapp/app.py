@@ -6,7 +6,6 @@ import flask
 
 sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), '../../')))
 
-
 from flask_mongoengine import MongoEngine
 from flask_debugtoolbar import DebugToolbarExtension
 
@@ -33,13 +32,11 @@ db.init_app(app)
 
 DebugToolbarExtension(app)
 
-
 class Todo(db.Document):
     title = db.StringField(max_length=60)
     text = db.StringField()
     done = db.BooleanField(default=False)
     pub_date = db.DateTimeField(default=datetime.datetime.now)
-
 
 @app.route('/')
 def index():

@@ -315,8 +315,8 @@ def fetch_connection_settings(config, removePass=True):
 
 def create_connection(config):
     """
-    Connection is created base on application configuration
-    settings. Application settings which is enabled as TESTING
+    Connection is created based on application configuration
+    setting. Application settings which is enabled as TESTING
     can submit MongoMock URI or enable TEMP_DB setting to provide
     default temporary MongoDB instance on localhost for testing
     purposes. This connection is initiated with a separate temporary
@@ -324,7 +324,7 @@ def create_connection(config):
 
     Unless PRESERVE_TEST_DB is setting is enabled in application
     configuration, temporary MongoDB instance will be deleted when
-    application instance go out of scope.
+    application instance goes out of scope.
 
     Setting to request MongoMock instance connection:
         >> app.config['TESTING'] = True

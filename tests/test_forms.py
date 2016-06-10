@@ -3,12 +3,16 @@ import datetime
 import flask
 import wtforms
 import re
+
+
 from bson import ObjectId
 from werkzeug.datastructures import MultiDict
 from flask_mongoengine import MongoEngine
 from flask_mongoengine.wtf import model_form
+
 from mongoengine import queryset_manager
 from tests import FlaskMongoEngineTestCase
+
 
 class WTFormsAppTestCase(FlaskMongoEngineTestCase):
 
@@ -139,10 +143,6 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
 
             self.assertTrue(form.validate())
             form.save()
-
-            self.assertEqual(form.title.type, 'StringField')
-            self.assertEqual(form.content.type, 'TextAreaField')
-            self.assertEqual(form.lead_paragraph.type, 'TextAreaField')
 
             self.assertEqual(form.title.type, 'StringField')
             self.assertEqual(form.content.type, 'TextAreaField')
@@ -333,21 +333,21 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertEqual(len(choices), 2)
             self.assertFalse(choices[0].checked)
             self.assertFalse(choices[1].checked)
-
+            
     def test_modelradiofield(self):
         with self.app.test_request_context('/'):
             db = self.db
-
+        
             choices = (('male', 'Male'), ('female', 'Female'), ('other', 'Other'))
-
+        
             class Poll(db.Document):
                 answer = db.StringField(choices=choices)
-
+    
             PollForm = model_form(Poll, field_args={'answer': {'radio': True}})
-
+        
             form = PollForm(answer=None)
             self.assertTrue(form.validate())
-
+        
             self.assertEqual(form.answer.type, 'RadioField')
             self.assertEqual(form.answer.choices, choices)
 
@@ -483,6 +483,8 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             PostForm = model_form(Post)
             form = PostForm()
             self.assertTrue("content-text" in "%s" % form.content.text)
+
+
 
 if __name__ == '__main__':
     unittest.main()

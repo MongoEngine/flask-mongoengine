@@ -85,6 +85,3 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         self.app.config['TEMP_DB'] = True
         self.app.config['MONGODB_ALIAS'] = 'unittest_4'
         self.assertRaises(InvalidSettingsError, MongoEngine, self.app)
-
-if __name__ == '__main__':
-    unittest.main()

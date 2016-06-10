@@ -17,7 +17,6 @@ def _maybe_patch_jinja_loader(jinja_env):
     elif package_loader not in jinja_env.loader.loaders:
         jinja_env.loader.loaders.append(package_loader)
 
-
 class MongoDebugPanel(DebugPanel):
     """Panel that shows information about MongoDB operations (including stack)
 

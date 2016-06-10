@@ -16,7 +16,6 @@ def _make_encoder(superclass):
                 return json_util._json_convert(obj.as_pymongo())
             return superclass.default(self, obj)
     return MongoEngineJSONEncoder
-
 MongoEngineJSONEncoder = _make_encoder(JSONEncoder)
 
 def override_json_encoder(app):

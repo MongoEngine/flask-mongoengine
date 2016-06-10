@@ -114,7 +114,6 @@ class Pagination(object):
         if last != self.pages:
             yield None
 
-
 class ListFieldPagination(Pagination):
 
     def __init__(self, queryset, doc_id, field_name, page, per_page,

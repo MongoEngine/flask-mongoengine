@@ -21,7 +21,6 @@ app.config['DEBUG_TB_PANELS'] = (
     'flask_debugtoolbar.panels.logger.LoggingPanel',
     'flask_mongoengine.panels.MongoDebugPanel'
 )
-
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 from models import db
