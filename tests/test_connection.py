@@ -1,4 +1,3 @@
-import unittest
 import mongomock
 import mongoengine, pymongo
 from pymongo.errors import InvalidURI
