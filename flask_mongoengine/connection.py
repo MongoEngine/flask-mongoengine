@@ -241,12 +241,12 @@ def _resolve_settings(conn_setting, removePass=True):
 
     if conn_setting and isinstance(conn_setting, dict):
         alias = conn_setting.get('MONGODB_ALIAS',
-                conn_setting.get('alias', DEFAULT_CONNECTION_NAME))
-        db = conn_setting.get('MONGODB_DB', conn_setting.get('db', 'test'))
-        host = conn_setting.get('MONGODB_HOST', conn_setting.get('host', 'localhost'))
-        port = conn_setting.get('MONGODB_PORT', conn_setting.get('port', 27017))
-        username = conn_setting.get('MONGODB_USERNAME', conn_setting.get('username', None))
-        password = conn_setting.get('MONGODB_PASSWORD', conn_setting.get('password', None))
+                conn_setting.get('alias', conn_setting.get('ALIAS', DEFAULT_CONNECTION_NAME)))
+        db = conn_setting.get('MONGODB_DB', conn_setting.get('db', conn_setting.get('DB', 'test')))
+        host = conn_setting.get('MONGODB_HOST', conn_setting.get('host', conn_setting.get('HOST', 'localhost')))
+        port = conn_setting.get('MONGODB_PORT', conn_setting.get('port', conn_setting.get('PORT', 27017)))
+        username = conn_setting.get('MONGODB_USERNAME', conn_setting.get('username', conn_setting.get('USERNAME', None)))
+        password = conn_setting.get('MONGODB_PASSWORD', conn_setting.get('password', conn_setting.get('PASSWORD', None)))
         # Default to ReadPreference.PRIMARY if no read_preference is supplied
         read_preference = conn_setting.get('MONGODB_READ_PREFERENCE',
                     conn_setting.get('read_preference', ReadPreference.PRIMARY))

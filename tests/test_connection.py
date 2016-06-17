@@ -33,8 +33,11 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         db = MongoEngine()
         self.app.config['TEMP_DB'] = True
         self.app.config['MONGODB_SETTINGS'] = {
-            'host' : 'localhost',
-            'port' : 27017
+            'HOST' : 'localhost',
+            'PORT' : 27017,
+            'USERNAME': None,
+            'PASSWORD': None,
+            'DB': 'test'
         }
         class Todo(db.Document):
             title = db.StringField(max_length=60)
