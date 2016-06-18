@@ -240,16 +240,17 @@ def _register_test_connection(port, db_alias, preserved):
 def _resolve_settings(conn_setting, removePass=True):
 
     if conn_setting and isinstance(conn_setting, dict):
-        alias = conn_setting.get('MONGODB_ALIAS',
-                conn_setting.get('alias', conn_setting.get('ALIAS', DEFAULT_CONNECTION_NAME)))
-        db = conn_setting.get('MONGODB_DB', conn_setting.get('db', conn_setting.get('DB', 'test')))
-        host = conn_setting.get('MONGODB_HOST', conn_setting.get('host', conn_setting.get('HOST', 'localhost')))
-        port = conn_setting.get('MONGODB_PORT', conn_setting.get('port', conn_setting.get('PORT', 27017)))
-        username = conn_setting.get('MONGODB_USERNAME', conn_setting.get('username', conn_setting.get('USERNAME', None)))
-        password = conn_setting.get('MONGODB_PASSWORD', conn_setting.get('password', conn_setting.get('PASSWORD', None)))
+        conn_setting = dict(((k[8:] if k.startswith("MONGODB_") else k), v) for k, v in conn_setting.items() if v is not None)
+        conn_setting = dict((k.lower(), v) for k, v in conn_setting.items())
+
+        alias = conn_setting.get('alias', DEFAULT_CONNECTION_NAME)
+        db = conn_setting.get('db', 'test')
+        host = conn_setting.get('host', 'localhost')
+        port = conn_setting.get('port', 27017)
+        username = conn_setting.get('username', None)
+        password = conn_setting.get('password', None)
         # Default to ReadPreference.PRIMARY if no read_preference is supplied
-        read_preference = conn_setting.get('MONGODB_READ_PREFERENCE',
-                    conn_setting.get('read_preference', ReadPreference.PRIMARY))
+        read_preference = conn_setting.get('read_preference', ReadPreference.PRIMARY)
 
         resolved = {}
         resolved['read_preference'] = read_preference
