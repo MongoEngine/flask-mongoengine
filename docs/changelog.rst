@@ -13,7 +13,8 @@ Changes in 0.8
 - Fixed paginator issues
 - Use InputRequired validator to allow 0 in required field
 - Made help_text Field attribute optional
-- Added RadioField
+- Added "radio" form_arg to convert field into RadioField
+- Added "textarea" form_arg to force conversion into TextAreaField
 - Added field parameters (validators, filters...)
 - Fixed 'False' connection settings ignored
 - Fixed bug to allow multiple instances of extension
