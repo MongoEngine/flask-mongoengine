@@ -127,7 +127,7 @@ In the template::
 MongoEngine and WTForms
 =======================
 
-You can use MongoEngine and WTForms like so::
+flask-mongoengine automatically generates WTForms from MongoEngine models::
 
     from flask_mongoengine.wtf import model_form
 
@@ -155,9 +155,28 @@ You can use MongoEngine and WTForms like so::
             redirect('done')
         return render_template('add_post.html', form=form)
 
+For each MongoEngine field, the most appropriate WTForm field is used.
+Parameters allow the user to provide hints if the conversion is not implicit::
+
+    PostForm = model_form(Post, field_args={'title': {'textarea': True}})
+
+Supported parameters:
+    
+For fields with `choices`:
+
+- `multiple` to use a SelectMultipleField
+- `radio` to use a RadioField
+
+For `StringField`:
+
+- `password` to use a PasswordField
+- `textarea` to use a TextAreaField
+
+(By default, a StringField is converted into a TextAreaField if and only if it has no max_length.)
+
 
 Supported fields
-================
+----------------
 
 * StringField
 * BinaryField
@@ -175,7 +194,7 @@ Supported fields
 * DictField
 
 Not currently supported field types:
-====================================
+------------------------------------
 
 * ObjectIdField
 * GeoLocationField
@@ -229,7 +248,7 @@ Upgrading
 
 
 Credits
-========
+=======
 
 Inspired by two repos:
 
