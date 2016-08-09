@@ -39,6 +39,10 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
             'PASSWORD': None,
             'DB': 'test'
         }
+
+        self._do_persist(db)
+
+    def _do_persist(self, db):
         class Todo(db.Document):
             title = db.StringField(max_length=60)
             text = db.StringField()
@@ -56,6 +60,44 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
 
         f_to = Todo.objects().first()
         self.assertEqual(s_todo.title, f_to.title)
+
+    def test_multiple_connections(self):
+        db = MongoEngine()
+        self.app.config['TESTING'] = True
+        self.app.config['MONGODB_SETTINGS'] = [
+            {
+             "ALIAS": "default",
+             "DB":    'my_db1',
+             "HOST": 'localhost',
+             "PORT": 27017
+            },
+            {
+             "ALIAS": "my_db2",
+             "DB": 'my_db2',
+             "HOST": 'localhost',
+             "PORT": 27017
+            },
+        ]
+        class Todo(db.Document):
+            title = db.StringField(max_length=60)
+            text = db.StringField()
+            done = db.BooleanField(default=False)
+            meta = {"db_alias": "my_db2"}
+
+        db.init_app(self.app)
+        Todo.drop_collection()
+
+        # Switch DB
+        from mongoengine.context_managers import switch_db
+        with switch_db(Todo, 'default') as Todo:
+            todo = Todo()
+            todo.text = "Sample"
+            todo.title = "Testing"
+            todo.done = True
+            s_todo = todo.save()
+
+            f_to = Todo.objects().first()
+            self.assertEqual(s_todo.title, f_to.title)
 
     def test_mongodb_temp_instance(self):
         # String value used instead of boolean

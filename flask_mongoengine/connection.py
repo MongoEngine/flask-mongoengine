@@ -73,6 +73,11 @@ def _validate_settings(is_test, temp_db, preserved, conn_host):
                 'only when `TESTING` is set to true.'
         raise InvalidSettingsError(msg)
 
+def __get_app_config(key):
+    return (_app_instance.get(key, False)
+            if isinstance(_app_instance, dict)
+            else _app_instance.config.get(key, False))
+
 def get_connection(alias=DEFAULT_CONNECTION_NAME, reconnect=False):
     global _connections
     set_global_attributes()
@@ -98,9 +103,9 @@ def get_connection(alias=DEFAULT_CONNECTION_NAME, reconnect=False):
         conn_settings.pop('password', None)
         conn_settings.pop('authentication_source', None)
 
-        is_test = _app_instance.config.get('TESTING', False)
-        temp_db = _app_instance.config.get('TEMP_DB', False)
-        preserved = _app_instance.config.get('PRESERVE_TEMP_DB', False)
+        is_test = __get_app_config('TESTING')
+        temp_db = __get_app_config('TEMP_DB')
+        preserved = __get_app_config('PRESERVE_TEMP_DB')
 
         # Validation
         _validate_settings(is_test, temp_db, preserved, conn_host)
@@ -351,7 +356,7 @@ def create_connection(config, app):
     @param app: instance of flask.Flask
     """
     global _connection_settings, _app_instance
-    _app_instance = app
+    _app_instance = app if app else config
 
     if config is None or not isinstance(config, dict):
         raise Exception("Invalid application configuration");
@@ -363,6 +368,7 @@ def create_connection(config, app):
         connections = {}
         for conn_setting in conn_settings:
             alias = conn_setting['alias']
+            _connection_settings[alias] = conn_setting
             connections[alias] = get_connection(alias)
         return connections
     else:
