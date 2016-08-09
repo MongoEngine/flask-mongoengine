@@ -23,6 +23,12 @@ Changes in 0.8
 - Configurable httponly flag for MongoEngineSessionInterface
 - Various bugfixes, code cleanup and documentation improvements
 - Move from deprecated flask.ext.* to flask_* syntax in imports
+- Added independent connection handler for FlaskMongoEngine
+- All MongoEngine connection calls are proxied via FlaskMongoEngine connection handler
+- Added backward compatibility for settings key names
+- Added support for MongoMock and temporary test DB
+- Fixed issue with multiple DB support
+- Various bugfixes
 
 Changes in 0.7
 ==============
