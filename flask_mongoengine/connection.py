@@ -99,9 +99,6 @@ def get_connection(alias=DEFAULT_CONNECTION_NAME, reconnect=False):
         db_name = conn_settings['name']
 
         conn_settings.pop('name', None)
-        conn_settings.pop('username', None)
-        conn_settings.pop('password', None)
-        conn_settings.pop('authentication_source', None)
 
         is_test = __get_app_config('TESTING')
         temp_db = __get_app_config('TEMP_DB')
