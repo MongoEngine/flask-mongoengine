@@ -262,8 +262,9 @@ def _resolve_settings(conn_setting, removePass=True):
         resolved['password'] = password
         resolved['port'] = port
         resolved['username'] = username
-        if conn_setting.pop('replicaset', None):
-            resolved['replicaSet'] = conn_setting.pop('replicaset', None)
+        replica_set = conn_setting.pop('replicaset', None):
+        if replica_set:
+            resolved['replicaSet'] = replica_set
 
         host = resolved['host']
         # Handle uri style connections
