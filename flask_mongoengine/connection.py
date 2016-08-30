@@ -267,6 +267,7 @@ def _resolve_settings(conn_setting, removePass=True):
 
         host = resolved['host']
         # Handle uri style connections
+        """
         if host.startswith('mongodb://'):
             uri_dict = uri_parser.parse_uri(host)
             if uri_dict['database']:
@@ -277,7 +278,7 @@ def _resolve_settings(conn_setting, removePass=True):
                 resolved['username'] = uri_dict['username']
             if uri_dict['options'] and uri_dict['options']['replicaset']:
                 resolved['replicaSet'] = uri_dict['options']['replicaset']
-
+        """
         if removePass and password:
             resolved.pop('password')
 
