@@ -251,6 +251,7 @@ def _resolve_settings(conn_setting, removePass=True):
         port = conn_setting.get('port', 27017)
         username = conn_setting.get('username', None)
         password = conn_setting.get('password', None)
+        connect = conn_setting.get('connect', True)
         # Default to ReadPreference.PRIMARY if no read_preference is supplied
         read_preference = conn_setting.get('read_preference', ReadPreference.PRIMARY)
 
@@ -262,6 +263,7 @@ def _resolve_settings(conn_setting, removePass=True):
         resolved['password'] = password
         resolved['port'] = port
         resolved['username'] = username
+        resolved['connect'] = connect
         replica_set = conn_setting.pop('replicaset', None)
         if replica_set:
             resolved['replicaSet'] = replica_set
