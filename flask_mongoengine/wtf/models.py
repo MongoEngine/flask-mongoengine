@@ -1,6 +1,9 @@
-from flask_wtf import Form
+# -*- coding:utf-8 -*-
 
-class ModelForm(Form):
+from flask_wtf import FlaskForm
+
+
+class ModelForm(FlaskForm):
     """A WTForms mongoengine model form"""
 
     def __init__(self, formdata=None, obj=None, **kwargs):
