@@ -1,4 +1,6 @@
-import os, imp
+import imp
+import os
+
 from setuptools import setup
 
 def load_module(module_name, script_file):
@@ -22,22 +24,19 @@ metadata = load_module("metadata", metadata_script)
 
 # Load documentation
 doc_path = os.path.join(os.path.dirname(__file__), "docs", "index.rst")
-
-# Load guide
-doc_path = os.path.join(os.path.dirname(__file__), "docs", "index.rst")
-DESCRIPTION = 'Flask-MongoEngine is a Flask extension ' + \
-'that provides integration with MongoEngine and WTF model forms.'
+DESCRIPTION = ('Flask-MongoEngine is a Flask extension '
+               'that provides integration with MongoEngine and WTF model forms.')
 
 LONG_DESCRIPTION = None
 try:
     LONG_DESCRIPTION = open(doc_path).read()
 
     # Stops exit traceback on tests
-    import multiprocessing
+    import multiprocessing # noqa
 except:
     pass
 
-test_requirements = ['nose', 'rednose', 'coverage', 'mongomock']
+test_requirements = ['coverage', 'flake8', 'mongomock', 'nose', 'rednose']
 
 setup(
     name='flask-mongoengine',

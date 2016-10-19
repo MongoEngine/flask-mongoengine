@@ -39,8 +39,8 @@ class MongoDebugPanel(DebugPanel):
     def nav_subtitle(self):
         attrs = ['queries', 'inserts', 'updates', 'removes']
         ops = sum(sum((1 for o in getattr(operation_tracker, a)
-                         if not o['internal']))
-                         for a in attrs)
+                      if not o['internal']))
+                  for a in attrs)
         total_time = sum(sum(o['time'] for o in getattr(operation_tracker, a))
                          for a in attrs)
         return '{0} operations in {1:.2f}ms'.format(ops, total_time)

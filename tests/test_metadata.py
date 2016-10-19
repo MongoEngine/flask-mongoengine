@@ -1,4 +1,7 @@
-import unittest, os, imp
+import imp
+import os
+import unittest
+
 from tests import FlaskMongoEngineTestCase
 
 class MetaDataTestCase(FlaskMongoEngineTestCase):

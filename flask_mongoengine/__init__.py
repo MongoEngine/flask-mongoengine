@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
-import mongoengine, inspect
+import inspect
+import mongoengine
 
 from flask import abort, current_app
 from mongoengine.base.fields import BaseField
 from mongoengine.queryset import (MultipleObjectsReturned,
-    DoesNotExist, QuerySet)
+                                  DoesNotExist, QuerySet)
 
 from mongoengine.base import ValidationError
-from pymongo import uri_parser
 from .sessions import *
 from .pagination import *
 from .metadata import *
 from .json import override_json_encoder
 from .wtf import WtfBaseField
 from .connection import *
-import flask_mongoengine
 
 def redirect_connection_calls(cls):
     """
@@ -120,7 +119,7 @@ class MongoEngine(object):
         # Make documents JSON serializable
         override_json_encoder(app)
 
-        if not 'mongoengine' in app.extensions:
+        if 'mongoengine' not in app.extensions:
             app.extensions['mongoengine'] = {}
 
         if self in app.extensions['mongoengine']:

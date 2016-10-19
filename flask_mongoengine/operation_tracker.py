@@ -60,7 +60,7 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
     )
     total_time = (time.time() - start_time) * 1000
 
-    __traceback_hide__ = True
+    __traceback_hide__ = True # noqa
     stack_trace, internal = _tidy_stacktrace()
     inserts.append({
         'document': doc_or_docs,
@@ -86,7 +86,7 @@ def _update(collection_self, spec, document, upsert=False,
     )
     total_time = (time.time() - start_time) * 1000
 
-    __traceback_hide__ = True
+    __traceback_hide__ = True # noqa
     stack_trace, internal = _tidy_stacktrace()
     updates.append({
         'document': document,
@@ -111,7 +111,7 @@ def _remove(collection_self, spec_or_id, safe=None, **kwargs):
     )
     total_time = (time.time() - start_time) * 1000
 
-    __traceback_hide__ = True
+    __traceback_hide__ = True # noqa
     stack_trace, internal = _tidy_stacktrace()
     removes.append({
         'spec_or_id': spec_or_id,
@@ -167,7 +167,7 @@ def _cursor_refresh(cursor_self):
         if maxScan:
             query_son["$maxScan"] = maxScan
 
-    __traceback_hide__ = True
+    __traceback_hide__ = True # noqa
     stack_trace, internal = _tidy_stacktrace()
     query_data = {
         'time': total_time,

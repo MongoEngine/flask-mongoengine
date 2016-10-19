@@ -1,7 +1,14 @@
-import atexit, os.path, time, mongoengine, sys
-import shutil, subprocess, tempfile
+import atexit
+import os.path
+import mongoengine
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+
 from flask import current_app
-from pymongo import MongoClient, ReadPreference, errors, uri_parser
+from pymongo import MongoClient, ReadPreference, errors
 from subprocess import Popen, PIPE
 from pymongo.errors import InvalidURI
 from mongoengine import connection
@@ -24,11 +31,14 @@ _app_instance = current_app
 class InvalidSettingsError(Exception):
     pass
 
+class ConnectionError(Exception):
+    pass
+
 def disconnect(alias=DEFAULT_CONNECTION_NAME, preserved=False):
     global _connections, _process, _tmpdir
 
     if alias in _connections:
-        conn = get_connection(alias=alias);
+        conn = get_connection(alias=alias)
         client = conn.client
         if client:
             client.close()
@@ -46,8 +56,7 @@ def disconnect(alias=DEFAULT_CONNECTION_NAME, preserved=False):
         if os.path.exists(_tmpdir):
             shutil.rmtree(_tmpdir, ignore_errors=True)
         if os.path.exists(sock_file):
-            os.remove("{0}/{1}".\
-                format(tempfile.gettempdir(), sock_file))
+            os.remove("{0}/{1}".format(tempfile.gettempdir(), sock_file))
 
 def _validate_settings(is_test, temp_db, preserved, conn_host):
     """
@@ -56,21 +65,20 @@ def _validate_settings(is_test, temp_db, preserved, conn_host):
     connection.
 
     """
-    if (not isinstance(is_test, bool)
-        or not isinstance(temp_db, bool)
-        or not isinstance(preserved, bool)):
-        msg = '`TESTING`, `TEMP_DB`, and `PRESERVE_TEMP_DB`'\
-                ' must be boolean values'
+    if (not isinstance(is_test, bool) or not isinstance(temp_db, bool) or
+            not isinstance(preserved, bool)):
+        msg = ('`TESTING`, `TEMP_DB`, and `PRESERVE_TEMP_DB`'
+               ' must be boolean values')
         raise InvalidSettingsError(msg)
 
     elif not is_test and conn_host.startswith('mongomock://'):
-        msg = "`MongoMock` connection is only required for `unittest`."\
-                "To enable this set `TESTING` to true`."
+        msg = ("`MongoMock` connection is only required for `unittest`."
+               "To enable this set `TESTING` to true`.")
         raise InvalidURI(msg)
 
     elif not is_test and temp_db or preserved:
-        msg = '`TESTING` and/or `TEMP_DB` can be used '\
-                'only when `TESTING` is set to true.'
+        msg = ('`TESTING` and/or `TEMP_DB` can be used '
+               'only when `TESTING` is set to true.')
         raise InvalidSettingsError(msg)
 
 def __get_app_config(key):
@@ -117,7 +125,7 @@ def get_connection(alias=DEFAULT_CONNECTION_NAME, reconnect=False):
                 return _register_test_connection(port, db_alias, preserved)
 
             elif (conn_host.startswith('mongomock://') and
-                mongoengine.VERSION < (0, 10, 6)):
+                    mongoengine.VERSION < (0, 10, 6)):
                 # Use MongoClient from mongomock
                 try:
                     import mongomock
@@ -212,16 +220,16 @@ def _register_test_connection(port, db_alias, preserved):
 
         if _conn is None:
             _process = subprocess.Popen([
-                    'mongod', '--bind_ip', 'localhost',
-                    '--port', str(port),
-                    '--dbpath', _tmpdir,
-                    '--nojournal', '--nohttpinterface',
-                    '--noauth', '--smallfiles',
-                    '--syncdelay', '0',
-                    '--maxConns', '10',
-                    '--nssize', '1', ],
-                    stdout=open(os.devnull, 'wb'),
-                    stderr=subprocess.STDOUT)
+                'mongod', '--bind_ip', 'localhost',
+                '--port', str(port),
+                '--dbpath', _tmpdir,
+                '--nojournal', '--nohttpinterface',
+                '--noauth', '--smallfiles',
+                '--syncdelay', '0',
+                '--maxConns', '10',
+                '--nssize', '1', ],
+                stdout=open(os.devnull, 'wb'),
+                stderr=subprocess.STDOUT)
             atexit.register(disconnect, preserved=preserved)
 
             # wait for the instance db to be ready
@@ -232,7 +240,8 @@ def _register_test_connection(port, db_alias, preserved):
                     _conn = MongoClient('localhost', port)
                 except errors.ConnectionFailure:
                     continue
-                else: break
+                else:
+                    break
             else:
                 msg = 'Cannot connect to the mongodb test instance'
                 raise mongoengine.ConnectionError(msg)
@@ -358,7 +367,7 @@ def create_connection(config, app):
     _app_instance = app if app else config
 
     if config is None or not isinstance(config, dict):
-        raise Exception("Invalid application configuration");
+        raise InvalidSettingsError("Invalid application configuration")
 
     conn_settings = fetch_connection_settings(config, False)
 
