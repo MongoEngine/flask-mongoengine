@@ -33,7 +33,7 @@ install:
 - travis_retry tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- -e test
 
 before_script:
-- tox -e flake8
+- if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then tox -e flake8; fi
 
 script:
 - tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage
