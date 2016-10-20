@@ -1,5 +1,7 @@
 import mongomock
-import mongoengine, pymongo
+import mongoengine
+import pymongo
+
 from pymongo.errors import InvalidURI
 from flask_mongoengine import MongoEngine, InvalidSettingsError
 from tests import FlaskMongoEngineTestCase
@@ -66,18 +68,19 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         self.app.config['TESTING'] = True
         self.app.config['MONGODB_SETTINGS'] = [
             {
-             "ALIAS": "default",
-             "DB":    'my_db1',
-             "HOST": 'localhost',
-             "PORT": 27017
+                "ALIAS": "default",
+                "DB":    'my_db1',
+                "HOST": 'localhost',
+                "PORT": 27017
             },
             {
-             "ALIAS": "my_db2",
-             "DB": 'my_db2',
-             "HOST": 'localhost',
-             "PORT": 27017
+                "ALIAS": "my_db2",
+                "DB": 'my_db2',
+                "HOST": 'localhost',
+                "PORT": 27017
             },
         ]
+
         class Todo(db.Document):
             title = db.StringField(max_length=60)
             text = db.StringField()

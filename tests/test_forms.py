@@ -257,13 +257,13 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             # Validate selecting one item
             form = DogOwnerForm(MultiDict({
                 'dog': dog.id,
-                }))
+            }))
             self.assertEqual(form.dog.data, dog)
 
             # Validate selecting no item
             form = DogOwnerForm(MultiDict({
                 'dog': u'__None',
-                }), dog=dog)
+            }), dog=dog)
             self.assertEqual(form.dog.data, None)
 
     def test_modelselectfield_multiple(self):
@@ -297,13 +297,13 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             # Validate selecting two items
             form = DogOwnerForm(MultiDict({
                 'dogs': [dog.id for dog in dogs],
-                }))
+            }))
             self.assertEqual(form.dogs.data, dogs)
 
             # Validate selecting none actually empties the list
             form = DogOwnerForm(MultiDict({
                 'dogs': [],
-                }), dogs=dogs)
+            }), dogs=dogs)
             self.assertEqual(form.dogs.data, None)
 
     def test_modelselectfield_multiple_initalvalue_None(self):
@@ -333,21 +333,21 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertEqual(len(choices), 2)
             self.assertFalse(choices[0].checked)
             self.assertFalse(choices[1].checked)
-            
+
     def test_modelradiofield(self):
         with self.app.test_request_context('/'):
             db = self.db
-        
+
             choices = (('male', 'Male'), ('female', 'Female'), ('other', 'Other'))
-        
+
             class Poll(db.Document):
                 answer = db.StringField(choices=choices)
-    
+
             PollForm = model_form(Poll, field_args={'answer': {'radio': True}})
-        
+
             form = PollForm(answer=None)
             self.assertTrue(form.validate())
-        
+
             self.assertEqual(form.answer.type, 'RadioField')
             self.assertEqual(form.answer.choices, choices)
 
@@ -483,7 +483,6 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             PostForm = model_form(Post)
             form = PostForm()
             self.assertTrue("content-text" in "%s" % form.content.text)
-
 
 
 if __name__ == '__main__':

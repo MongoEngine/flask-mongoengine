@@ -63,9 +63,9 @@ class JSONAppTestCase(FlaskMongoEngineTestCase):
         self.assertEqual(resp.status_code, 200)
         res = flask.json.loads(resp.data).get('result')
         self.assertDictContains(res, {
-                'title': 'First Item',
-                'text': 'The text'
-            })
+            'title': 'First Item',
+            'text': 'The text'
+        })
 
     def test_basic_insert(self):
         c = self.app.test_client()
@@ -84,4 +84,4 @@ class JSONAppTestCase(FlaskMongoEngineTestCase):
             self.assertTrue(any([
                 self.dictContains(obj, d1),
                 self.dictContains(obj, d2)
-                ]))
+            ]))
