@@ -243,7 +243,9 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             class DogOwner(db.Document):
                 dog = db.ReferenceField(Dog)
 
-            DogOwnerForm = model_form(DogOwner)
+            DogOwnerForm = model_form(DogOwner, field_args={
+                'dog': { 'allow_blank': True }
+            })
 
             dog = Dog(name="fido")
             dog.save()
@@ -253,6 +255,15 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
 
             self.assertEqual(wtforms.widgets.Select, type(form.dog.widget))
             self.assertFalse(form.dog.widget.multiple)
+
+            # Validate the options - should contain a dog (selected) and a
+            # blank option there should be an extra blank option.
+            choices = list(form.dog)
+            self.assertEqual(len(choices), 2)
+            self.assertFalse(choices[0].checked)
+            self.assertEqual(choices[0].data, '__None')
+            self.assertTrue(choices[1].checked)
+            self.assertEqual(choices[1].data, dog.pk)
 
             # Validate selecting one item
             form = DogOwnerForm(MultiDict({
@@ -289,7 +300,6 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
 
             self.assertEqual(wtforms.widgets.Select, type(form.dogs.widget))
             self.assertTrue(form.dogs.widget.multiple)
-            self.assertTrue(form.dogs.widget)
 
             # Validate the options - both dogs should be selected and
             # there should be an extra blank option.
