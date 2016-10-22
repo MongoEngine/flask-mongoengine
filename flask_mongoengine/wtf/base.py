@@ -2,6 +2,7 @@ from mongoengine.base import BaseField
 
 __all__ = ('WtfBaseField')
 
+
 class WtfBaseField(BaseField):
     """
     Extension wrapper class for mongoengine BaseField.

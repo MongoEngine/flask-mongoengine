@@ -1,19 +1,19 @@
-import functools
-import time
-import inspect
 import copy
-import sys
+import functools
+import inspect
 import os
+import sys
+import time
 try:
     import SocketServer
 except ImportError:
     import socketserver as SocketServer
 
+import bson
 import pymongo.collection
 import pymongo.cursor
 import pymongo.helpers
 
-from bson import SON
 
 __all__ = ['queries', 'inserts', 'updates', 'removes', 'install_tracker',
            'uninstall_tracker', 'reset', 'response_sizes']
@@ -35,6 +35,7 @@ response_sizes = []
 if sys.version_info >= (3, 0):
     unicode = str
 
+
 # Wrap helpers._unpack_response for getting response size
 @functools.wraps(_original_methods['_unpack_response'])
 def _unpack_response(response, *args, **kwargs):
@@ -46,6 +47,7 @@ def _unpack_response(response, *args, **kwargs):
     )
     response_sizes.append(sys.getsizeof(response, len(response)) / 1024.0)
     return result
+
 
 # Wrap Cursor.insert for getting queries
 @functools.wraps(_original_methods['insert'])
@@ -70,6 +72,7 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
         'internal': internal
     })
     return result
+
 
 # Wrap Cursor.update for getting queries
 @functools.wraps(_original_methods['update'])
@@ -100,6 +103,7 @@ def _update(collection_self, spec, document, upsert=False,
     })
     return result
 
+
 # Wrap Cursor.remove for getting queries
 @functools.wraps(_original_methods['remove'])
 def _remove(collection_self, spec_or_id, safe=None, **kwargs):
@@ -122,6 +126,7 @@ def _remove(collection_self, spec_or_id, safe=None, **kwargs):
     })
     return result
 
+
 # Wrap Cursor._refresh for getting queries
 @functools.wraps(_original_methods['refresh'])
 def _cursor_refresh(cursor_self):
@@ -142,7 +147,7 @@ def _cursor_refresh(cursor_self):
     total_time = (time.time() - start_time) * 1000
 
     query_son = privar('query_spec')()
-    if not isinstance(query_son, SON):
+    if not isinstance(query_son, bson.SON):
 
         if "$query" not in query_son:
             query_son = {"$query": query_son}
@@ -203,6 +208,7 @@ def _cursor_refresh(cursor_self):
 
     return result
 
+
 def install_tracker():
     if pymongo.collection.Collection.insert != _insert:
         pymongo.collection.Collection.insert = _insert
@@ -214,6 +220,7 @@ def install_tracker():
         pymongo.cursor.Cursor._refresh = _cursor_refresh
     if pymongo.helpers._unpack_response != _unpack_response:
         pymongo.helpers._unpack_response = _unpack_response
+
 
 def uninstall_tracker():
     if pymongo.collection.Collection.insert == _insert:
@@ -227,6 +234,7 @@ def uninstall_tracker():
     if pymongo.helpers._unpack_response == _unpack_response:
         pymongo.helpers._unpack_response = _original_methods['_unpack_response']
 
+
 def reset():
     global queries, inserts, updates, removes, response_sizes
     queries = []
@@ -234,6 +242,7 @@ def reset():
     updates = []
     removes = []
     response_sizes = []
+
 
 def _get_ordering(son):
     """Helper function to extract formatted ordering from dict.
@@ -243,6 +252,7 @@ def _get_ordering(son):
 
     if '$orderby' in son:
         return ', '.join(fmt(f, d) for f, d in son['$orderby'].items())
+
 
 def _tidy_stacktrace():
     """

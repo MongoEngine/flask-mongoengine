@@ -1,7 +1,8 @@
-import flask
 import unittest
 
+import flask
 from flask_mongoengine import current_mongoengine_instance
+
 
 class FlaskMongoEngineTestCase(unittest.TestCase):
     """Parent class of all test cases"""

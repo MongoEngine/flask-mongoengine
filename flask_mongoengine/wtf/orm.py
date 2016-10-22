@@ -1,10 +1,10 @@
 """
 Tools for generating forms based on mongoengine Document schemas.
 """
-import sys
 import decimal
+import sys
+
 from bson import ObjectId
-from operator import itemgetter
 
 try:
     from collections import OrderedDict
@@ -12,21 +12,26 @@ except ImportError:
     # Use bson's SON implementation instead
     from bson import SON as OrderedDict
 
-from wtforms import fields as f, validators
 from mongoengine import ReferenceField
+from wtforms import fields as f, validators
 
-from flask_mongoengine.wtf.fields import ModelSelectField, ModelSelectMultipleField, DictField, NoneStringField, BinaryField
+from flask_mongoengine.wtf.fields import (BinaryField, DictField,
+                                          ModelSelectField,
+                                          ModelSelectMultipleField,
+                                          NoneStringField)
 from flask_mongoengine.wtf.models import ModelForm
 
 __all__ = (
     'model_fields', 'model_form',
 )
 
+
 def converts(*args):
     def _inner(func):
         func._converter_for = frozenset(args)
         return func
     return _inner
+
 
 class ModelConverter(object):
     def __init__(self, converters=None):
@@ -237,7 +242,7 @@ def model_fields(model, only=None, exclude=None, field_args=None, converter=None
         names = ((k, v.creation_counter) for k, v in model._fields.items())
     else:
         names = ((k, v.creation_counter) for k, v in model._fields.iteritems())
-    field_names = [x for x in map(itemgetter(0), sorted(names, key=itemgetter(1)))]
+    field_names = [n[0] for n in sorted(names, key=lambda n: n[1])]
 
     if only:
         field_names = [x for x in only if x in set(field_names)]

@@ -1,16 +1,15 @@
-import unittest
 import datetime
-import flask
-import wtforms
 import re
+import unittest
 
-
-from bson import ObjectId
+import bson
+import flask
+from mongoengine import queryset_manager
 from werkzeug.datastructures import MultiDict
+import wtforms
+
 from flask_mongoengine import MongoEngine
 from flask_mongoengine.wtf import model_form
-
-from mongoengine import queryset_manager
 from tests import FlaskMongoEngineTestCase
 
 
@@ -373,7 +372,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
 
             Item.drop_collection()
 
-            object_id = ObjectId()
+            object_id = bson.ObjectId()
             Item(object_id, owner_item_id="1").save()
 
             try:

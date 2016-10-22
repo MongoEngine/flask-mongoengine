@@ -6,6 +6,7 @@ from mongoengine.queryset import QuerySet
 
 __all__ = ("Pagination", "ListFieldPagination")
 
+
 class Pagination(object):
 
     def __init__(self, iterable, page, per_page):
@@ -102,17 +103,21 @@ class Pagination(object):
             {% endmacro %}
         """
         last = 0
-        for num in range(1, self.pages + 1) if sys.version_info >= (3, 0) else xrange(1, self.pages + 1):
-            if (num <= left_edge or
+        range_func = range if sys.version_info >= (3, 0) else xrange
+        for num in range_func(1, self.pages + 1):
+            if (
+                num <= left_edge or
+                num > self.pages - right_edge or
                 (num >= self.page - left_current and
-                 num <= self.page + right_current) or
-                num > self.pages - right_edge):
+                 num <= self.page + right_current)
+            ):
                 if last + 1 != num:
                     yield None
                 yield num
                 last = num
         if last != self.pages:
             yield None
+
 
 class ListFieldPagination(Pagination):
 

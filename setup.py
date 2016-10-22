@@ -3,6 +3,7 @@ import os
 
 from setuptools import setup
 
+
 def load_module(module_name, script_file):
     '''
     XXX: Load modules dynamically without

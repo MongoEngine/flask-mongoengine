@@ -1,7 +1,8 @@
-from flask.json import JSONEncoder
 from bson import json_util
+from flask.json import JSONEncoder
 from mongoengine.base import BaseDocument
 from mongoengine.queryset import QuerySet
+
 
 def _make_encoder(superclass):
     class MongoEngineJSONEncoder(superclass):
@@ -17,6 +18,7 @@ def _make_encoder(superclass):
             return superclass.default(self, obj)
     return MongoEngineJSONEncoder
 MongoEngineJSONEncoder = _make_encoder(JSONEncoder)
+
 
 def override_json_encoder(app):
     '''

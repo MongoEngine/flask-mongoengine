@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 import inspect
-import mongoengine
 
 from flask import abort, current_app
-from mongoengine.base.fields import BaseField
-from mongoengine.queryset import (MultipleObjectsReturned,
-                                  DoesNotExist, QuerySet)
-
+import mongoengine
 from mongoengine.base import ValidationError
-from .sessions import *
-from .pagination import *
-from .metadata import *
-from .json import override_json_encoder
-from .wtf import WtfBaseField
+from mongoengine.base.fields import BaseField
+from mongoengine.queryset import (DoesNotExist, MultipleObjectsReturned,
+                                  QuerySet)
+
 from .connection import *
+from .json import override_json_encoder
+from .metadata import *
+from .pagination import *
+from .sessions import *
+from .wtf import WtfBaseField
+
 
 def redirect_connection_calls(cls):
     """
@@ -25,9 +26,9 @@ def redirect_connection_calls(cls):
     # Proxy all 'mongoengine.connection'
     # specific attr via 'flask_mongoengine'
     connection_methods = {
-        'get_db' : get_db,
-        'DEFAULT_CONNECTION_NAME' : DEFAULT_CONNECTION_NAME,
-        'get_connection' : get_connection
+        'get_db': get_db,
+        'DEFAULT_CONNECTION_NAME': DEFAULT_CONNECTION_NAME,
+        'get_connection': get_connection
     }
 
     cls_module = inspect.getmodule(cls)
@@ -36,6 +37,7 @@ def redirect_connection_calls(cls):
             n = attr[0]
             if connection_methods.get(n, None):
                 setattr(cls_module, n, connection_methods.get(n, None))
+
 
 def _patch_base_field(obj, name):
     """
@@ -75,6 +77,7 @@ def _patch_base_field(obj, name):
     setattr(obj, name, cls)
     redirect_connection_calls(cls)
 
+
 def _include_mongoengine(obj):
     for module in mongoengine, mongoengine.fields:
         for key in module.__all__:
@@ -83,6 +86,7 @@ def _include_mongoengine(obj):
 
                 # patch BaseField if available
                 _patch_base_field(obj, key)
+
 
 def current_mongoengine_instance():
     """
@@ -97,6 +101,7 @@ def current_mongoengine_instance():
             if isinstance(k, MongoEngine):
                 return k
     return None
+
 
 class MongoEngine(object):
 
@@ -187,6 +192,7 @@ class BaseQuerySet(QuerySet):
         total = total or count or len(getattr(item, field_name))
         return ListFieldPagination(self, doc_id, field_name, page, per_page,
                                    total=total)
+
 
 class Document(mongoengine.Document):
     """Abstract document with extra helpers in the queryset class"""

@@ -4,6 +4,7 @@ from flask import session
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from tests import FlaskMongoEngineTestCase
 
+
 class SessionTestCase(FlaskMongoEngineTestCase):
 
     def setUp(self):
