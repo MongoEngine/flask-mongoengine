@@ -5,13 +5,13 @@ from setuptools import setup
 
 
 def load_module(module_name, script_file):
-    '''
+    """
     XXX: Load modules dynamically without
     triggering flask_mongoengine.__init__
 
     This way we do not encounter errors which
     requires dependencies to be pre-installed.
-    '''
+    """
     module = None
     try:
         module = imp.load_source(module_name, script_file)
