@@ -183,7 +183,6 @@ class BaseQuerySet(QuerySet):
         Get a document and raise a 404 Not Found error if it doesn't
         exist.
         """
-        Works like .get(), but calls abort(404) if the object DoesNotExist.
         try:
             return self.get(*args, **kwargs)
         except (MultipleObjectsReturned, DoesNotExist, ValidationError):

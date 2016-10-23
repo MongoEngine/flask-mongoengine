@@ -66,7 +66,6 @@ def _validate_settings(is_test, temp_db, preserved, conn_host):
     Validate unitest settings to ensure
     valid values are supplied before obtaining
     connection.
-
     """
     if (not isinstance(is_test, bool) or not isinstance(temp_db, bool) or
             not isinstance(preserved, bool)):
@@ -109,9 +108,7 @@ def get_connection(alias=DEFAULT_CONNECTION_NAME, reconnect=False):
 
         conn_settings = _connection_settings[alias].copy()
         conn_host = conn_settings['host']
-        db_name = conn_settings['name']
-
-        conn_settings.pop('name', None)
+        db_name = conn_settings.pop('name')
 
         is_test = __get_app_config('TESTING')
         temp_db = __get_app_config('TEMP_DB')
