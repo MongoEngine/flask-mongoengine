@@ -2,7 +2,7 @@
 from __future__ import absolute_import
 import inspect
 
-from flask import abort, current_app
+from flask import abort, current_app, Flask
 import mongoengine
 from mongoengine.base import ValidationError
 from mongoengine.base.fields import BaseField
@@ -93,14 +93,13 @@ def current_mongoengine_instance():
     Obtain instance of MongoEngine in the
     current working app instance.
     """
-    me = current_app.extensions.get('mongoengine', None)
+    me = current_app.extensions.get('mongoengine')
     if current_app and me:
         instance_dict = me.items()\
             if (sys.version_info >= (3, 0)) else me.iteritems()
         for k, v in instance_dict:
             if isinstance(k, MongoEngine):
                 return k
-    return None
 
 
 class MongoEngine(object):
@@ -115,7 +114,6 @@ class MongoEngine(object):
             self.init_app(app, config)
 
     def init_app(self, app, config=None):
-        from flask import Flask
         if not app or not isinstance(app, Flask):
             raise Exception('Invalid Flask application instance')
 
