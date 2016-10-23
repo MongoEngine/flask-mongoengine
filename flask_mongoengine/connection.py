@@ -256,55 +256,31 @@ def _register_test_connection(port, db_alias, preserved):
         return _conn
 
 
-def _resolve_settings(conn_setting, removePass=True):
+def _resolve_settings(conn_setting, remove_pass=True):
 
     if conn_setting and isinstance(conn_setting, dict):
         conn_setting = dict(((k[8:] if k.startswith("MONGODB_") else k), v) for k, v in conn_setting.items() if v is not None)
         conn_setting = dict((k.lower(), v) for k, v in conn_setting.items())
 
-        alias = conn_setting.get('alias', DEFAULT_CONNECTION_NAME)
-        db = conn_setting.get('db', 'test')
-        host = conn_setting.get('host', 'localhost')
-        port = conn_setting.get('port', 27017)
-        username = conn_setting.get('username', None)
-        password = conn_setting.get('password', None)
-        # Default to ReadPreference.PRIMARY if no read_preference is supplied
-        read_preference = conn_setting.get('read_preference', ReadPreference.PRIMARY)
-
-        resolved = {}
-        resolved['read_preference'] = read_preference
-        resolved['alias'] = alias
-        resolved['name'] = db
-        resolved['host'] = host
-        resolved['password'] = password
-        resolved['port'] = port
-        resolved['username'] = username
-        replica_set = conn_setting.pop('replicaset', None)
-        if replica_set:
-            resolved['replicaSet'] = replica_set
-
-        host = resolved['host']
-        # Handle uri style connections
-        """
-        if host.startswith('mongodb://'):
-            uri_dict = uri_parser.parse_uri(host)
-            if uri_dict['database']:
-                resolved['host'] = uri_dict['database']
-            if uri_dict['password']:
-                resolved['password'] = uri_dict['password']
-            if uri_dict['username']:
-                resolved['username'] = uri_dict['username']
-            if uri_dict['options'] and uri_dict['options']['replicaset']:
-                resolved['replicaSet'] = uri_dict['options']['replicaset']
-        """
-        if removePass and password:
-            resolved.pop('password')
-
+        resolved = {
+            'alias': conn_setting.get('alias', DEFAULT_CONNECTION_NAME),
+            'name': conn_setting.get('db', 'test'),
+            'host': conn_setting.get('host', 'localhost'),
+            'port': conn_setting.get('port', 27017),
+            'username': conn_setting.get('username'),
+            # default to ReadPreference.PRIMARY if no read_preference is supplied
+            'read_preference': conn_setting.get('read_preference', ReadPreference.PRIMARY),
+        }
+        if 'replicaset' in conn_setting:
+            resolved['replicaSet'] = conn_setting.pop('replicaset')
+        if not remove_pass:
+            resolved['password'] = conn_setting.get('password')
         return resolved
+
     return conn_setting
 
 
-def fetch_connection_settings(config, removePass=True):
+def fetch_connection_settings(config, remove_pass=True):
     """
     Fetch DB connection settings from FlaskMongoEngine
     application instance configuration. For backward
@@ -316,7 +292,7 @@ def fetch_connection_settings(config, removePass=True):
 
     @param config:          FlaskMongoEngine instance config
 
-    @param removePass:      Flag to instruct the method to either
+    @param remove_pass:      Flag to instruct the method to either
                             remove password or maintain as is.
                             By default a call to this method returns
                             settings without password.
@@ -328,14 +304,14 @@ def fetch_connection_settings(config, removePass=True):
             # List of connection settings.
             settings_list = []
             for setting in settings:
-                settings_list.append(_resolve_settings(setting, removePass))
+                settings_list.append(_resolve_settings(setting, remove_pass))
             return settings_list
         else:
             # Connection settings provided as a dictionary.
-            return _resolve_settings(settings, removePass)
+            return _resolve_settings(settings, remove_pass)
     else:
         # Connection settings provided in standard format.
-        return _resolve_settings(config, removePass)
+        return _resolve_settings(config, remove_pass)
 
 
 def create_connection(config, app):
