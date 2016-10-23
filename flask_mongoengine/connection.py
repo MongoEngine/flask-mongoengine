@@ -292,11 +292,15 @@ def fetch_connection_settings(config, remove_pass=True):
 
     @param config:          FlaskMongoEngine instance config
 
-    @param remove_pass:      Flag to instruct the method to either
+    @param remove_pass:     Flag to instruct the method to either
                             remove password or maintain as is.
                             By default a call to this method returns
                             settings without password.
     """
+    # TODO why do we need remove_pass and why is the default True?
+    # this function is only used in this file (called with remove_pass=False)
+    # and in __init__.py (where it's passed to `disconnect`, which doesn't
+    # do anything password-related either...)
 
     if 'MONGODB_SETTINGS' in config:
         settings = config['MONGODB_SETTINGS']
@@ -355,9 +359,9 @@ def create_connection(config, app):
     if config is None or not isinstance(config, dict):
         raise InvalidSettingsError("Invalid application configuration")
 
-    conn_settings = fetch_connection_settings(config, False)
+    conn_settings = fetch_connection_settings(config, remove_pass=False)
 
-    # Handle multiple connections recursively
+    # if conn_settings is a list, set up each item as a separate connection
     if isinstance(conn_settings, list):
         connections = {}
         for conn_setting in conn_settings:
