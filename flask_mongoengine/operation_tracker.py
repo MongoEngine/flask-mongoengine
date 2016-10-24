@@ -265,12 +265,7 @@ def _tidy_stacktrace():
 
     # Check html templates
     fnames = []
-    _range = None
-    if sys.version_info >= (3, 0):
-        _range = range(100)
-    else:
-        _range = xrange(100)
-    for i in _range:
+    for i in range(100):
         try:
             fname = sys._getframe(i).f_code.co_filename
             if '.html' in fname:

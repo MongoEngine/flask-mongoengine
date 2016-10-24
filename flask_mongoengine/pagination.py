@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import math
-import sys
 from flask import abort
 from mongoengine.queryset import QuerySet
 
@@ -103,8 +102,7 @@ class Pagination(object):
             {% endmacro %}
         """
         last = 0
-        range_func = range if sys.version_info >= (3, 0) else xrange
-        for num in range_func(1, self.pages + 1):
+        for num in range(1, self.pages + 1):
             if (
                 num <= left_edge or
                 num > self.pages - right_edge or
