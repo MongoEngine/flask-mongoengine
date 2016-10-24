@@ -149,13 +149,12 @@ def get_connection(alias=DEFAULT_CONNECTION_NAME, reconnect=False):
 
         try:
             connection = None
-            connection_iter_items = _connection_settings.items() \
-                if (sys.version_info >= (3, 0)) else _connection_settings.iteritems()
 
             # check for shared connections
-            connection_settings_iterator = \
-                ((db_alias, settings.copy()) for db_alias, settings in connection_iter_items)
-
+            connection_settings_iterator = (
+                (db_alias, settings.copy())
+                for db_alias, settings in _connection_settings.items()
+            )
             for db_alias, connection_settings in connection_settings_iterator:
                 connection_settings.pop('name', None)
                 connection_settings.pop('username', None)

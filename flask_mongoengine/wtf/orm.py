@@ -238,10 +238,7 @@ def model_fields(model, only=None, exclude=None, field_args=None, converter=None
     converter = converter or ModelConverter()
     field_args = field_args or {}
 
-    if sys.version_info >= (3, 0):
-        names = ((k, v.creation_counter) for k, v in model._fields.items())
-    else:
-        names = ((k, v.creation_counter) for k, v in model._fields.iteritems())
+    names = ((k, v.creation_counter) for k, v in model._fields.items())
     field_names = [n[0] for n in sorted(names, key=lambda n: n[1])]
 
     if only:
