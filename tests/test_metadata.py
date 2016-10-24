@@ -4,6 +4,7 @@ import unittest
 
 from tests import FlaskMongoEngineTestCase
 
+
 class MetaDataTestCase(FlaskMongoEngineTestCase):
 
     def setUp(self):

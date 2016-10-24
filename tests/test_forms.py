@@ -1,16 +1,15 @@
-import unittest
 import datetime
-import flask
-import wtforms
 import re
+import unittest
 
-
-from bson import ObjectId
+import bson
+import flask
+from mongoengine import queryset_manager
 from werkzeug.datastructures import MultiDict
+import wtforms
+
 from flask_mongoengine import MongoEngine
 from flask_mongoengine.wtf import model_form
-
-from mongoengine import queryset_manager
 from tests import FlaskMongoEngineTestCase
 
 
@@ -244,7 +243,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
                 dog = db.ReferenceField(Dog)
 
             DogOwnerForm = model_form(DogOwner, field_args={
-                'dog': { 'allow_blank': True }
+                'dog': {'allow_blank': True}
             })
 
             dog = Dog(name="fido")
@@ -288,7 +287,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
                 dogs = db.ListField(db.ReferenceField(Dog))
 
             DogOwnerForm = model_form(DogOwner, field_args={
-                'dogs': { 'allow_blank': True }
+                'dogs': {'allow_blank': True}
             })
 
             dogs = [Dog(name="fido"), Dog(name="rex")]
@@ -391,7 +390,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
 
             Item.drop_collection()
 
-            object_id = ObjectId()
+            object_id = bson.ObjectId()
             Item(object_id, owner_item_id="1").save()
 
             try:

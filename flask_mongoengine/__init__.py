@@ -1,41 +1,48 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 import inspect
+
+from flask import Flask, abort, current_app
 import mongoengine
-
-from flask import abort, current_app
-from mongoengine.base.fields import BaseField
-from mongoengine.queryset import (MultipleObjectsReturned,
-                                  DoesNotExist, QuerySet)
-
 from mongoengine.base import ValidationError
-from .sessions import *
-from .pagination import *
-from .metadata import *
-from .json import override_json_encoder
-from .wtf import WtfBaseField
+from mongoengine.base.fields import BaseField
+from mongoengine.queryset import (DoesNotExist, MultipleObjectsReturned,
+                                  QuerySet)
+
 from .connection import *
+from .json import override_json_encoder
+from .metadata import *
+from .pagination import *
+from .sessions import *
+from .wtf import WtfBaseField
+
 
 def redirect_connection_calls(cls):
     """
-    Redirect mongonengine.connection
-    calls via flask_mongoengine.connection
+    Monkey-patch mongoengine's connection methods so that they use
+    Flask-MongoEngine's equivalents.
+
+    Given a random mongoengine class (`cls`), get the module it's in,
+    and iterate through all of that module's members to find the
+    particular methods we want to monkey-patch.
     """
+    # TODO this is so whack... Why don't we pass particular connection
+    # settings down to mongoengine and just use their original implementation?
 
-    # Proxy all 'mongoengine.connection'
-    # specific attr via 'flask_mongoengine'
+    # Map of mongoengine method/variable names and flask-mongoengine
+    # methods they should point to
     connection_methods = {
-        'get_db' : get_db,
-        'DEFAULT_CONNECTION_NAME' : DEFAULT_CONNECTION_NAME,
-        'get_connection' : get_connection
+        'get_db': get_db,
+        'DEFAULT_CONNECTION_NAME': DEFAULT_CONNECTION_NAME,
+        'get_connection': get_connection
     }
-
     cls_module = inspect.getmodule(cls)
     if cls_module != mongoengine.connection:
         for attr in inspect.getmembers(cls_module):
             n = attr[0]
-            if connection_methods.get(n, None):
-                setattr(cls_module, n, connection_methods.get(n, None))
+            if n in connection_methods:
+                setattr(cls_module, n, connection_methods[n])
+
 
 def _patch_base_field(obj, name):
     """
@@ -50,55 +57,61 @@ def _patch_base_field(obj, name):
     @see: flask_mongoengine.wtf.base.WtfBaseField.
     @see: model_form in flask_mongoengine.wtf.orm
 
-    @param obj:     The object whose footprint to locate the class.
-    @param name:    Name of the class to locate.
+    @param obj: MongoEngine instance in which we should locate the class.
+    @param name: Name of an attribute which may or may not be a BaseField.
     """
 
-    # locate class
+    # get an attribute of the MongoEngine class and return if it's not
+    # a class
     cls = getattr(obj, name)
     if not inspect.isclass(cls):
         return
 
-    # fetch class base classes
+    # if it is a class, inspect all of its parent classes
     cls_bases = list(cls.__bases__)
 
-    # replace BaseField with WtfBaseField
+    # if any of them is a BaseField, replace it with WtfBaseField
     for index, base in enumerate(cls_bases):
         if base == BaseField:
             cls_bases[index] = WtfBaseField
             cls.__bases__ = tuple(cls_bases)
             break
 
-    # re-assign class back to
-    # object footprint
+    # re-assign the class back to the MongoEngine instance
     delattr(obj, name)
     setattr(obj, name, cls)
     redirect_connection_calls(cls)
 
+
 def _include_mongoengine(obj):
-    for module in mongoengine, mongoengine.fields:
-        for key in module.__all__:
-            if not hasattr(obj, key):
-                setattr(obj, key, getattr(module, key))
+    """
+    Copy all of the attributes from mongoengine and mongoengine.fields
+    onto obj (which should be an instance of the MongoEngine class).
+    """
+    # TODO why do we need this? What's wrong with importing from the
+    # original modules?
+    for module in (mongoengine, mongoengine.fields):
+        for attr_name in module.__all__:
+            if not hasattr(obj, attr_name):
+                setattr(obj, attr_name, getattr(module, attr_name))
 
                 # patch BaseField if available
-                _patch_base_field(obj, key)
+                _patch_base_field(obj, attr_name)
+
 
 def current_mongoengine_instance():
     """
     Obtain instance of MongoEngine in the
     current working app instance.
     """
-    me = current_app.extensions.get('mongoengine', None)
-    if current_app and me:
-        instance_dict = me.items()\
-            if (sys.version_info >= (3, 0)) else me.iteritems()
-        for k, v in instance_dict:
-            if isinstance(k, MongoEngine):
-                return k
-    return None
+    me = current_app.extensions.get('mongoengine', {})
+    for k, v in me.items():
+        if isinstance(k, MongoEngine):
+            return k
+
 
 class MongoEngine(object):
+    """Main class used for initialization of Flask-MongoEngine."""
 
     def __init__(self, app=None, config=None):
         _include_mongoengine(self)
@@ -110,7 +123,6 @@ class MongoEngine(object):
             self.init_app(app, config)
 
     def init_app(self, app, config=None):
-        from flask import Flask
         if not app or not isinstance(app, Flask):
             raise Exception('Invalid Flask application instance')
 
@@ -143,6 +155,7 @@ class MongoEngine(object):
         app.extensions['mongoengine'][self] = s
 
     def disconnect(self):
+        """Close all connections to MongoDB."""
         conn_settings = fetch_connection_settings(current_app.config)
         if isinstance(conn_settings, list):
             for setting in conn_settings:
@@ -155,38 +168,54 @@ class MongoEngine(object):
 
     @property
     def connection(self):
+        """
+        Return MongoDB connection associated with this MongoEngine
+        instance.
+        """
         return current_app.extensions['mongoengine'][self]['conn']
 
 
 class BaseQuerySet(QuerySet):
-    """
-    A base queryset with handy extras
-    """
+    """Mongoengine's queryset extended with handy extras."""
 
     def get_or_404(self, *args, **kwargs):
+        """
+        Get a document and raise a 404 Not Found error if it doesn't
+        exist.
+        """
         try:
             return self.get(*args, **kwargs)
         except (MultipleObjectsReturned, DoesNotExist, ValidationError):
+            # TODO probably only DoesNotExist should raise a 404
             abort(404)
 
     def first_or_404(self):
-
+        """Same as get_or_404, but uses .first, not .get."""
         obj = self.first()
         if obj is None:
             abort(404)
 
         return obj
 
-    def paginate(self, page, per_page, error_out=True):
+    def paginate(self, page, per_page, **kwargs):
+        """
+        Paginate the QuerySet with a certain number of docs per page
+        and return docs for a given page.
+        """
         return Pagination(self, page, per_page)
 
-    def paginate_field(self, field_name, doc_id, page, per_page,
-                       total=None):
+    def paginate_field(self, field_name, doc_id, page, per_page, total=None):
+        """
+        Paginate items within a list field from one document in the
+        QuerySet.
+        """
+        # TODO this doesn't sound useful at all - remove in next release?
         item = self.get(id=doc_id)
         count = getattr(item, field_name + "_count", '')
         total = total or count or len(getattr(item, field_name))
         return ListFieldPagination(self, doc_id, field_name, page, per_page,
                                    total=total)
+
 
 class Document(mongoengine.Document):
     """Abstract document with extra helpers in the queryset class"""
@@ -195,6 +224,8 @@ class Document(mongoengine.Document):
             'queryset_class': BaseQuerySet}
 
     def paginate_field(self, field_name, page, per_page, total=None):
+        """Paginate items within a list field."""
+        # TODO this doesn't sound useful at all - remove in next release?
         count = getattr(self, field_name + "_count", '')
         total = total or count or len(getattr(self, field_name))
         return ListFieldPagination(self.__class__.objects, self.pk, field_name,

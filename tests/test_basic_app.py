@@ -4,6 +4,7 @@ import flask
 from flask_mongoengine import MongoEngine
 from tests import FlaskMongoEngineTestCase
 
+
 class BasicAppTestCase(FlaskMongoEngineTestCase):
 
     def setUp(self):

@@ -2,14 +2,15 @@ import datetime
 import sys
 import uuid
 
+from bson.tz_util import utc
 from flask.sessions import SessionInterface, SessionMixin
 from werkzeug.datastructures import CallbackDict
-from bson.tz_util import utc
 
 __all__ = ("MongoEngineSession", "MongoEngineSessionInterface")
 
 if sys.version_info >= (3, 0):
     basestring = str
+
 
 class MongoEngineSession(CallbackDict, SessionMixin):
 
@@ -19,6 +20,7 @@ class MongoEngineSession(CallbackDict, SessionMixin):
         CallbackDict.__init__(self, initial, on_update)
         self.sid = sid
         self.modified = False
+
 
 class MongoEngineSessionInterface(SessionInterface):
     """SessionInterface for mongoengine"""
