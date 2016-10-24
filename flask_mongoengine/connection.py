@@ -1,17 +1,15 @@
 import atexit
 import os.path
-import mongoengine
 import shutil
 import subprocess
-import sys
 import tempfile
 import time
 
 from flask import current_app
-from pymongo import MongoClient, ReadPreference, errors
-from subprocess import Popen, PIPE
-from pymongo.errors import InvalidURI
+import mongoengine
 from mongoengine import connection
+from pymongo import MongoClient, ReadPreference, errors
+from pymongo.errors import InvalidURI
 
 __all__ = (
     'create_connection', 'disconnect', 'get_connection',
@@ -28,11 +26,14 @@ _conn = None
 _process = None
 _app_instance = current_app
 
+
 class InvalidSettingsError(Exception):
     pass
 
+
 class ConnectionError(Exception):
     pass
+
 
 def disconnect(alias=DEFAULT_CONNECTION_NAME, preserved=False):
     global _connections, _process, _tmpdir
@@ -58,12 +59,12 @@ def disconnect(alias=DEFAULT_CONNECTION_NAME, preserved=False):
         if os.path.exists(sock_file):
             os.remove("{0}/{1}".format(tempfile.gettempdir(), sock_file))
 
+
 def _validate_settings(is_test, temp_db, preserved, conn_host):
     """
     Validate unitest settings to ensure
     valid values are supplied before obtaining
     connection.
-
     """
     if (not isinstance(is_test, bool) or not isinstance(temp_db, bool) or
             not isinstance(preserved, bool)):
@@ -81,10 +82,12 @@ def _validate_settings(is_test, temp_db, preserved, conn_host):
                'only when `TESTING` is set to true.')
         raise InvalidSettingsError(msg)
 
+
 def __get_app_config(key):
     return (_app_instance.get(key, False)
             if isinstance(_app_instance, dict)
             else _app_instance.config.get(key, False))
+
 
 def get_connection(alias=DEFAULT_CONNECTION_NAME, reconnect=False):
     global _connections
@@ -104,9 +107,7 @@ def get_connection(alias=DEFAULT_CONNECTION_NAME, reconnect=False):
 
         conn_settings = _connection_settings[alias].copy()
         conn_host = conn_settings['host']
-        db_name = conn_settings['name']
-
-        conn_settings.pop('name', None)
+        db_name = conn_settings.pop('name')
 
         is_test = __get_app_config('TESTING')
         temp_db = __get_app_config('TEMP_DB')
@@ -147,13 +148,12 @@ def get_connection(alias=DEFAULT_CONNECTION_NAME, reconnect=False):
 
         try:
             connection = None
-            connection_iter_items = _connection_settings.items() \
-                if (sys.version_info >= (3, 0)) else _connection_settings.iteritems()
 
             # check for shared connections
-            connection_settings_iterator = \
-                ((db_alias, settings.copy()) for db_alias, settings in connection_iter_items)
-
+            connection_settings_iterator = (
+                (db_alias, settings.copy())
+                for db_alias, settings in _connection_settings.items()
+            )
             for db_alias, connection_settings in connection_settings_iterator:
                 connection_settings.pop('name', None)
                 connection_settings.pop('username', None)
@@ -175,24 +175,29 @@ def get_connection(alias=DEFAULT_CONNECTION_NAME, reconnect=False):
 
     return mongoengine.connection.get_db(alias)
 
+
 def _sys_exec(cmd, shell=True, env=None):
     if env is None:
         env = os.environ
 
-    a = Popen(cmd, shell=shell, stdout=PIPE, stderr=PIPE, env=env)
+    a = subprocess.Popen(cmd, shell=shell, stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE, env=env)
     a.wait()  # Wait for process to terminate
     if a.returncode:  # Not 0 => Error has occured
         raise Exception(a.communicate()[1])
     return a.communicate()[0]
+
 
 def set_global_attributes():
     setattr(connection, '_connection_settings', _connection_settings)
     setattr(connection, '_connections', _connections)
     setattr(connection, 'disconnect', disconnect)
 
+
 def get_db(alias=DEFAULT_CONNECTION_NAME, reconnect=False):
     set_global_attributes()
     return connection.get_db(alias, reconnect)
+
 
 def _register_test_connection(port, db_alias, preserved):
     global _process, _tmpdir
@@ -248,54 +253,32 @@ def _register_test_connection(port, db_alias, preserved):
             _connections[db_alias] = _conn
         return _conn
 
-def _resolve_settings(conn_setting, removePass=True):
+
+def _resolve_settings(conn_setting, remove_pass=True):
 
     if conn_setting and isinstance(conn_setting, dict):
         conn_setting = dict(((k[8:] if k.startswith("MONGODB_") else k), v) for k, v in conn_setting.items() if v is not None)
         conn_setting = dict((k.lower(), v) for k, v in conn_setting.items())
 
-        alias = conn_setting.get('alias', DEFAULT_CONNECTION_NAME)
-        db = conn_setting.get('db', 'test')
-        host = conn_setting.get('host', 'localhost')
-        port = conn_setting.get('port', 27017)
-        username = conn_setting.get('username', None)
-        password = conn_setting.get('password', None)
-        # Default to ReadPreference.PRIMARY if no read_preference is supplied
-        read_preference = conn_setting.get('read_preference', ReadPreference.PRIMARY)
-
-        resolved = {}
-        resolved['read_preference'] = read_preference
-        resolved['alias'] = alias
-        resolved['name'] = db
-        resolved['host'] = host
-        resolved['password'] = password
-        resolved['port'] = port
-        resolved['username'] = username
-        replica_set = conn_setting.pop('replicaset', None)
-        if replica_set:
-            resolved['replicaSet'] = replica_set
-
-        host = resolved['host']
-        # Handle uri style connections
-        """
-        if host.startswith('mongodb://'):
-            uri_dict = uri_parser.parse_uri(host)
-            if uri_dict['database']:
-                resolved['host'] = uri_dict['database']
-            if uri_dict['password']:
-                resolved['password'] = uri_dict['password']
-            if uri_dict['username']:
-                resolved['username'] = uri_dict['username']
-            if uri_dict['options'] and uri_dict['options']['replicaset']:
-                resolved['replicaSet'] = uri_dict['options']['replicaset']
-        """
-        if removePass and password:
-            resolved.pop('password')
-
+        resolved = {
+            'alias': conn_setting.get('alias', DEFAULT_CONNECTION_NAME),
+            'name': conn_setting.get('db', 'test'),
+            'host': conn_setting.get('host', 'localhost'),
+            'port': conn_setting.get('port', 27017),
+            'username': conn_setting.get('username'),
+            # default to ReadPreference.PRIMARY if no read_preference is supplied
+            'read_preference': conn_setting.get('read_preference', ReadPreference.PRIMARY),
+        }
+        if 'replicaset' in conn_setting:
+            resolved['replicaSet'] = conn_setting.pop('replicaset')
+        if not remove_pass:
+            resolved['password'] = conn_setting.get('password')
         return resolved
+
     return conn_setting
 
-def fetch_connection_settings(config, removePass=True):
+
+def fetch_connection_settings(config, remove_pass=True):
     """
     Fetch DB connection settings from FlaskMongoEngine
     application instance configuration. For backward
@@ -307,11 +290,15 @@ def fetch_connection_settings(config, removePass=True):
 
     @param config:          FlaskMongoEngine instance config
 
-    @param removePass:      Flag to instruct the method to either
+    @param remove_pass:     Flag to instruct the method to either
                             remove password or maintain as is.
                             By default a call to this method returns
                             settings without password.
     """
+    # TODO why do we need remove_pass and why is the default True?
+    # this function is only used in this file (called with remove_pass=False)
+    # and in __init__.py (where it's passed to `disconnect`, which doesn't
+    # do anything password-related either...)
 
     if 'MONGODB_SETTINGS' in config:
         settings = config['MONGODB_SETTINGS']
@@ -319,14 +306,15 @@ def fetch_connection_settings(config, removePass=True):
             # List of connection settings.
             settings_list = []
             for setting in settings:
-                settings_list.append(_resolve_settings(setting, removePass))
+                settings_list.append(_resolve_settings(setting, remove_pass))
             return settings_list
         else:
             # Connection settings provided as a dictionary.
-            return _resolve_settings(settings, removePass)
+            return _resolve_settings(settings, remove_pass)
     else:
         # Connection settings provided in standard format.
-        return _resolve_settings(config, removePass)
+        return _resolve_settings(config, remove_pass)
+
 
 def create_connection(config, app):
     """
@@ -369,9 +357,9 @@ def create_connection(config, app):
     if config is None or not isinstance(config, dict):
         raise InvalidSettingsError("Invalid application configuration")
 
-    conn_settings = fetch_connection_settings(config, False)
+    conn_settings = fetch_connection_settings(config, remove_pass=False)
 
-    # Handle multiple connections recursively
+    # if conn_settings is a list, set up each item as a separate connection
     if isinstance(conn_settings, list):
         connections = {}
         for conn_setting in conn_settings:

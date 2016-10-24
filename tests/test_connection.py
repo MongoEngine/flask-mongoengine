@@ -1,10 +1,11 @@
-import mongomock
 import mongoengine
+import mongomock
 import pymongo
-
 from pymongo.errors import InvalidURI
-from flask_mongoengine import MongoEngine, InvalidSettingsError
+
+from flask_mongoengine import InvalidSettingsError, MongoEngine
 from tests import FlaskMongoEngineTestCase
+
 
 class ConnectionTestCase(FlaskMongoEngineTestCase):
 
@@ -35,8 +36,8 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         db = MongoEngine()
         self.app.config['TEMP_DB'] = True
         self.app.config['MONGODB_SETTINGS'] = {
-            'HOST' : 'localhost',
-            'PORT' : 27017,
+            'HOST': 'localhost',
+            'PORT': 27017,
             'USERNAME': None,
             'PASSWORD': None,
             'DB': 'test'
@@ -68,10 +69,10 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         self.app.config['TESTING'] = True
         self.app.config['MONGODB_SETTINGS'] = [
             {
-                "ALIAS": "default",
-                "DB":    'my_db1',
-                "HOST": 'localhost',
-                "PORT": 27017
+                'ALIAS': 'default',
+                'DB': 'my_db1',
+                'HOST': 'localhost',
+                'PORT': 27017
             },
             {
                 "ALIAS": "my_db2",

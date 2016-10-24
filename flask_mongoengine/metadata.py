@@ -8,6 +8,7 @@ else:
     unicode = unicode
     basestring = basestring
 
+
 def get_version():
     if isinstance(VERSION[-1], basestring):
         return '.'.join(map(str, VERSION[:-1])) + VERSION[-1]

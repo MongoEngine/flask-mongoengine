@@ -3,12 +3,14 @@ import flask
 from flask_mongoengine import MongoEngine
 from tests import FlaskMongoEngineTestCase
 
+
 class DummyEncoder(flask.json.JSONEncoder):
-    '''
+    """
     An example encoder which a user may create and override
     the apps json_encoder with.
     This class is a NO-OP, but used to test proper inheritance.
-    '''
+    """
+
 
 class JSONAppTestCase(FlaskMongoEngineTestCase):
 

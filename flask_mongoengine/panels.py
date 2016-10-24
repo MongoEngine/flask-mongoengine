@@ -1,12 +1,12 @@
 from flask import current_app
-
 from flask_debugtoolbar.panels import DebugPanel
-from jinja2 import PackageLoader, ChoiceLoader
+from jinja2 import ChoiceLoader, PackageLoader
+
 from flask_mongoengine import operation_tracker
 
-_ = lambda x: x
 
 package_loader = PackageLoader('flask_mongoengine', 'templates')
+
 
 def _maybe_patch_jinja_loader(jinja_env):
     """Patch the jinja_env loader to include flaskext.mongoengine
@@ -16,6 +16,7 @@ def _maybe_patch_jinja_loader(jinja_env):
         jinja_env.loader = ChoiceLoader([jinja_env.loader, package_loader])
     elif package_loader not in jinja_env.loader.loaders:
         jinja_env.loader.loaders.append(package_loader)
+
 
 class MongoDebugPanel(DebugPanel):
     """Panel that shows information about MongoDB operations (including stack)

@@ -1,5 +1,6 @@
 from flask_wtf import Form
 
+
 class ModelForm(Form):
     """A WTForms mongoengine model form"""
 
