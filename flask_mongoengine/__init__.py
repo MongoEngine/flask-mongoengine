@@ -2,7 +2,7 @@
 from __future__ import absolute_import
 import inspect
 
-from flask import abort, current_app, Flask
+from flask import Flask, abort, current_app
 import mongoengine
 from mongoengine.base import ValidationError
 from mongoengine.base.fields import BaseField

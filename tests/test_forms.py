@@ -243,7 +243,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
                 dog = db.ReferenceField(Dog)
 
             DogOwnerForm = model_form(DogOwner, field_args={
-                'dog': { 'allow_blank': True }
+                'dog': {'allow_blank': True}
             })
 
             dog = Dog(name="fido")
@@ -287,7 +287,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
                 dogs = db.ListField(db.ReferenceField(Dog))
 
             DogOwnerForm = model_form(DogOwner, field_args={
-                'dogs': { 'allow_blank': True }
+                'dogs': {'allow_blank': True}
             })
 
             dogs = [Dog(name="fido"), Dog(name="rex")]
