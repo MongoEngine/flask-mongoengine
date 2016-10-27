@@ -269,7 +269,7 @@ def _resolve_settings(settings, settings_prefix=None, remove_pass=True):
 
         # Add various default values.
         resolved_settings['alias'] = resolved_settings.get('alias', DEFAULT_CONNECTION_NAME)
-        if (resolved_settings.has_key('db')):
+        if 'db' in resolved_settings:
             resolved_settings['name'] = resolved_settings.pop('db')
         else:
             resolved_settings['name'] = 'test'
