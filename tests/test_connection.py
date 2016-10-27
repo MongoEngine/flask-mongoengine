@@ -147,4 +147,4 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         self.app.config['TESTING'] = True
         db = MongoEngine()
         db.init_app(self.app)
-        self.assertTrue(db.connection.client.codec_options.tz_aware == True)
+        self.assertTrue(db.connection.client.codec_options.tz_aware)
