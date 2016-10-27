@@ -257,33 +257,33 @@ def _register_test_connection(port, db_alias, preserved):
 def _resolve_settings(settings, remove_pass=True):
 
     if settings and isinstance(settings, dict):
-        resolved_setting = dict()
+        resolved_settings = dict()
         for k, v in settings.items():
             if k.startswith("MONGODB_"):
-                resolved_setting[k[8:].lower()] = v
+                resolved_settings[k[8:].lower()] = v
             else:
-                resolved_setting[k.lower()] = v
+                resolved_settings[k.lower()] = v
 
-        resolved_setting['alias'] = resolved_setting.get('alias', DEFAULT_CONNECTION_NAME)
-        if (resolved_setting.has_key('db')):
-            resolved_setting['name'] = resolved_setting.pop('db')
+                resolved_settings['alias'] = resolved_settings.get('alias', DEFAULT_CONNECTION_NAME)
+        if (resolved_settings.has_key('db')):
+            resolved_settings['name'] = resolved_settings.pop('db')
         else:
-            resolved_setting['name'] = 'test'
-        resolved_setting['host'] = resolved_setting.get('host', 'localhost')
-        resolved_setting['port'] = resolved_setting.get('port', 27017)
-        resolved_setting['username'] = resolved_setting.get('username', None)
+            resolved_settings['name'] = 'test'
+        resolved_settings['host'] = resolved_settings.get('host', 'localhost')
+        resolved_settings['port'] = resolved_settings.get('port', 27017)
+        resolved_settings['username'] = resolved_settings.get('username', None)
         # default to ReadPreference.PRIMARY if no read_preference is supplied
-        resolved_setting['read_preference'] = resolved_setting.get('read_preference', ReadPreference.PRIMARY)
-        if 'replicaset' in resolved_setting:
-            resolved_setting['replicaSet'] = resolved_setting.pop('replicaset')
+        resolved_settings['read_preference'] = resolved_settings.get('read_preference', ReadPreference.PRIMARY)
+        if 'replicaset' in resolved_settings:
+            resolved_settings['replicaSet'] = resolved_settings.pop('replicaset')
         if remove_pass:
             try:
-                del resolved_setting['password']
+                del resolved_settings['password']
             except KeyError:
                 # Password not specified, ignore.
                 pass
 
-        return resolved_setting
+        return resolved_settings
     return settings
 
 
