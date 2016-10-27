@@ -254,28 +254,37 @@ def _register_test_connection(port, db_alias, preserved):
         return _conn
 
 
-def _resolve_settings(conn_setting, remove_pass=True):
+def _resolve_settings(settings, remove_pass=True):
 
-    if conn_setting and isinstance(conn_setting, dict):
-        conn_setting = dict(((k[8:] if k.startswith("MONGODB_") else k), v) for k, v in conn_setting.items() if v is not None)
-        conn_setting = dict((k.lower(), v) for k, v in conn_setting.items())
+    if settings and isinstance(settings, dict):
+        resolved_setting = dict()
+        for k, v in settings.items():
+            if k.startswith("MONGODB_"):
+                resolved_setting[k[8:].lower()] = v
+            else:
+                resolved_setting[k.lower()] = v
 
-        resolved = {
-            'alias': conn_setting.get('alias', DEFAULT_CONNECTION_NAME),
-            'name': conn_setting.get('db', 'test'),
-            'host': conn_setting.get('host', 'localhost'),
-            'port': conn_setting.get('port', 27017),
-            'username': conn_setting.get('username'),
-            # default to ReadPreference.PRIMARY if no read_preference is supplied
-            'read_preference': conn_setting.get('read_preference', ReadPreference.PRIMARY),
-        }
-        if 'replicaset' in conn_setting:
-            resolved['replicaSet'] = conn_setting.pop('replicaset')
-        if not remove_pass:
-            resolved['password'] = conn_setting.get('password')
-        return resolved
+        resolved_setting['alias'] = resolved_setting.get('alias', DEFAULT_CONNECTION_NAME)
+        if (resolved_setting.has_key('db')):
+            resolved_setting['name'] = resolved_setting.pop('db')
+        else:
+            resolved_setting['name'] = 'test'
+        resolved_setting['host'] = resolved_setting.get('host', 'localhost')
+        resolved_setting['port'] = resolved_setting.get('port', 27017)
+        resolved_setting['username'] = resolved_setting.get('username', None)
+        # default to ReadPreference.PRIMARY if no read_preference is supplied
+        resolved_setting['read_preference'] = resolved_setting.get('read_preference', ReadPreference.PRIMARY)
+        if 'replicaset' in resolved_setting:
+            resolved_setting['replicaSet'] = resolved_setting.pop('replicaset')
+        if remove_pass:
+            try:
+                del resolved_setting['password']
+            except KeyError:
+                # Password not specified, ignore.
+                pass
 
-    return conn_setting
+        return resolved_setting
+    return settings
 
 
 def fetch_connection_settings(config, remove_pass=True):
