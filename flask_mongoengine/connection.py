@@ -259,7 +259,7 @@ def _resolve_settings(settings, settings_prefix=None, remove_pass=True):
     if settings and isinstance(settings, dict):
         resolved_settings = dict()
         for k, v in settings.items():
-            if settings_prefix > 0:
+            if settings_prefix:
                 # Only resolve parameters that contain the prefix, ignoring the rest.
                 if k.startswith(settings_prefix):
                     resolved_settings[k[len(settings_prefix):].lower()] = v
