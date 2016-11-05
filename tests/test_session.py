@@ -9,7 +9,7 @@ class SessionTestCase(FlaskMongoEngineTestCase):
 
     def setUp(self):
         super(SessionTestCase, self).setUp()
-        self.db_name = 'testing'
+        self.db_name = 'test_db'
         self.app.config['MONGODB_DB'] = self.db_name
         self.app.config['TESTING'] = True
         db = MongoEngine(self.app)

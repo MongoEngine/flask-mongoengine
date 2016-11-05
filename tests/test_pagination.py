@@ -9,7 +9,7 @@ class PaginationTestCase(FlaskMongoEngineTestCase):
 
     def setUp(self):
         super(PaginationTestCase, self).setUp()
-        self.db_name = 'testing'
+        self.db_name = 'test_db'
         self.app.config['MONGODB_DB'] = self.db_name
         self.app.config['TESTING'] = True
         self.app.config['CSRF_ENABLED'] = False

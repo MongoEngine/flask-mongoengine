@@ -17,7 +17,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
 
     def setUp(self):
         super(WTFormsAppTestCase, self).setUp()
-        self.db_name = 'testing'
+        self.db_name = 'test_db'
         self.app.config['MONGODB_DB'] = self.db_name
         self.app.config['TESTING'] = True
         # For Flask-WTF < 0.9

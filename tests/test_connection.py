@@ -45,6 +45,13 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
 
         self._do_persist(db)
 
+    def test_uri_connection_string(self):
+        db = MongoEngine()
+        self.app.config['TEMP_DB'] = True
+        self.app.config['MONGO_URI'] = 'mongodb://localhost:27017/test_uri'
+
+        self._do_persist(db)
+
     def _do_persist(self, db):
         class Todo(db.Document):
             title = db.StringField(max_length=60)
@@ -67,16 +74,17 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
     def test_multiple_connections(self):
         db = MongoEngine()
         self.app.config['TESTING'] = True
+        self.app.config['TEMP_DB'] = True
         self.app.config['MONGODB_SETTINGS'] = [
             {
                 'ALIAS': 'default',
-                'DB': 'my_db1',
+                'DB': 'testing_db1',
                 'HOST': 'localhost',
                 'PORT': 27017
             },
             {
-                "ALIAS": "my_db2",
-                "DB": 'my_db2',
+                "ALIAS": "testing_db2",
+                "DB": 'testing_db2',
                 "HOST": 'localhost',
                 "PORT": 27017
             },
@@ -86,7 +94,7 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
             title = db.StringField(max_length=60)
             text = db.StringField()
             done = db.BooleanField(default=False)
-            meta = {"db_alias": "my_db2"}
+            meta = {"db_alias": "testing_db2"}
 
         db.init_app(self.app)
         Todo.drop_collection()
@@ -133,3 +141,10 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         self.app.config['TEMP_DB'] = True
         self.app.config['MONGODB_ALIAS'] = 'unittest_4'
         self.assertRaises(InvalidSettingsError, MongoEngine, self.app)
+
+    def test_connection_kwargs(self):
+        self.app.config['MONGODB_SETTINGS'] = {'DB': 'testing_tz_aware', 'alias': 'tz_aware_true', 'TZ_AWARE': True}
+        self.app.config['TESTING'] = True
+        db = MongoEngine()
+        db.init_app(self.app)
+        self.assertTrue(db.connection.client.codec_options.tz_aware)

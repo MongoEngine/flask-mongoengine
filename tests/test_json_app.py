@@ -18,7 +18,7 @@ class JSONAppTestCase(FlaskMongoEngineTestCase):
 
     def setUp(self):
         super(JSONAppTestCase, self).setUp()
-        self.app.config['MONGODB_DB'] = 'testing'
+        self.app.config['MONGODB_DB'] = 'test_db'
         self.app.config['TESTING'] = True
         self.app.config['TEMP_DB'] = True
         db = MongoEngine()

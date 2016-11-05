@@ -254,28 +254,44 @@ def _register_test_connection(port, db_alias, preserved):
         return _conn
 
 
-def _resolve_settings(conn_setting, remove_pass=True):
+def _resolve_settings(settings, settings_prefix=None, remove_pass=True):
 
-    if conn_setting and isinstance(conn_setting, dict):
-        conn_setting = dict(((k[8:] if k.startswith("MONGODB_") else k), v) for k, v in conn_setting.items() if v is not None)
-        conn_setting = dict((k.lower(), v) for k, v in conn_setting.items())
+    if settings and isinstance(settings, dict):
+        resolved_settings = dict()
+        for k, v in settings.items():
+            if settings_prefix:
+                # Only resolve parameters that contain the prefix, ignoring the rest.
+                if k.startswith(settings_prefix):
+                    resolved_settings[k[len(settings_prefix):].lower()] = v
+            else:
+                # If no prefix is provided then we assume that all parameters are relevant for the DB connection string.
+                resolved_settings[k.lower()] = v
 
-        resolved = {
-            'alias': conn_setting.get('alias', DEFAULT_CONNECTION_NAME),
-            'name': conn_setting.get('db', 'test'),
-            'host': conn_setting.get('host', 'localhost'),
-            'port': conn_setting.get('port', 27017),
-            'username': conn_setting.get('username'),
-            # default to ReadPreference.PRIMARY if no read_preference is supplied
-            'read_preference': conn_setting.get('read_preference', ReadPreference.PRIMARY),
-        }
-        if 'replicaset' in conn_setting:
-            resolved['replicaSet'] = conn_setting.pop('replicaset')
-        if not remove_pass:
-            resolved['password'] = conn_setting.get('password')
-        return resolved
+        # Add various default values.
+        resolved_settings['alias'] = resolved_settings.get('alias', DEFAULT_CONNECTION_NAME)
+        if 'db' in resolved_settings:
+            resolved_settings['name'] = resolved_settings.pop('db')
+        else:
+            resolved_settings['name'] = 'test'
 
-    return conn_setting
+        resolved_settings['host'] = resolved_settings.get('host', 'localhost')
+        resolved_settings['port'] = resolved_settings.get('port', 27017)
+        resolved_settings['username'] = resolved_settings.get('username', None)
+
+        # default to ReadPreference.PRIMARY if no read_preference is supplied
+        resolved_settings['read_preference'] = resolved_settings.get('read_preference', ReadPreference.PRIMARY)
+        if 'replicaset' in resolved_settings:
+            resolved_settings['replicaSet'] = resolved_settings.pop('replicaset')
+        if remove_pass:
+            try:
+                del resolved_settings['password']
+            except KeyError:
+                # Password not specified, ignore.
+                pass
+
+        return resolved_settings
+
+    return settings
 
 
 def fetch_connection_settings(config, remove_pass=True):
@@ -306,14 +322,14 @@ def fetch_connection_settings(config, remove_pass=True):
             # List of connection settings.
             settings_list = []
             for setting in settings:
-                settings_list.append(_resolve_settings(setting, remove_pass))
+                settings_list.append(_resolve_settings(setting, remove_pass=remove_pass))
             return settings_list
         else:
             # Connection settings provided as a dictionary.
-            return _resolve_settings(settings, remove_pass)
+            return _resolve_settings(settings, remove_pass=remove_pass)
     else:
         # Connection settings provided in standard format.
-        return _resolve_settings(config, remove_pass)
+        return _resolve_settings(config, settings_prefix='MONGODB_', remove_pass=remove_pass)
 
 
 def create_connection(config, app):
