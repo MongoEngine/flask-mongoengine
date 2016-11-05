@@ -255,43 +255,57 @@ def _register_test_connection(port, db_alias, preserved):
 
 
 def _resolve_settings(settings, settings_prefix=None, remove_pass=True):
+    """
+    Given a dict of connection settings, sanitize the keys and fall back
+    to some sane defaults.
 
-    if settings and isinstance(settings, dict):
-        resolved_settings = dict()
-        for k, v in settings.items():
-            if settings_prefix:
-                # Only resolve parameters that contain the prefix, ignoring the rest.
-                if k.startswith(settings_prefix):
-                    resolved_settings[k[len(settings_prefix):].lower()] = v
-            else:
-                # If no prefix is provided then we assume that all parameters are relevant for the DB connection string.
-                resolved_settings[k.lower()] = v
+    If settings_prefix is passed, only use the keys that start with the
+    prefix. If remove_pass is True, remove the password from the final
+    settings dict.
+    """
+    # TODO does pymongo/mongoengine handle the defaults? For example, do we
+    # really need to pass port '27017', host 'localhost', empty username, etc?
 
-        # Add various default values.
-        resolved_settings['alias'] = resolved_settings.get('alias', DEFAULT_CONNECTION_NAME)
-        if 'db' in resolved_settings:
-            resolved_settings['name'] = resolved_settings.pop('db')
+    if not settings or not isinstance(settings, dict):
+        return settings
+        # TODO maybe the line below is better?
+        # raise ValueError('settings should be a dict')
+
+    resolved_settings = {}
+    for k, v in settings.items():
+        if settings_prefix:
+            # Only resolve parameters that contain the prefix, ignoring the rest.
+            if k.startswith(settings_prefix):
+                resolved_settings[k[len(settings_prefix):].lower()] = v
         else:
-            resolved_settings['name'] = 'test'
+            # If no prefix is provided then we assume that all parameters are
+            # relevant for the DB connection string.
+            resolved_settings[k.lower()] = v
 
-        resolved_settings['host'] = resolved_settings.get('host', 'localhost')
-        resolved_settings['port'] = resolved_settings.get('port', 27017)
-        resolved_settings['username'] = resolved_settings.get('username', None)
+    # Add a default "name" or use the "db" key if exists
+    if 'db' in resolved_settings:
+        resolved_settings['name'] = resolved_settings.pop('db')
+    else:
+        resolved_settings['name'] = 'test'
 
-        # default to ReadPreference.PRIMARY if no read_preference is supplied
-        resolved_settings['read_preference'] = resolved_settings.get('read_preference', ReadPreference.PRIMARY)
-        if 'replicaset' in resolved_settings:
-            resolved_settings['replicaSet'] = resolved_settings.pop('replicaset')
-        if remove_pass:
-            try:
-                del resolved_settings['password']
-            except KeyError:
-                # Password not specified, ignore.
-                pass
+    # Add various default values.
+    resolved_settings['alias'] = resolved_settings.get('alias', DEFAULT_CONNECTION_NAME)
+    resolved_settings['host'] = resolved_settings.get('host', 'localhost')
+    resolved_settings['port'] = resolved_settings.get('port', 27017)
+    resolved_settings['username'] = resolved_settings.get('username')  # TODO can we just ignore username if it's not in the original settings? Why do we have to always have it here even if it's None?
 
-        return resolved_settings
+    # Default to ReadPreference.PRIMARY if no read_preference is supplied
+    resolved_settings['read_preference'] = resolved_settings.get('read_preference', ReadPreference.PRIMARY)
 
-    return settings
+    # Rename "replicaset" to "replicaSet" if it exists in the dict
+    if 'replicaset' in resolved_settings:
+        resolved_settings['replicaSet'] = resolved_settings.pop('replicaset')
+
+    # Remove the password from the dict if remove_pass is True
+    if remove_pass:
+        resolved_settings.pop('password', None)
+
+    return resolved_settings
 
 
 def fetch_connection_settings(config, remove_pass=True):
