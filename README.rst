@@ -7,6 +7,9 @@ Flask-MongoEngine
 .. image:: https://travis-ci.org/MongoEngine/flask-mongoengine.svg?branch=master
   :target: https://travis-ci.org/MongoEngine/flask-mongoengine
 
+.. image:: https://coveralls.io/repos/MongoEngine/flask-mongoengine/badge.png?branch=master
+  :target: https://coveralls.io/r/MongoEngine/flask-mongoengine?branch=master
+
 About
 =====
 Flask-MongoEngine is a Flask extension that provides integration with MongoEngine. It handles connection management for your app.
