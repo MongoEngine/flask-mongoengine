@@ -11,7 +11,6 @@ from mongoengine.queryset import (DoesNotExist, MultipleObjectsReturned,
 
 from .connection import *
 from .json import override_json_encoder
-from .metadata import *
 from .pagination import *
 from .sessions import *
 from .wtf import WtfBaseField
