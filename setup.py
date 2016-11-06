@@ -1,38 +1,16 @@
-import imp
 import os
-
 from setuptools import setup
 
 
-def load_module(module_name, script_file):
-    """
-    XXX: Load modules dynamically without
-    triggering flask_mongoengine.__init__
-
-    This way we do not encounter errors which
-    requires dependencies to be pre-installed.
-    """
-    module = None
-    try:
-        module = imp.load_source(module_name, script_file)
-    except:
-        pass
-    return module
-
-# Load MetaData
-metadata_script = os.path.join(os.path.dirname(__file__), "flask_mongoengine", "metadata.py")
-metadata = load_module("metadata", metadata_script)
-
-# Load documentation
-doc_path = os.path.join(os.path.dirname(__file__), "docs", "index.rst")
-DESCRIPTION = ('Flask-MongoEngine is a Flask extension '
+description = ('Flask-MongoEngine is a Flask extension '
                'that provides integration with MongoEngine and WTF model forms.')
 
-LONG_DESCRIPTION = None
-try:
-    LONG_DESCRIPTION = open(doc_path).read()
+# Load index.rst as long_description
+doc_path = os.path.join(os.path.dirname(__file__), "docs", "index.rst")
+long_description = open(doc_path).read()
 
-    # Stops exit traceback on tests
+# Stops exit traceback on tests
+try:
     import multiprocessing # noqa
 except:
     pass
@@ -41,7 +19,7 @@ test_requirements = ['coverage', 'mongomock', 'nose', 'rednose']
 
 setup(
     name='flask-mongoengine',
-    version=metadata.__version__,
+    version='0.8',
     url='https://github.com/mongoengine/flask-mongoengine',
     license='BSD',
     author='Ross Lawley',
@@ -59,8 +37,8 @@ setup(
     include_package_data=True,
     tests_require=test_requirements,
     setup_requires=test_requirements,  # Allow proper nose usage with setuptools and tox
-    description=DESCRIPTION,
-    long_description=LONG_DESCRIPTION,
+    description=description,
+    long_description=long_description,
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
