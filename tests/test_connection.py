@@ -1,8 +1,6 @@
-import mongoengine
-import pymongo
 from pymongo.errors import InvalidURI
 
-from flask_mongoengine import InvalidSettingsError, MongoEngine
+from flask_mongoengine import MongoEngine
 from tests import FlaskMongoEngineTestCase
 
 

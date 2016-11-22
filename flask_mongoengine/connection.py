@@ -1,4 +1,3 @@
-from flask import current_app
 import mongoengine
 from pymongo import ReadPreference, uri_parser
 
@@ -117,4 +116,3 @@ def _connect(conn_settings):
     """
     db_name = conn_settings.pop('name')
     return mongoengine.connect(db_name, **conn_settings)
-
