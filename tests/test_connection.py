@@ -1,27 +1,17 @@
+from mongoengine.context_managers import switch_db
+import pymongo
 from pymongo.errors import InvalidURI
+from pymongo.read_preferences import ReadPreference
 
 from flask_mongoengine import MongoEngine
-from tests import FlaskMongoEngineTestCase
+
+from .tests import FlaskMongoEngineTestCase
 
 
 class ConnectionTestCase(FlaskMongoEngineTestCase):
 
-    def test_live_connection(self):
-        db = MongoEngine()
-        self.app.config['MONGODB_SETTINGS'] = {
-            'HOST': 'localhost',
-            'PORT': 27017,
-            'DB': 'flask_mongoengine_test_db'
-        }
-        self._do_persist(db)
-
-    def test_live_connection_with_uri_string(self):
-        db = MongoEngine()
-        self.app.config['MONGO_URI'] = 'mongodb://localhost:27017/flask_mongoengine_test_db'
-        self._do_persist(db)
-
     def _do_persist(self, db):
-        """Initialize test Flask application and persist some data in
+        """Initialize a test Flask application and persist some data in
         MongoDB, ultimately asserting that the connection works.
         """
         class Todo(db.Document):
@@ -42,9 +32,28 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         f_to = Todo.objects().first()
         self.assertEqual(s_todo.title, f_to.title)
 
-    def test_multiple_connections(self):
-        from mongoengine.context_managers import switch_db
+    def test_simple_connection(self):
+        """Make sure a simple connection to a standalone MongoDB works."""
+        db = MongoEngine()
+        self.app.config['MONGODB_SETTINGS'] = {
+            'HOST': 'localhost',
+            'PORT': 27017,
+            'DB': 'flask_mongoengine_test_db'
+        }
+        self._do_persist(db)
 
+    def test_connection_with_uri_string(self):
+        """Make sure we can connect to a standalone MongoDB if we specify
+        the host as a MongoDB URI.
+        """
+        db = MongoEngine()
+        self.app.config['MONGODB_HOST'] = 'mongodb://localhost:27017/flask_mongoengine_test_db'
+        self._do_persist(db)
+
+    def test_multiple_connections(self):
+        """Make sure establishing multiple connections to a standalone
+        MongoDB and switching between them works.
+        """
         db = MongoEngine()
         self.app.config['MONGODB_SETTINGS'] = [
             {
@@ -92,16 +101,35 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
             self.assertNotEqual(doc, None)
 
     def test_connection_with_invalid_uri(self):
-        self.app.config['MONGODB_ALIAS'] = 'unittest_2'
+        """Make sure connecting via an invalid URI raises an InvalidURI
+        exception.
+        """
         self.app.config['MONGODB_HOST'] = 'mongo://localhost'
         self.assertRaises(InvalidURI, MongoEngine, self.app)
 
     def test_connection_kwargs(self):
+        """Make sure additional connection kwargs work."""
+
+        # Figure out whether to use "MAX_POOL_SIZE" or "MAXPOOLSIZE" based
+        # on PyMongo version (former was changed to the latter as described
+        # in https://jira.mongodb.org/browse/PYTHON-854)
+        # TODO remove once PyMongo < 3.0 support is dropped
+        if pymongo.version_tuple[0] >= 3:
+            MAX_POOL_SIZE_KEY = 'MAXPOOLSIZE'
+        else:
+            MAX_POOL_SIZE_KEY = 'MAX_POOL_SIZE'
+
         self.app.config['MONGODB_SETTINGS'] = {
             'DB': 'flask_mongoengine_testing_tz_aware',
-            'alias': 'tz_aware_true',
-            'TZ_AWARE': True
+            'TZ_AWARE': True,
+            'READ_PREFERENCE': ReadPreference.SECONDARY,
+            MAX_POOL_SIZE_KEY: 10,
         }
         db = MongoEngine()
         db.init_app(self.app)
         self.assertTrue(db.connection.client.codec_options.tz_aware)
+        self.assertEqual(db.connection.client.max_pool_size, 10)
+        self.assertEqual(
+            db.connection.client.read_preference,
+            ReadPreference.SECONDARY
+        )
