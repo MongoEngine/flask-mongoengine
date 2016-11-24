@@ -5,7 +5,7 @@ from pymongo.read_preferences import ReadPreference
 
 from flask_mongoengine import MongoEngine
 
-from .tests import FlaskMongoEngineTestCase
+from tests import FlaskMongoEngineTestCase
 
 
 class ConnectionTestCase(FlaskMongoEngineTestCase):
@@ -36,18 +36,25 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         """Make sure a simple connection to a standalone MongoDB works."""
         db = MongoEngine()
         self.app.config['MONGODB_SETTINGS'] = {
+            'ALIAS': 'simple_conn',
             'HOST': 'localhost',
             'PORT': 27017,
             'DB': 'flask_mongoengine_test_db'
         }
         self._do_persist(db)
 
-    def test_connection_with_uri_string(self):
+    def test_host_as_uri_string(self):
         """Make sure we can connect to a standalone MongoDB if we specify
         the host as a MongoDB URI.
         """
         db = MongoEngine()
         self.app.config['MONGODB_HOST'] = 'mongodb://localhost:27017/flask_mongoengine_test_db'
+        self._do_persist(db)
+
+    def test_host_as_list(self):
+        """Make sure MONGODB_HOST can be a list hosts."""
+        db = MongoEngine()
+        self.app.config['MONGODB_HOST'] = ['localhost:27017']
         self._do_persist(db)
 
     def test_multiple_connections(self):
@@ -120,6 +127,7 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
             MAX_POOL_SIZE_KEY = 'MAX_POOL_SIZE'
 
         self.app.config['MONGODB_SETTINGS'] = {
+            'ALIAS': 'tz_aware_true',
             'DB': 'flask_mongoengine_testing_tz_aware',
             'TZ_AWARE': True,
             'READ_PREFERENCE': ReadPreference.SECONDARY,
@@ -127,9 +135,9 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         }
         db = MongoEngine()
         db.init_app(self.app)
-        self.assertTrue(db.connection.client.codec_options.tz_aware)
-        self.assertEqual(db.connection.client.max_pool_size, 10)
+        self.assertTrue(db.connection.codec_options.tz_aware)
+        self.assertEqual(db.connection.max_pool_size, 10)
         self.assertEqual(
-            db.connection.client.read_preference,
+            db.connection.read_preference,
             ReadPreference.SECONDARY
         )
