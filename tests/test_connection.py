@@ -54,7 +54,10 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
     def test_host_as_list(self):
         """Make sure MONGODB_HOST can be a list hosts."""
         db = MongoEngine()
-        self.app.config['MONGODB_HOST'] = ['localhost:27017']
+        self.app.config['MONGODB_SETTINGS'] = {
+            'ALIAS': 'host_list',
+            'HOST': ['localhost:27017'],
+        }
         self._do_persist(db)
 
     def test_multiple_connections(self):
