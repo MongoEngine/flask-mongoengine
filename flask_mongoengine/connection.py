@@ -28,7 +28,7 @@ def _sanitize_settings(settings):
         resolved_settings['db'] = uri_dict['database']
 
     # Add a default name param or use the "db" key if exists
-    if 'db' in resolved_settings:
+    if resolved_settings.get('db'):
         resolved_settings['name'] = resolved_settings.pop('db')
     else:
         resolved_settings['name'] = 'test'
