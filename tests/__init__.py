@@ -1,7 +1,6 @@
 import unittest
 
 import flask
-from flask_mongoengine import current_mongoengine_instance
 
 
 class FlaskMongoEngineTestCase(unittest.TestCase):
@@ -15,7 +14,4 @@ class FlaskMongoEngineTestCase(unittest.TestCase):
         self.ctx.push()
 
     def tearDown(self):
-        me_instance = current_mongoengine_instance()
-        if me_instance:
-            me_instance.disconnect()
         self.ctx.pop()

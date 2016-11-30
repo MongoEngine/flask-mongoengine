@@ -51,5 +51,6 @@ class SessionTestCase(FlaskMongoEngineTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(resp.data.decode('utf-8'), 'sessions: 1')
 
+
 if __name__ == '__main__':
     unittest.main()

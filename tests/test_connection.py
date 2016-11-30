@@ -1,58 +1,19 @@
-import mongoengine
-import mongomock
+from mongoengine.context_managers import switch_db
 import pymongo
 from pymongo.errors import InvalidURI
+from pymongo.read_preferences import ReadPreference
 
-from flask_mongoengine import InvalidSettingsError, MongoEngine
+from flask_mongoengine import MongoEngine
+
 from tests import FlaskMongoEngineTestCase
 
 
 class ConnectionTestCase(FlaskMongoEngineTestCase):
 
-    def ensure_mongomock_connection(self):
-        db = MongoEngine(self.app)
-        self.assertTrue(isinstance(db.connection.client, mongomock.MongoClient))
-
-    def test_mongomock_connection_request_on_most_recent_mongoengine(self):
-        self.app.config['TESTING'] = True
-        self.app.config['MONGODB_ALIAS'] = 'unittest_0'
-        self.app.config['MONGODB_HOST'] = 'mongomock://localhost'
-
-        if mongoengine.VERSION >= (0, 10, 6):
-            self.ensure_mongomock_connection()
-
-    def test_mongomock_connection_request_on_most_old_mongoengine(self):
-        self.app.config['TESTING'] = 'True'
-        self.assertRaises(InvalidSettingsError, MongoEngine, self.app)
-
-        self.app.config['TESTING'] = True
-        self.app.config['MONGODB_ALIAS'] = 'unittest_1'
-        self.app.config['MONGODB_HOST'] = 'mongomock://localhost'
-
-        if mongoengine.VERSION < (0, 10, 6):
-            self.ensure_mongomock_connection()
-
-    def test_live_connection(self):
-        db = MongoEngine()
-        self.app.config['TEMP_DB'] = True
-        self.app.config['MONGODB_SETTINGS'] = {
-            'HOST': 'localhost',
-            'PORT': 27017,
-            'USERNAME': None,
-            'PASSWORD': None,
-            'DB': 'test'
-        }
-
-        self._do_persist(db)
-
-    def test_uri_connection_string(self):
-        db = MongoEngine()
-        self.app.config['TEMP_DB'] = True
-        self.app.config['MONGO_URI'] = 'mongodb://localhost:27017/test_uri'
-
-        self._do_persist(db)
-
     def _do_persist(self, db):
+        """Initialize a test Flask application and persist some data in
+        MongoDB, ultimately asserting that the connection works.
+        """
         class Todo(db.Document):
             title = db.StringField(max_length=60)
             text = db.StringField()
@@ -71,22 +32,51 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         f_to = Todo.objects().first()
         self.assertEqual(s_todo.title, f_to.title)
 
-    def test_multiple_connections(self):
+    def test_simple_connection(self):
+        """Make sure a simple connection to a standalone MongoDB works."""
         db = MongoEngine()
-        self.app.config['TESTING'] = True
-        self.app.config['TEMP_DB'] = True
+        self.app.config['MONGODB_SETTINGS'] = {
+            'ALIAS': 'simple_conn',
+            'HOST': 'localhost',
+            'PORT': 27017,
+            'DB': 'flask_mongoengine_test_db'
+        }
+        self._do_persist(db)
+
+    def test_host_as_uri_string(self):
+        """Make sure we can connect to a standalone MongoDB if we specify
+        the host as a MongoDB URI.
+        """
+        db = MongoEngine()
+        self.app.config['MONGODB_HOST'] = 'mongodb://localhost:27017/flask_mongoengine_test_db'
+        self._do_persist(db)
+
+    def test_host_as_list(self):
+        """Make sure MONGODB_HOST can be a list hosts."""
+        db = MongoEngine()
+        self.app.config['MONGODB_SETTINGS'] = {
+            'ALIAS': 'host_list',
+            'HOST': ['localhost:27017'],
+        }
+        self._do_persist(db)
+
+    def test_multiple_connections(self):
+        """Make sure establishing multiple connections to a standalone
+        MongoDB and switching between them works.
+        """
+        db = MongoEngine()
         self.app.config['MONGODB_SETTINGS'] = [
             {
                 'ALIAS': 'default',
-                'DB': 'testing_db1',
+                'DB': 'flask_mongoengine_test_db_1',
                 'HOST': 'localhost',
                 'PORT': 27017
             },
             {
-                "ALIAS": "testing_db2",
-                "DB": 'testing_db2',
-                "HOST": 'localhost',
-                "PORT": 27017
+                'ALIAS': 'alternative',
+                'DB': 'flask_mongoengine_test_db_2',
+                'HOST': 'localhost',
+                'PORT': 27017
             },
         ]
 
@@ -94,13 +84,12 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
             title = db.StringField(max_length=60)
             text = db.StringField()
             done = db.BooleanField(default=False)
-            meta = {"db_alias": "testing_db2"}
+            meta = {'db_alias': 'alternative'}
 
         db.init_app(self.app)
         Todo.drop_collection()
 
-        # Switch DB
-        from mongoengine.context_managers import switch_db
+        # Test saving a doc via the default connection
         with switch_db(Todo, 'default') as Todo:
             todo = Todo()
             todo.text = "Sample"
@@ -111,40 +100,47 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
             f_to = Todo.objects().first()
             self.assertEqual(s_todo.title, f_to.title)
 
-    def test_mongodb_temp_instance(self):
-        # String value used instead of boolean
-        self.app.config['TESTING'] = True
-        self.app.config['TEMP_DB'] = 'True'
-        self.assertRaises(InvalidSettingsError, MongoEngine, self.app)
+        # Make sure the doc doesn't exist in the alternative db
+        with switch_db(Todo, 'alternative') as Todo:
+            doc = Todo.objects().first()
+            self.assertEqual(doc, None)
 
-        self.app.config['TEMP_DB'] = True
-        db = MongoEngine(self.app)
-        self.assertTrue(isinstance(db.connection, pymongo.MongoClient))
+        # Make sure switching back to the default connection shows the doc
+        with switch_db(Todo, 'default') as Todo:
+            doc = Todo.objects().first()
+            self.assertNotEqual(doc, None)
 
-    def test_InvalidURI_exception_connections(self):
-        # Invalid URI
-        self.app.config['TESTING'] = True
-        self.app.config['MONGODB_ALIAS'] = 'unittest_2'
+    def test_connection_with_invalid_uri(self):
+        """Make sure connecting via an invalid URI raises an InvalidURI
+        exception.
+        """
         self.app.config['MONGODB_HOST'] = 'mongo://localhost'
         self.assertRaises(InvalidURI, MongoEngine, self.app)
 
-    def test_parse_uri_if_testing_true_and_not_uses_mongomock_schema(self):
-        # TESTING is false but mongomock URI
-        self.app.config['TESTING'] = False
-        self.app.config['MONGODB_ALIAS'] = 'unittest_3'
-        self.app.config['MONGODB_HOST'] = 'mongomock://localhost'
-        self.assertRaises(InvalidURI, MongoEngine, self.app)
-
-    def test_temp_db_with_false_testing(self):
-        # TEMP_DB is set to true but testing is false
-        self.app.config['TESTING'] = False
-        self.app.config['TEMP_DB'] = True
-        self.app.config['MONGODB_ALIAS'] = 'unittest_4'
-        self.assertRaises(InvalidSettingsError, MongoEngine, self.app)
-
     def test_connection_kwargs(self):
-        self.app.config['MONGODB_SETTINGS'] = {'DB': 'testing_tz_aware', 'alias': 'tz_aware_true', 'TZ_AWARE': True}
-        self.app.config['TESTING'] = True
+        """Make sure additional connection kwargs work."""
+
+        # Figure out whether to use "MAX_POOL_SIZE" or "MAXPOOLSIZE" based
+        # on PyMongo version (former was changed to the latter as described
+        # in https://jira.mongodb.org/browse/PYTHON-854)
+        # TODO remove once PyMongo < 3.0 support is dropped
+        if pymongo.version_tuple[0] >= 3:
+            MAX_POOL_SIZE_KEY = 'MAXPOOLSIZE'
+        else:
+            MAX_POOL_SIZE_KEY = 'MAX_POOL_SIZE'
+
+        self.app.config['MONGODB_SETTINGS'] = {
+            'ALIAS': 'tz_aware_true',
+            'DB': 'flask_mongoengine_testing_tz_aware',
+            'TZ_AWARE': True,
+            'READ_PREFERENCE': ReadPreference.SECONDARY,
+            MAX_POOL_SIZE_KEY: 10,
+        }
         db = MongoEngine()
         db.init_app(self.app)
-        self.assertTrue(db.connection.client.codec_options.tz_aware)
+        self.assertTrue(db.connection.codec_options.tz_aware)
+        self.assertEqual(db.connection.max_pool_size, 10)
+        self.assertEqual(
+            db.connection.read_preference,
+            ReadPreference.SECONDARY
+        )

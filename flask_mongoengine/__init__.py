@@ -16,33 +16,6 @@ from .sessions import *
 from .wtf import WtfBaseField
 
 
-def redirect_connection_calls(cls):
-    """
-    Monkey-patch mongoengine's connection methods so that they use
-    Flask-MongoEngine's equivalents.
-
-    Given a random mongoengine class (`cls`), get the module it's in,
-    and iterate through all of that module's members to find the
-    particular methods we want to monkey-patch.
-    """
-    # TODO this is so whack... Why don't we pass particular connection
-    # settings down to mongoengine and just use their original implementation?
-
-    # Map of mongoengine method/variable names and flask-mongoengine
-    # methods they should point to
-    connection_methods = {
-        'get_db': get_db,
-        'DEFAULT_CONNECTION_NAME': DEFAULT_CONNECTION_NAME,
-        'get_connection': get_connection
-    }
-    cls_module = inspect.getmodule(cls)
-    if cls_module != mongoengine.connection:
-        for attr in inspect.getmembers(cls_module):
-            n = attr[0]
-            if n in connection_methods:
-                setattr(cls_module, n, connection_methods[n])
-
-
 def _patch_base_field(obj, name):
     """
     If the object submitted has a class whose base class is
@@ -59,6 +32,8 @@ def _patch_base_field(obj, name):
     @param obj: MongoEngine instance in which we should locate the class.
     @param name: Name of an attribute which may or may not be a BaseField.
     """
+    # TODO is there a less hacky way to accomplish the same level of
+    # extensibility/control?
 
     # get an attribute of the MongoEngine class and return if it's not
     # a class
@@ -79,7 +54,6 @@ def _patch_base_field(obj, name):
     # re-assign the class back to the MongoEngine instance
     delattr(obj, name)
     setattr(obj, name, cls)
-    redirect_connection_calls(cls)
 
 
 def _include_mongoengine(obj):
@@ -99,10 +73,7 @@ def _include_mongoengine(obj):
 
 
 def current_mongoengine_instance():
-    """
-    Obtain instance of MongoEngine in the
-    current working app instance.
-    """
+    """Return a MongoEngine instance associated with current Flask app."""
     me = current_app.extensions.get('mongoengine', {})
     for k, v in me.items():
         if isinstance(k, MongoEngine):
@@ -139,36 +110,22 @@ class MongoEngine(object):
             raise Exception('Extension already initialized')
 
         if not config:
-            # If not passed a config then we
-            # read the connection settings from
-            # the app config.
+            # If not passed a config then we read the connection settings
+            # from the app config.
             config = app.config
 
-        # Obtain db connection
-        connection = create_connection(config, app)
+        # Obtain db connection(s)
+        connections = create_connections(config)
 
-        # Store objects in application instance
-        # so that multiple apps do not end up
-        # accessing the same objects.
-        s = {'app': app, 'conn': connection}
+        # Store objects in application instance so that multiple apps do not
+        # end up accessing the same objects.
+        s = {'app': app, 'conn': connections}
         app.extensions['mongoengine'][self] = s
-
-    def disconnect(self):
-        """Close all connections to MongoDB."""
-        conn_settings = fetch_connection_settings(current_app.config)
-        if isinstance(conn_settings, list):
-            for setting in conn_settings:
-                alias = setting.get('alias', DEFAULT_CONNECTION_NAME)
-                disconnect(alias, setting.get('preserve_temp_db', False))
-        else:
-            alias = conn_settings.get('alias', DEFAULT_CONNECTION_NAME)
-            disconnect(alias, conn_settings.get('preserve_temp_db', False))
-        return True
 
     @property
     def connection(self):
         """
-        Return MongoDB connection associated with this MongoEngine
+        Return MongoDB connection(s) associated with this MongoEngine
         instance.
         """
         return current_app.extensions['mongoengine'][self]['conn']

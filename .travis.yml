@@ -1,5 +1,5 @@
-# http://travis-ci.org/#!/MongoEngine/flask_mongoengine
 language: python
+
 python:
     - "2.6"
     - "2.7"
@@ -44,6 +44,7 @@ script:
 
 notifications:
   irc: "irc.freenode.org#flask-mongoengine"
+
 branches:
   only:
     - master
