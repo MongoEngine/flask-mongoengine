@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Changes in 0.8.1
+================
+
+- Fixed connection issues introduced in 0.8
+- Removed support for MongoMock
+
 Changes in 0.8
 ==============
 
