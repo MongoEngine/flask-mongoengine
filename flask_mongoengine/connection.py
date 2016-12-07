@@ -50,7 +50,7 @@ def _sanitize_settings(settings):
     #    resolved_settings['replicaSet'] = resolved_settings.pop('replicaset')
 
     # Clean up empty values
-    for k, v in resolved_settings.items():
+    for k, v in list(resolved_settings.items()):
         if v is None:
             del resolved_settings[k]
 
