@@ -4,8 +4,8 @@ import inspect
 
 from flask import Flask, abort, current_app
 import mongoengine
-from mongoengine.base import ValidationError
 from mongoengine.base.fields import BaseField
+from mongoengine.errors import ValidationError
 from mongoengine.queryset import (DoesNotExist, MultipleObjectsReturned,
                                   QuerySet)
 
