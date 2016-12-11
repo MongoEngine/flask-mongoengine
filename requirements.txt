@@ -4,3 +4,4 @@ Flask-WTF>=0.8.3
 mongoengine>=0.8.0
 flake8
 flake8-import-order
+six

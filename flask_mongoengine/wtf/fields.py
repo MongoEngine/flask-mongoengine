@@ -5,8 +5,8 @@ import json
 import sys
 
 from gettext import gettext as _
-from mongoengine.python_support import bin_type
 from mongoengine.queryset import DoesNotExist
+import six
 from wtforms import widgets
 from wtforms.fields import SelectFieldBase, StringField, TextAreaField
 from wtforms.validators import ValidationError
@@ -176,11 +176,11 @@ class NoneStringField(StringField):
 
 class BinaryField(TextAreaField):
     """
-    Custom TextAreaField that converts its value with bin_type.
+    Custom TextAreaField that converts its value with binary_type.
     """
     def process_formdata(self, valuelist):
         if valuelist:
-            if sys.version_info >= (3, 0):
-                self.data = bin_type(valuelist[0], 'utf-8')
+            if six.PY3:
+                self.data = six.binary_type(valuelist[0], 'utf-8')
             else:
-                self.data = bin_type(valuelist[0])
+                self.data = six.binary_type(valuelist[0])

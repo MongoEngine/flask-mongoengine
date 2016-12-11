@@ -2,6 +2,15 @@
 Changelog
 =========
 
+Development
+================
+- (Fill this out as you fix issues and develop you features).
+
+Changes in 0.8.2
+================
+- Fixed relying on mongoengine.python_support.
+- Fixed cleaning up empty connection settings #285
+
 Changes in 0.8.1
 ================
 
