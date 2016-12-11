@@ -1,19 +1,19 @@
 language: python
 
 python:
-    - "2.6"
-    - "2.7"
-    - "3.3"
-    - '3.4'
-    - '3.5'
-    - pypy
-    - pypy3
+- '2.6'
+- '2.7'
+- '3.3'
+- '3.4'
+- '3.5'
+- pypy
+- pypy3
 
 env:
-  - MONGOENGINE=0.8
-  - MONGOENGINE=0.9
-  - MONGOENGINE=0.10.0
-  - MONGOENGINE=dev
+- MONGOENGINE=0.8
+- MONGOENGINE=0.9
+- MONGOENGINE=0.10.0
+- MONGOENGINE=dev
 
 before_install:
 - travis_retry sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
@@ -43,9 +43,20 @@ script:
 - tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage
 
 notifications:
-  irc: "irc.freenode.org#flask-mongoengine"
+  irc: irc.freenode.org#flask-mongoengine
 
 branches:
   only:
-    - master
-    - dev
+  - master
+  - dev
+
+# Whenever a new release is created via GitHub, publish it on PyPI.
+deploy:
+  provider: pypi
+  user: wojcikstefan
+  password:
+    secure: ZShEfSeu1pUHPGWtO5JAERp3nkG1omFIDxz/N+qNEJGwIRxXH6S0E17p9jaRAwrBY11F6ecajOgz1E1ICovYf8IitOP8I/CyieF6EPV7Bv4PZyKJdWGzT/Edjrt+wAjY7Kwlr2Gkh9Tu1lChZcWvhyMVPYCgqyA2yP0W2b9kC4Y=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: MongoEngine/flask-mongoengine
