@@ -25,8 +25,6 @@ before_install:
 
 install:
 - travis_retry pip install --upgrade pip
-- travis_retry pip install --upgrade nose
-- travis_retry pip install --upgrade setuptools
 - travis_retry pip install coveralls
 - travis_retry pip install flake8
 - travis_retry pip install tox>=1.9
