@@ -28,8 +28,9 @@ db.init_app(app)
 
 DebugToolbarExtension(app)
 
-from views import index
+from views import index, pagination
 app.add_url_rule('/', view_func=index)
+app.add_url_rule('/pagination', view_func=pagination)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=4000)

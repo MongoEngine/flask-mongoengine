@@ -15,11 +15,26 @@ try:
 except:
     pass
 
+
+def get_version(version_tuple):
+    """Return the version tuple as a string, e.g. for (0, 10, 7),
+    return '0.10.7'.
+    """
+    return '.'.join(map(str, version_tuple))
+
+
+# Dirty hack to get version number from flask_monogengine/__init__.py - we
+# can't import it as it depends on PyMongo and PyMongo isn't installed until
+# this file is read
+init = os.path.join(os.path.dirname(__file__), 'flask_mongoengine', '__init__.py')
+version_line = list(filter(lambda l: l.startswith('VERSION'), open(init)))[0]
+version = get_version(eval(version_line.split('=')[-1]))
+
 test_requirements = ['coverage', 'nose', 'rednose']
 
 setup(
     name='flask-mongoengine',
-    version='0.9.0',
+    version=version,
     url='https://github.com/mongoengine/flask-mongoengine',
     license='BSD',
     author='Ross Lawley',
