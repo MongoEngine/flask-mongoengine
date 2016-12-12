@@ -19,7 +19,7 @@ test_requirements = ['coverage', 'nose', 'rednose']
 
 setup(
     name='flask-mongoengine',
-    version='0.8.2',
+    version='0.9.0',
     url='https://github.com/mongoengine/flask-mongoengine',
     license='BSD',
     author='Ross Lawley',
