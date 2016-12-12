@@ -3,8 +3,12 @@ Changelog
 =========
 
 Development
-================
+===========
 - (Fill this out as you fix issues and develop you features).
+
+Changes in 0.9.0
+================
+- BREAKING CHANGE: Dropped Python v2.6 support
 
 Changes in 0.8.2
 ================
