@@ -41,14 +41,6 @@ def _sanitize_settings(settings):
     # Default to ReadPreference.PRIMARY if no read_preference is supplied
     resolved_settings['read_preference'] = resolved_settings.get('read_preference', ReadPreference.PRIMARY)
 
-    # Rename "replicaset" to "replicaSet" if it exists in the dict
-    # TODO is this necessary? PyMongo normalizes the options and makes them
-    # all lowercase via pymongo.common.validate (which is called in
-    # MongoClient.__init__), so both "replicaset and "replicaSet" should be
-    # valid
-    # if 'replicaset' in resolved_settings:
-    #    resolved_settings['replicaSet'] = resolved_settings.pop('replicaset')
-
     # Clean up empty values
     for k, v in list(resolved_settings.items()):
         if v is None:
