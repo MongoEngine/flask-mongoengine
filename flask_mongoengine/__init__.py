@@ -16,6 +16,19 @@ from .sessions import *
 from .wtf import WtfBaseField
 
 
+VERSION = (0, 9, 0)
+
+
+def get_version():
+    """Return the VERSION as a string, e.g. for VERSION == (0, 9, 0),
+    return '0.9.0'.
+    """
+    return '.'.join(map(str, VERSION))
+
+
+__version__ = get_version()
+
+
 def _patch_base_field(obj, name):
     """
     If the object submitted has a class whose base class is

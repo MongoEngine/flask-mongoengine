@@ -107,9 +107,17 @@ has_prev, next_num, prev_num.
 
 In the template::
 
-    {% macro render_pagination(pagination, endpoint) %}
+    {# Display a page of todos #}
+    <ul>
+        {% for todo in paginated_todos.items %}
+            <li>{{ todo.title }}</li>
+        {% endfor %}
+    </ul>
+
+    {# Macro for creating navigation links #}
+    {% macro render_navigation(pagination, endpoint) %}
       <div class=pagination>
-      {%- for page in pagination.iter_pages() %}
+      {% for page in pagination.iter_pages() %}
         {% if page %}
           {% if page != pagination.page %}
             <a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
@@ -119,9 +127,11 @@ In the template::
         {% else %}
           <span class=ellipsis>…</span>
         {% endif %}
-      {%- endfor %}
+      {% endfor %}
       </div>
     {% endmacro %}
+
+    {{ render_navigation(paginated_todos, 'view_todos') }}
 
 
 MongoEngine and WTForms
