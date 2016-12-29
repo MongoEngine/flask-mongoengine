@@ -99,6 +99,7 @@ class MongoEngine(object):
     def __init__(self, app=None, config=None):
         _include_mongoengine(self)
 
+        self.app = None
         self.Document = Document
         self.DynamicDocument = DynamicDocument
 
@@ -108,6 +109,8 @@ class MongoEngine(object):
     def init_app(self, app, config=None):
         if not app or not isinstance(app, Flask):
             raise Exception('Invalid Flask application instance')
+
+        self.app = app
 
         app.extensions = getattr(app, 'extensions', {})
 
