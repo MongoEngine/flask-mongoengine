@@ -5,6 +5,7 @@ Changelog
 Development
 ===========
 - (Fill this out as you fix issues and develop you features).
+- Added Flask-WTF v0.14 support (#294).
 
 Changes in 0.9.0
 ================

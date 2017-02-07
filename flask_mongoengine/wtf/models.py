@@ -4,12 +4,12 @@ from flask_wtf import FlaskForm
 class ModelForm(FlaskForm):
     """A WTForms mongoengine model form"""
 
-    def __init__(self, formdata=None, obj=None, **kwargs):
-        self.instance = (kwargs.pop('instance', None) or obj)
+    def __init__(self, formdata=None, **kwargs):
+        self.instance = (kwargs.pop('instance', None) or kwargs.get('obj'))
         if self.instance and not formdata:
-            obj = self.instance
+            kwargs['obj'] = self.instance
         self.formdata = formdata
-        super(ModelForm, self).__init__(formdata, obj, **kwargs)
+        super(ModelForm, self).__init__(formdata, **kwargs)
 
     def save(self, commit=True, **kwargs):
         if self.instance:
