@@ -4,7 +4,8 @@ Changelog
 
 Development
 ===========
-- (Fill this out as you fix issues and develop you features).
+- (Fill this out as you fix issues and develop features).
+- Fixed setup.py for various platforms (#298).
 - Added Flask-WTF v0.14 support (#294).
 
 Changes in 0.9.0
