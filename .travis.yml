@@ -43,11 +43,6 @@ script:
 notifications:
   irc: irc.freenode.org#flask-mongoengine
 
-branches:
-  only:
-  - master
-  - dev
-
 # Whenever a new release is created via GitHub, publish it on PyPI.
 deploy:
   provider: pypi
