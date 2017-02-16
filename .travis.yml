@@ -58,6 +58,12 @@ deploy:
   # create a source distribution and a pure python wheel for faster installs
   distributions: "sdist bdist_wheel"
 
-  # only deploy on tagged commits (aka GitHub releases)
+  # only deploy on tagged commits (aka GitHub releases) on the master branch
+  # and only for the builds running Python 2.7 along with dev MongoEngine (we
+  # run Travis against many different Python and MongoEngine versions and we
+  # don't want the deploy to occur multiple times).
   on:
+    branch: master
     tags: true
+    condition: "$MONGOENGINE = dev"
+    python: 2.7
