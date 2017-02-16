@@ -54,7 +54,10 @@ deploy:
   user: wojcikstefan
   password:
     secure: ZShEfSeu1pUHPGWtO5JAERp3nkG1omFIDxz/N+qNEJGwIRxXH6S0E17p9jaRAwrBY11F6ecajOgz1E1ICovYf8IitOP8I/CyieF6EPV7Bv4PZyKJdWGzT/Edjrt+wAjY7Kwlr2Gkh9Tu1lChZcWvhyMVPYCgqyA2yP0W2b9kC4Y=
+
+  # create a source distribution and a pure python wheel for faster installs
+  distributions: "sdist bdist_wheel"
+
+  # only deploy on tagged commits (aka GitHub releases)
   on:
     tags: true
-    distributions: sdist bdist_wheel
-    repo: MongoEngine/flask-mongoengine
