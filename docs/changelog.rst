@@ -10,6 +10,7 @@ Changes in 0.9.1
 ================
 - Fixed setup.py for various platforms (#298).
 - Added Flask-WTF v0.14 support (#294).
+- MongoEngine instance now holds a reference to a particular Flask app it was initialized with (#261).
 
 Changes in 0.9.0
 ================
