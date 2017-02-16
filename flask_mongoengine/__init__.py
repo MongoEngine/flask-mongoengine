@@ -16,12 +16,12 @@ from .sessions import *
 from .wtf import WtfBaseField
 
 
-VERSION = (0, 9, 0)
+VERSION = (0, 9, 1)
 
 
 def get_version():
-    """Return the VERSION as a string, e.g. for VERSION == (0, 9, 0),
-    return '0.9.0'.
+    """Return the VERSION as a string, e.g. for VERSION == (0, 9, 1),
+    return '0.9.1'.
     """
     return '.'.join(map(str, VERSION))
 
