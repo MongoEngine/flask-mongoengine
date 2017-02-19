@@ -1,17 +1,6 @@
 # Use a container-based environment
 sudo: false
 
-services:
-- mongodb
-
-addons:
-  apt:
-    sources:
-    - mongodb-3.0-precise
-    packages:
-    - mongodb-org-server
-    - mongodb-org-shell
-
 language: python
 
 python:
@@ -27,6 +16,17 @@ env:
 - MONGOENGINE=0.9
 - MONGOENGINE=0.10.0
 - MONGOENGINE=dev
+
+services:
+- mongodb
+
+addons:
+  apt:
+    sources:
+    - mongodb-3.0-precise
+    packages:
+    - mongodb-org-server
+    - mongodb-org-shell
 
 install:
 - travis_retry pip install --upgrade pip
@@ -48,6 +48,12 @@ after_success:
 notifications:
   irc: irc.freenode.org#flask-mongoengine
 
+# Only run builds on the master branch and GitHub releases (tagged as vX.Y.Z)
+branches:
+  only:
+  - master
+  - /^v.*$/
+
 # Whenever a new release is created via GitHub, publish it on PyPI.
 deploy:
   provider: pypi
@@ -59,11 +65,11 @@ deploy:
   distributions: "sdist bdist_wheel"
 
   # only deploy on tagged commits (aka GitHub releases) and only for the
-  # builds running Python 2.7 along with dev MongoEngine (we run Travis
-  # against many different Python and MongoEngine versions and we don't want
-  # the deploy to occur multiple times).
+  # parent repo's builds running Python 2.7 along with dev MongoEngine (we run
+  # Travis against many different Python and MongoEngine versions and we don't
+  # want the deploy to occur multiple times).
   on:
-    all_branches: true
     tags: true
     condition: "$MONGOENGINE = dev"
     python: 2.7
+    repo: MongoEngine/flask-mongoengine
