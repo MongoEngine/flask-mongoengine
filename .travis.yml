@@ -1,3 +1,17 @@
+# Use a container-based environment
+sudo: false
+
+services:
+- mongodb
+
+addons:
+  apt:
+    sources:
+    - mongodb-3.0-precise
+    packages:
+    - mongodb-org-server
+    - mongodb-org-shell
+
 language: python
 
 python:
@@ -14,15 +28,6 @@ env:
 - MONGOENGINE=0.10.0
 - MONGOENGINE=dev
 
-before_install:
-- travis_retry sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
-- echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' |
-  sudo tee /etc/apt/sources.list.d/mongodb.list
-- travis_retry sudo apt-get update
-- travis_retry sudo apt-get autoremove
-- travis_retry sudo apt-get autoclean
-- travis_retry sudo apt-get install mongodb-org-server
-
 install:
 - travis_retry pip install --upgrade pip
 - travis_retry pip install coveralls
@@ -34,11 +39,11 @@ install:
 before_script:
 - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then tox -e flake8; fi
 
-after_script:
-- coveralls --verbose
-
 script:
 - tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage
+
+after_success:
+- coveralls --verbose
 
 notifications:
   irc: irc.freenode.org#flask-mongoengine
