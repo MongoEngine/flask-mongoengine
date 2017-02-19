@@ -1,3 +1,6 @@
+# Use a container-based environment
+sudo: false
+
 language: python
 
 python:
@@ -14,14 +17,16 @@ env:
 - MONGOENGINE=0.10.0
 - MONGOENGINE=dev
 
-before_install:
-- travis_retry sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
-- echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' |
-  sudo tee /etc/apt/sources.list.d/mongodb.list
-- travis_retry sudo apt-get update
-- travis_retry sudo apt-get autoremove
-- travis_retry sudo apt-get autoclean
-- travis_retry sudo apt-get install mongodb-org-server
+services:
+- mongodb
+
+addons:
+  apt:
+    sources:
+    - mongodb-3.0-precise
+    packages:
+    - mongodb-org-server
+    - mongodb-org-shell
 
 install:
 - travis_retry pip install --upgrade pip
@@ -31,17 +36,26 @@ install:
 - travis_retry pip install "virtualenv<14.0.0"  # virtualenv>=14.0.0 has dropped Python 3.2 support (and pypy3 is based on py32)
 - travis_retry tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- -e test
 
+# Cache dependencies installed via pip
+cache: pip
+
 before_script:
 - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then tox -e flake8; fi
-
-after_script:
-- coveralls --verbose
 
 script:
 - tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage
 
+after_success:
+- coveralls --verbose
+
 notifications:
   irc: irc.freenode.org#flask-mongoengine
+
+# Only run builds on the master branch and GitHub releases (tagged as vX.Y.Z)
+branches:
+  only:
+  - master
+  - /^v.*$/
 
 # Whenever a new release is created via GitHub, publish it on PyPI.
 deploy:
@@ -54,11 +68,11 @@ deploy:
   distributions: "sdist bdist_wheel"
 
   # only deploy on tagged commits (aka GitHub releases) and only for the
-  # builds running Python 2.7 along with dev MongoEngine (we run Travis
-  # against many different Python and MongoEngine versions and we don't want
-  # the deploy to occur multiple times).
+  # parent repo's builds running Python 2.7 along with dev MongoEngine (we run
+  # Travis against many different Python and MongoEngine versions and we don't
+  # want the deploy to occur multiple times).
   on:
-    all_branches: true
     tags: true
     condition: "$MONGOENGINE = dev"
     python: 2.7
+    repo: MongoEngine/flask-mongoengine
