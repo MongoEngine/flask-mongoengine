@@ -24,7 +24,15 @@ def _sanitize_settings(settings):
 
     # Handle uri style connections
     if "://" in resolved_settings.get('host', ''):
-        uri_dict = uri_parser.parse_uri(resolved_settings['host'])
+        # this section pulls the database name from the URI
+        # PyMongo requires URI to start with mongodb:// to parse
+        # this workaround allows mongomock to work
+        uri_to_check = resolved_settings['host']
+
+        if uri_to_check.startswith('mongomock://'):
+            uri_to_check = uri_to_check.replace('mongomock://', 'mongodb://')
+
+        uri_dict = uri_parser.parse_uri(uri_to_check)
         resolved_settings['db'] = uri_dict['database']
 
     # Add a default name param or use the "db" key if exists

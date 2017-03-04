@@ -51,6 +51,14 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         self.app.config['MONGODB_HOST'] = 'mongodb://localhost:27017/flask_mongoengine_test_db'
         self._do_persist(db)
 
+    def test_mongomock_host_as_uri_string(self):
+        """Make sure we can connect to the mongomock object if we specify
+        the host as a mongomock URI.
+        """
+        db = MongoEngine()
+        self.app.config['MONGODB_HOST'] = 'mongomock://localhost:27017/flask_mongoengine_test_db'
+        self._do_persist(db)
+
     def test_host_as_list(self):
         """Make sure MONGODB_HOST can be a list hosts."""
         db = MongoEngine()
