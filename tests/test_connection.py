@@ -1,8 +1,10 @@
+import mongoengine
 from mongoengine.context_managers import switch_db
+from nose import SkipTest
+from nose.tools import assert_raises
 import pymongo
 from pymongo.errors import InvalidURI
 from pymongo.read_preferences import ReadPreference
-from nose.tools import assert_raises
 
 from flask_mongoengine import MongoEngine
 
@@ -62,6 +64,8 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
     def test_mongomock_host_as_uri_string(self):
         """Make sure we switch to mongomock if we specify the host as a mongomock URI.
         """
+        if mongoengine.VERSION < (0, 9, 0):
+            raise SkipTest('Mongomock not supported for mongoengine < 0.9.0')
         db = MongoEngine()
         self.app.config['MONGODB_HOST'] = 'mongomock://localhost:27017/flask_mongoengine_test_db'
         with assert_raises(RuntimeError) as exc:
@@ -71,6 +75,8 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
     def test_mongomock_as_param(self):
         """Make sure we switch to mongomock when providing IS_MOCK option.
         """
+        if mongoengine.VERSION < (0, 9, 0):
+            raise SkipTest('Mongomock not supported for mongoengine < 0.9.0')
         db = MongoEngine()
         self.app.config['MONGODB_SETTINGS'] = {
             'ALIAS': 'simple_conn',

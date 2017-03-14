@@ -1,6 +1,6 @@
 import unittest
-import mongoengine
 import flask
+import mongoengine
 
 
 class FlaskMongoEngineTestCase(unittest.TestCase):
