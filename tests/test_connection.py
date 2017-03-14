@@ -2,6 +2,7 @@ from mongoengine.context_managers import switch_db
 import pymongo
 from pymongo.errors import InvalidURI
 from pymongo.read_preferences import ReadPreference
+from nose.tools import assert_raises
 
 from flask_mongoengine import MongoEngine
 
@@ -10,14 +11,21 @@ from tests import FlaskMongoEngineTestCase
 
 class ConnectionTestCase(FlaskMongoEngineTestCase):
 
-    def _do_persist(self, db):
+    def _do_persist(self, db, alias=None):
         """Initialize a test Flask application and persist some data in
         MongoDB, ultimately asserting that the connection works.
         """
-        class Todo(db.Document):
-            title = db.StringField(max_length=60)
-            text = db.StringField()
-            done = db.BooleanField(default=False)
+        if alias:
+            class Todo(db.Document):
+                meta = {'db_alias': alias}
+                title = db.StringField(max_length=60)
+                text = db.StringField()
+                done = db.BooleanField(default=False)
+        else:
+            class Todo(db.Document):
+                title = db.StringField(max_length=60)
+                text = db.StringField()
+                done = db.BooleanField(default=False)
 
         db.init_app(self.app)
         Todo.drop_collection()
@@ -41,7 +49,7 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
             'PORT': 27017,
             'DB': 'flask_mongoengine_test_db'
         }
-        self._do_persist(db)
+        self._do_persist(db, alias='simple_conn')
 
     def test_host_as_uri_string(self):
         """Make sure we can connect to a standalone MongoDB if we specify
@@ -52,12 +60,28 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         self._do_persist(db)
 
     def test_mongomock_host_as_uri_string(self):
-        """Make sure we can connect to the mongomock object if we specify
-        the host as a mongomock URI.
+        """Make sure we switch to mongomock if we specify the host as a mongomock URI.
         """
         db = MongoEngine()
         self.app.config['MONGODB_HOST'] = 'mongomock://localhost:27017/flask_mongoengine_test_db'
-        self._do_persist(db)
+        with assert_raises(RuntimeError) as exc:
+            self._do_persist(db)
+        assert str(exc.exception) == 'You need mongomock installed to mock MongoEngine.'
+
+    def test_mongomock_as_param(self):
+        """Make sure we switch to mongomock when providing IS_MOCK option.
+        """
+        db = MongoEngine()
+        self.app.config['MONGODB_SETTINGS'] = {
+            'ALIAS': 'simple_conn',
+            'HOST': 'localhost',
+            'PORT': 27017,
+            'DB': 'flask_mongoengine_test_db',
+            'IS_MOCK': True
+        }
+        with assert_raises(RuntimeError) as exc:
+            self._do_persist(db, alias='simple_conn')
+        assert str(exc.exception) == 'You need mongomock installed to mock MongoEngine.'
 
     def test_host_as_list(self):
         """Make sure MONGODB_HOST can be a list hosts."""
@@ -65,8 +89,9 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         self.app.config['MONGODB_SETTINGS'] = {
             'ALIAS': 'host_list',
             'HOST': ['localhost:27017'],
+            'DB': 'flask_mongoengine_test_db'
         }
-        self._do_persist(db)
+        self._do_persist(db, alias='host_list')
 
     def test_multiple_connections(self):
         """Make sure establishing multiple connections to a standalone
