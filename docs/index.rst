@@ -185,6 +185,33 @@ For `StringField`:
 (By default, a StringField is converted into a TextAreaField if and only if it has no max_length.)
 
 
+Testing applications
+====================
+
+If your **MONGODB_SETTINGS** is {"DB": "my_tumble_log"}, your tests will go to run using **test_my_tumble_log** database
+
+basic_app.py::
+
+    from flask import Flask
+    from flask.ext.mongoengine import MongoEngine
+
+    app = Flask(__name__)
+    app.config.from_pyfile('the-config.cfg')
+    db = MongoEngine(app)
+
+test_basic_app.py::
+
+    from basic_app import db
+    from flask.ext.mongoengine.test import tc_factory
+
+    TestCase = tc_factory(db)
+
+    class BasicAppTestCase(TestCase):
+
+        def test_simple_test(self):
+            ..
+
+
 Supported fields
 ----------------
 

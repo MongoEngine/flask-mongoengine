@@ -146,6 +146,19 @@ class MongoEngine(object):
         """
         return current_app.extensions['mongoengine'][self]['conn']
 
+    def configure_test_db(self):
+        mongoengine.connection.disconnect()
+
+        db_name = self.app.config.get("MONGODB_SETTINGS")["DB"]
+        test_db_name = db_name if "test_" in db_name else "test_" + db_name
+        test_config = {
+            "TESTING": True,
+            "MONGODB_SETTINGS": {"DB": test_db_name}
+        }
+        self.app.config.update(test_config)
+
+        self.init_app(self.app)
+
 
 class BaseQuerySet(QuerySet):
     """Mongoengine's queryset extended with handy extras."""
