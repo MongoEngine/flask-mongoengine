@@ -1,9 +1,14 @@
 import mongoengine
 from pymongo import ReadPreference, uri_parser
 
+
 __all__ = (
     'create_connections', 'get_connection_settings', 'InvalidSettingsError',
 )
+
+
+MONGODB_CONF_VARS = ('MONGODB_ALIAS', 'MONGODB_DB', 'MONGODB_HOST', 'MONGODB_IS_MOCK',
+                     'MONGODB_PASSWORD', 'MONGODB_PORT', 'MONGODB_USERNAME')
 
 
 class InvalidSettingsError(Exception):
@@ -82,10 +87,10 @@ def get_connection_settings(config):
         else:
             return _sanitize_settings(settings)
 
-    # If "MONGODB_SETTINGS" doesn't exist, sanitize all the keys starting with
-    # "MONGODB_" as if they all describe a single connection.
+    # If "MONGODB_SETTINGS" doesn't exist, sanitize the "MONGODB_" keys
+    # as if they all describe a single connection.
     else:
-        config = dict((k, v) for k, v in config.items() if k.startswith('MONGODB_'))  # ugly dict comprehention in order to support python 2.6
+        config = dict((k, v) for k, v in config.items() if k in MONGODB_CONF_VARS)  # ugly dict comprehention in order to support python 2.6
         return _sanitize_settings(config)
 
 

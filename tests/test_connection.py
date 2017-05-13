@@ -156,6 +156,16 @@ class ConnectionTestCase(FlaskMongoEngineTestCase):
         self.app.config['MONGODB_HOST'] = 'mongo://localhost'
         self.assertRaises(InvalidURI, MongoEngine, self.app)
 
+    def test_ingnored_mongodb_prefix_config(self):
+        """Config starting by MONGODB_ but not used by flask-mongoengine
+        should be ignored.
+        """
+        db = MongoEngine()
+        self.app.config['MONGODB_HOST'] = 'mongodb://localhost:27017/flask_mongoengine_test_db_prod'
+        # Invalid host, should trigger exception if used
+        self.app.config['MONGODB_TEST_HOST'] = 'dummy://localhost:27017/test'
+        self._do_persist(db)
+
     def test_connection_kwargs(self):
         """Make sure additional connection kwargs work."""
 
