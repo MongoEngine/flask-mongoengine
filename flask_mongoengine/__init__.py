@@ -16,7 +16,7 @@ from .sessions import *
 from .wtf import WtfBaseField
 
 
-VERSION = (0, 9, 2)
+VERSION = (0, 9, 3)
 
 
 def get_version():
