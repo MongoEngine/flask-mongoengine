@@ -74,6 +74,16 @@ Connection settings may also be provided individually by prefixing the setting w
     app.config['MONGODB_USERNAME'] = 'webapp'
     app.config['MONGODB_PASSWORD'] = 'pwd123'
 
+By default flask-mongoengine open the connection when extension is instanciated but you can configure it
+to open connection only on first database access by setting the ``MONGODB_SETTINGS['connect']`` parameter
+or its ``MONGODB_CONNECT`` flat equivalent to ``False``::
+
+    app.config['MONGODB_SETTINGS'] = {
+        'host': 'mongodb://localhost/database_name',
+        'connect': False,
+    }
+    # or
+    app.config['MONGODB_CONNECT'] = False
 
 Custom Queryset
 ===============

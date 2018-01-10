@@ -8,7 +8,7 @@ __all__ = (
 
 
 MONGODB_CONF_VARS = ('MONGODB_ALIAS', 'MONGODB_DB', 'MONGODB_HOST', 'MONGODB_IS_MOCK',
-                     'MONGODB_PASSWORD', 'MONGODB_PORT', 'MONGODB_USERNAME')
+                     'MONGODB_PASSWORD', 'MONGODB_PORT', 'MONGODB_USERNAME', 'MONGODB_CONNECT')
 
 
 class InvalidSettingsError(Exception):
