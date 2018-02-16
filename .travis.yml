@@ -39,9 +39,6 @@ install:
 # Cache dependencies installed via pip
 cache: pip
 
-before_script:
-- if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then tox -e flake8; fi
-
 script:
 - tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage
 
