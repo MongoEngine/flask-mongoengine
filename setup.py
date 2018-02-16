@@ -13,7 +13,7 @@ long_description = io.open(doc_path, encoding='utf-8').read()
 # Stops exit traceback on tests
 try:
     import multiprocessing # noqa
-except:
+except ImportError:
     pass
 
 

@@ -19,7 +19,7 @@ class PaginationTestCase(FlaskMongoEngineTestCase):
     def tearDown(self):
         try:
             self.db.connection.drop_database(self.db_name)
-        except:
+        except Exception:
             self.db.connection.client.drop_database(self.db_name)
 
     def test_queryset_paginator(self):

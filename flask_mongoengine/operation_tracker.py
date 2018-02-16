@@ -270,7 +270,7 @@ def _tidy_stacktrace():
             fname = sys._getframe(i).f_code.co_filename
             if '.html' in fname:
                 fnames.append(fname)
-        except:
+        except Exception:
             break
     fnames = list(set(fnames))
     trace = []
@@ -306,7 +306,7 @@ def _tidy_stacktrace():
             else:
                 try:
                     text = unicode(''.join(text).strip())
-                except:
+                except Exception:
                     pass
         trace.append((path, line_no, func_name, text, hidden))
     return trace, internal

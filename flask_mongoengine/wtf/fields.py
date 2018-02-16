@@ -3,8 +3,8 @@ Useful form fields for use with the mongoengine.
 """
 import json
 import sys
-
 from gettext import gettext as _
+
 from mongoengine.queryset import DoesNotExist
 import six
 from wtforms import widgets

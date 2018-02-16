@@ -30,7 +30,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
     def tearDown(self):
         try:
             self.db.connection.drop_database(self.db_name)
-        except:
+        except Exception:
             self.db.connection.client.drop_database(self.db_name)
 
     def test_binaryfield(self):
@@ -396,7 +396,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             try:
                 Item(object_id, owner_item_id="1").save()
                 self.fail("Should have raised duplicate key error")
-            except:
+            except Exception:
                 pass
 
             self.assertEqual(1, Item.objects.count())
