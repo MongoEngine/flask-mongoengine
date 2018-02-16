@@ -26,6 +26,10 @@ __all__ = (
 )
 
 
+if sys.version_info >= (3, 0):
+    unicode = str
+
+
 def converts(*args):
     def _inner(func):
         func._converter_for = frozenset(args)
@@ -219,10 +223,7 @@ class ModelConverter(object):
             "DecimalField": decimal.Decimal,
             "ObjectIdField": ObjectId
         }
-        if sys.version_info >= (3, 0):
-            return coercions.get(field_type, str)
-        else:
-            return coercions.get(field_type, unicode)
+        return coercions.get(field_type, unicode)
 
 
 def model_fields(model, only=None, exclude=None, field_args=None, converter=None):
