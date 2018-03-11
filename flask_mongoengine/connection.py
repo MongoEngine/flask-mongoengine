@@ -39,7 +39,9 @@ def _sanitize_settings(settings):
             uri_to_check = uri_to_check.replace('mongomock://', 'mongodb://')
 
         uri_dict = uri_parser.parse_uri(uri_to_check)
-        resolved_settings['db'] = uri_dict['database']
+        if uri_dict['database'] is not None:
+            # If mongodb://... don't provide database name, don't put None to resolved_settings['db']
+            resolved_settings['db'] = uri_dict['database']
 
     # Add a default name param or use the "db" key if exists
     if resolved_settings.get('db'):
