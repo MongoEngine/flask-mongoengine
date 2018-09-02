@@ -207,6 +207,10 @@ class ModelConverter(object):
         form_class = model_form(field.document_type_obj, field_args={})
         return f.FormField(form_class, **kwargs)
 
+    @converts('EmbeddedDocumentListField')
+    def conv_EmbeddedDocumentList(self, model, field, kwargs):
+        return self.conv_List(model, field, kwargs)
+
     @converts('ReferenceField')
     def conv_Reference(self, model, field, kwargs):
         return ModelSelectField(model=field.document_type, **kwargs)
