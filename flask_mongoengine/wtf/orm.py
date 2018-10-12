@@ -146,7 +146,8 @@ class ModelConverter(object):
     @converts("DecimalField")
     def conv_Decimal(self, model, field, kwargs):
         self._number_common(model, field, kwargs)
-        return f.DecimalField(places = getattr(field, 'precision', None),**kwargs)
+        kwargs['places'] = getattr(field, 'precision', None)
+        return f.DecimalField(**kwargs)
 
     @converts("BooleanField")
     def conv_Boolean(self, model, field, kwargs):
