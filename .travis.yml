@@ -10,38 +10,57 @@ python:
 - pypy
 
 env:
-- MONGOENGINE=0.8
-- MONGOENGINE=0.9
-- MONGOENGINE=0.10.0
-- MONGOENGINE=dev
+- MONGOENGINE=dev MONGODB=2.6 PYMONGO=3.x
 
-services:
-- mongodb
+matrix:
+  # Finish the build as soon as one job fails
+  fast_finish: true
 
-addons:
-  apt:
-    sources:
-    - mongodb-3.0-precise
-    packages:
-    - mongodb-org-server
-    - mongodb-org-shell
+  include:
+  - python: 2.7
+    env: MONGODB=2.4 PYMONGO=3.5 MONGOENGINE=0.15.0
+  - python: 2.7
+    env: MONGODB=3.0 PYMONGO=3.x MONGOENGINE=0.15.0
+  - python: 3.5
+    env: MONGODB=2.4 PYMONGO=3.5 MONGOENGINE=0.15.0
+  - python: 3.5
+    env: MONGODB=3.0 PYMONGO=3.x MONGOENGINE=0.15.0
+  - python: 3.6
+    env: MONGODB=2.4 PYMONGO=3.5 MONGOENGINE=0.15.0
+  - python: 3.6
+    env: MONGODB=3.0 PYMONGO=3.x MONGOENGINE=0.15.0
+
+before_install:
+- bash .install_mongodb_on_travis.sh
+- sleep 15  # https://docs.travis-ci.com/user/database-setup/#MongoDB-does-not-immediately-accept-connections
+- mongo --eval 'db.version();'
 
 install:
+- sudo apt-get install python-dev python3-dev libopenjpeg-dev zlib1g-dev libjpeg-turbo8-dev
+  libtiff4-dev libjpeg8-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.5-dev tk8.5-dev
+  python-tk
 - travis_retry pip install --upgrade pip
 - travis_retry pip install coveralls
-- travis_retry pip install flake8
+- travis_retry pip install flake8 flake8-import-order
 - travis_retry pip install tox>=1.9
-- travis_retry pip install virtualenv
-- travis_retry tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- -e test
+- travis_retry pip install "virtualenv<14.0.0"  # virtualenv>=14.0.0 has dropped Python 3.2 support (and pypy3 is based on py32)
+- travis_retry tox -e $(echo py$TRAVIS_PYTHON_VERSION-mg$PYMONGO | tr -d . | sed -e 's/pypypy/pypy/') -- -e test
 
 # Cache dependencies installed via pip
 cache: pip
 
-script:
-- tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage
+# Run flake8 for py27
+before_script:
+- if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then flake8 .; else echo "flake8 only runs on py27"; fi
 
+script:
+- tox -e $(echo py$TRAVIS_PYTHON_VERSION-mg$PYMONGO | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage
+
+# For now only submit coveralls for Python v2.7. Python v3.x currently shows
+# 0% coverage. That's caused by 'use_2to3', which builds the py3-compatible
+# code in a separate dir and runs tests on that.
 after_success:
-- coveralls --verbose
+- if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then coveralls --verbose; fi
 
 notifications:
   irc: irc.freenode.org#flask-mongoengine
