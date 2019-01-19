@@ -209,7 +209,7 @@ class ModelConverter(object):
 
     @converts('EmbeddedDocumentListField')
     def conv_EmbeddedDocumentList(self, model, field, kwargs):
-        return self.conv_List(model, field, kwargs)
+        return self.conv_List(model, self.conv_EmbeddedDocument(model,field, kwargs), kwargs)
 
     @converts('ReferenceField')
     def conv_Reference(self, model, field, kwargs):
