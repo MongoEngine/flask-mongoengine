@@ -159,12 +159,19 @@ class BaseQuerySet(QuerySet):
             return self.get(*args, **kwargs)
         except (MultipleObjectsReturned, DoesNotExist, ValidationError):
             # TODO probably only DoesNotExist should raise a 404
+            _msg = kwargs.get('_msg', None)
+            if _msg:
+                abort(404, message)
+            
             abort(404)
 
-    def first_or_404(self):
+    def first_or_404(self, _msg=None):
         """Same as get_or_404, but uses .first, not .get."""
         obj = self.first()
         if obj is None:
+            if _msg:
+                abort(404, _msg)
+
             abort(404)
 
         return obj
