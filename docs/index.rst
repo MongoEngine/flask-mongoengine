@@ -90,8 +90,8 @@ Custom Queryset
 
 flask-mongoengine attaches the following methods to Mongoengine's default QuerySet:
 
-* **get_or_404**: works like .get(), but calls abort(404) if the object DoesNotExist.
-* **first_or_404**: same as above, except for .first().
+* **get_or_404**: works like .get(), but calls abort(404) if the object DoesNotExist. Abort with custom message with _msg parameter. 
+* **first_or_404**: same as above, except for .first(). Abort with custom message with _msg parameter.
 * **paginate**: paginates the QuerySet. Takes two arguments, *page* and *per_page*.
 * **paginate_field**: paginates a field from one document in the QuerySet.
   Arguments: *field_name*, *doc_id*, *page*, *per_page*.
