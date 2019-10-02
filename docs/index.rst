@@ -192,6 +192,10 @@ For `StringField`:
 - `password` to use a PasswordField
 - `textarea` to use a TextAreaField
 
+For `ListField`:
+
+- `min_entries` to set the minimal number of entries
+
 (By default, a StringField is converted into a TextAreaField if and only if it has no max_length.)
 
 
