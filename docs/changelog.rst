@@ -13,6 +13,10 @@ Development
 - CHANGED: Internal test engine switched from nose to pytest (#357)
 - DROPPED: Internal check with flake8-import-order dropped, as not
   compatible with modern editors (#358)
+- UPDATED: Functions `get_or_404`, `first_or_404` now accepts `message`
+  argument, and will display custom message if specified. (#351)
+- UPDATED: `get_or_404` will raise 404 error only on `DoesNotExist` exception,
+  other exceptions should be captured by user. (#360)
 
 Tests and development for old packages versions dropped to minimize tests footprint.
 
