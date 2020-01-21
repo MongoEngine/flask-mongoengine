@@ -4,7 +4,16 @@ Changelog
 
 Development
 ===========
-- (Fill this out as you fix issues and develop features).
+- BREAKING CHANGE: Dropped Python v2.6, v2.7, v3.2, v3.3, v3.4 (#355)
+- BREAKING CHANGE: Added tests support for python versions: v3.5, v3.6, v3.7, v3.8 (#355)
+- BREAKING CHANGE: Minimum Flask version set to v1.1 (#355)
+- BREAKING CHANGE: Minimum Flask-WTF version set to v0.14 (#355)
+- BREAKING CHANGE: Minimum mongoengine version set to v0.19 (#355)
+- BREAKING CHANGE: Minimum mongodb version set to v4.0 (#355)
+
+Tests and development for old packages versions dropped to minimize tests footprint.
+
+Use version 0.9.5 if old dependencies required.
 
 Changes in 0.9.1
 ================

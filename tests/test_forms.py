@@ -391,10 +391,10 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             Item.drop_collection()
 
             object_id = bson.ObjectId()
-            Item(object_id, owner_item_id="1").save()
+            Item(owner_id=object_id, owner_item_id="1").save()
 
             try:
-                Item(object_id, owner_item_id="1").save()
+                Item(owner_id=object_id, owner_item_id="1").save()
                 self.fail("Should have raised duplicate key error")
             except Exception:
                 pass

@@ -46,10 +46,8 @@ class BasicAppTestCase(FlaskMongoEngineTestCase):
         self.app.config['TESTING'] = True
 
         db = MongoEngine()
-        db.init_app(self.app)
-
-        self.app.config['TESTING'] = True
-        db = MongoEngine()
+        # Disconnect to drop connection from setup.
+        db.disconnect()
         db.init_app(self.app)
 
     def test_with_id(self):
