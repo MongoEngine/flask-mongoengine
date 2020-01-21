@@ -10,6 +10,7 @@ Development
 - BREAKING CHANGE: Minimum Flask-WTF version set to v0.14 (#355)
 - BREAKING CHANGE: Minimum mongoengine version set to v0.19 (#355)
 - BREAKING CHANGE: Minimum mongodb version set to v4.0 (#355)
+- CHANGED: Internal test engine switched from nose to pytest (#357)
 
 Tests and development for old packages versions dropped to minimize tests footprint.
 
