@@ -1,5 +1,6 @@
 import datetime
 import flask
+from bson import ObjectId
 
 from flask_mongoengine import MongoEngine
 from tests import FlaskMongoEngineTestCase
@@ -54,7 +55,7 @@ class JSONAppTestCase(FlaskMongoEngineTestCase):
 
     def test_with_id(self):
         c = self.app.test_client()
-        resp = c.get('/show/38783728378090/')
+        resp = c.get('/show/%s/' % ObjectId())
         self.assertEqual(resp.status_code, 404)
 
         rv = c.post('/add', data={'title': 'First Item', 'text': 'The text'})
