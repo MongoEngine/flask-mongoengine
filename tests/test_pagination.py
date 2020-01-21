@@ -74,34 +74,34 @@ class PaginationTestCase(FlaskMongoEngineTestCase):
             self._test_paginator(paginator)
 
     def _test_paginator(self, paginator):
-            self.assertEqual(5, paginator.pages)
-            self.assertEqual([1, 2, 3, 4, 5], list(paginator.iter_pages()))
+        self.assertEqual(5, paginator.pages)
+        self.assertEqual([1, 2, 3, 4, 5], list(paginator.iter_pages()))
 
-            for i in [1, 2, 3, 4, 5]:
+        for i in [1, 2, 3, 4, 5]:
 
-                if i == 1:
-                    self.assertRaises(NotFound, paginator.prev)
-                    self.assertFalse(paginator.has_prev)
-                else:
-                    self.assertTrue(paginator.has_prev)
+            if i == 1:
+                self.assertRaises(NotFound, paginator.prev)
+                self.assertFalse(paginator.has_prev)
+            else:
+                self.assertTrue(paginator.has_prev)
 
-                if i == 5:
-                    self.assertRaises(NotFound, paginator.next)
-                    self.assertFalse(paginator.has_next)
-                else:
-                    self.assertTrue(paginator.has_next)
+            if i == 5:
+                self.assertRaises(NotFound, paginator.next)
+                self.assertFalse(paginator.has_next)
+            else:
+                self.assertTrue(paginator.has_next)
 
-                if i == 3:
-                    self.assertEqual([None, 2, 3, 4, None],
-                                     list(paginator.iter_pages(0, 1, 1, 0)))
+            if i == 3:
+                self.assertEqual([None, 2, 3, 4, None],
+                                 list(paginator.iter_pages(0, 1, 1, 0)))
 
-                self.assertEqual(i, paginator.page)
-                self.assertEqual(i - 1, paginator.prev_num)
-                self.assertEqual(i + 1, paginator.next_num)
+            self.assertEqual(i, paginator.page)
+            self.assertEqual(i - 1, paginator.prev_num)
+            self.assertEqual(i + 1, paginator.next_num)
 
-                # Paginate to the next page
-                if i < 5:
-                    paginator = paginator.next()
+            # Paginate to the next page
+            if i < 5:
+                paginator = paginator.next()
 
 
 if __name__ == '__main__':
