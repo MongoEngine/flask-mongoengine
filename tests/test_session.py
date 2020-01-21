@@ -41,15 +41,15 @@ class SessionTestCase(FlaskMongoEngineTestCase):
         c = self.app.test_client()
         resp = c.get('/')
         self.assertEqual(resp.status_code, 200)
-        self.assertEquals(resp.data.decode('utf-8'), 'hello session')
+        self.assertEqual(resp.data.decode('utf-8'), 'hello session')
 
         resp = c.get('/check-session')
         self.assertEqual(resp.status_code, 200)
-        self.assertEquals(resp.data.decode('utf-8'), 'session: hello session')
+        self.assertEqual(resp.data.decode('utf-8'), 'session: hello session')
 
         resp = c.get('/check-session-database')
         self.assertEqual(resp.status_code, 200)
-        self.assertEquals(resp.data.decode('utf-8'), 'sessions: 1')
+        self.assertEqual(resp.data.decode('utf-8'), 'sessions: 1')
 
 
 if __name__ == '__main__':
