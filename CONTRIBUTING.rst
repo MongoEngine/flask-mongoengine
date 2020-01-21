@@ -20,7 +20,7 @@ post to the `user group <http://groups.google.com/group/mongoengine-users>`
 Supported Interpreters
 ----------------------
 
-Flask-MongoEngine supports CPython 2.6 and newer. Language
+Flask-MongoEngine supports CPython 3.5 and newer. Language
 features not supported by all interpreters can not be used.
 
 Style Guide

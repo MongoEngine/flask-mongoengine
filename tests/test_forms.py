@@ -147,8 +147,8 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             self.assertEqual(form.content.type, 'TextAreaField')
             self.assertEqual(form.lead_paragraph.type, 'TextAreaField')
 
-            self.assertEquals(BlogPost.objects.first().title, 'Using MongoEngine')
-            self.assertEquals(BlogPost.objects.count(), 1)
+            self.assertEqual(BlogPost.objects.first().title, 'Using MongoEngine')
+            self.assertEqual(BlogPost.objects.count(), 1)
 
             form = TextPostForm(MultiDict({
                 'title': 'Using Flask-MongoEngine',
@@ -157,7 +157,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
 
             self.assertTrue(form.validate())
             form.save()
-            self.assertEquals(BlogPost.objects.count(), 2)
+            self.assertEqual(BlogPost.objects.count(), 2)
 
             post = BlogPost.objects(title="Using Flask-MongoEngine").get()
 
@@ -391,10 +391,10 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             Item.drop_collection()
 
             object_id = bson.ObjectId()
-            Item(object_id, owner_item_id="1").save()
+            Item(owner_id=object_id, owner_item_id="1").save()
 
             try:
-                Item(object_id, owner_item_id="1").save()
+                Item(owner_id=object_id, owner_item_id="1").save()
                 self.fail("Should have raised duplicate key error")
             except Exception:
                 pass

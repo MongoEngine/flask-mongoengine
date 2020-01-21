@@ -46,10 +46,8 @@ class BasicAppTestCase(FlaskMongoEngineTestCase):
         self.app.config['TESTING'] = True
 
         db = MongoEngine()
-        db.init_app(self.app)
-
-        self.app.config['TESTING'] = True
-        db = MongoEngine()
+        # Disconnect to drop connection from setup.
+        db.disconnect()
         db.init_app(self.app)
 
     def test_with_id(self):
@@ -61,14 +59,14 @@ class BasicAppTestCase(FlaskMongoEngineTestCase):
 
         resp = c.get('/show/%s/' % self.Todo.objects.first_or_404().id)
         self.assertEqual(resp.status_code, 200)
-        self.assertEquals(resp.data.decode('utf-8'), 'First Item\nThe text')
+        self.assertEqual(resp.data.decode('utf-8'), 'First Item\nThe text')
 
     def test_basic_insert(self):
         c = self.app.test_client()
         c.post('/add', data={'title': 'First Item', 'text': 'The text'})
         c.post('/add', data={'title': '2nd Item', 'text': 'The text'})
         rv = c.get('/')
-        self.assertEquals(rv.data.decode('utf-8'), 'First Item\n2nd Item')
+        self.assertEqual(rv.data.decode('utf-8'), 'First Item\n2nd Item')
 
     def test_request_context(self):
         with self.app.test_request_context():

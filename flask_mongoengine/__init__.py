@@ -1,20 +1,23 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
+
 import inspect
 
-from flask import Flask, abort, current_app
 import mongoengine
+from flask import Flask, abort, current_app
 from mongoengine.base.fields import BaseField
-from mongoengine.errors import ValidationError
-from mongoengine.queryset import (DoesNotExist, MultipleObjectsReturned,
-                                  QuerySet)
+from mongoengine.errors import (
+    DoesNotExist,
+    MultipleObjectsReturned,
+    ValidationError,
+)
+from mongoengine.queryset import QuerySet
 
 from .connection import *
 from .json import override_json_encoder
 from .pagination import *
 from .sessions import *
 from .wtf import WtfBaseField
-
 
 VERSION = (0, 9, 5)
 

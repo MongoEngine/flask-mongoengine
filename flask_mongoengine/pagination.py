@@ -104,10 +104,10 @@ class Pagination(object):
         last = 0
         for num in range(1, self.pages + 1):
             if (
-                num <= left_edge or
-                num > self.pages - right_edge or
-                (num >= self.page - left_current and
-                 num <= self.page + right_current)
+                    num <= left_edge
+                    or num > self.pages - right_edge
+                    or (num >= self.page - left_current
+                        and num <= self.page + right_current)
             ):
                 if last + 1 != num:
                     yield None
