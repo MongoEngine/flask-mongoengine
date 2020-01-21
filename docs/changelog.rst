@@ -11,6 +11,8 @@ Development
 - BREAKING CHANGE: Minimum mongoengine version set to v0.19 (#355)
 - BREAKING CHANGE: Minimum mongodb version set to v4.0 (#355)
 - CHANGED: Internal test engine switched from nose to pytest (#357)
+- DROPPED: Internal check with flake8-import-order dropped, as not
+  compatible with modern editors (#358)
 
 Tests and development for old packages versions dropped to minimize tests footprint.
 
