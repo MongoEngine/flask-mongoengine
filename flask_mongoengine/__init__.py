@@ -8,8 +8,6 @@ from flask import Flask, abort, current_app
 from mongoengine.base.fields import BaseField
 from mongoengine.errors import (
     DoesNotExist,
-    MultipleObjectsReturned,
-    ValidationError,
 )
 from mongoengine.queryset import QuerySet
 
