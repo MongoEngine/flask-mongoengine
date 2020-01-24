@@ -4,3 +4,5 @@ Flask-WTF>=0.8.3
 mongoengine>=0.8.0
 flake8
 six
+black
+pre-commit
