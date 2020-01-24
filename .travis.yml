@@ -9,25 +9,17 @@ python:
   - '3.8'
   - pypy3
 
-matrix:
+jobs:
   include:
-    - name: "lint"
-      python: 3.7
-      env:
-        - TEST_CMD="pre-commit run --all-files"
-    - name: "3.6"
+    - language: python
       python: 3.6
-    - name: "3.7"
-      python: 3.7
-    - name: "3.8"
-      python: 3.8
-    - name: "pypy3"
-      python: pypy3
+      name: "linting"
+      script:
+        - tox -e lint
 
 env:
   - MONGOENGINE=latest_pip
   - MONGOENGINE=dev
-  - TEST_CMD="tox -e $(echo py$TRAVIS_PYTHON_VERSION-me_$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage"
 
 services:
   - mongodb
@@ -38,13 +30,12 @@ install:
   - travis_retry pip install flake8
   - travis_retry pip install tox>=3.14
   - travis_retry pip install virtualenv
-  - travis_retry pip install pre-commit
 
 # Cache dependencies installed via pip
 cache: pip
 
 script:
-  - $TEST_CMD
+  - tox -e $(echo py$TRAVIS_PYTHON_VERSION-me_$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage
 
 after_success:
   - coveralls --verbose
@@ -75,5 +66,5 @@ deploy:
   on:
     tags: true
     condition: "$MONGOENGINE = dev"
-    python: 3.6
+    python: 3.5
     repo: MongoEngine/flask-mongoengine
