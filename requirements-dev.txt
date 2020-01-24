@@ -1,0 +1,8 @@
+-r requirements.txt
+
+# Dev and test dependencies without version limiting, to test with latest.
+black
+pre-commit
+pytest
+pytest-cov
+nose
