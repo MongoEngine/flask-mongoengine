@@ -15,14 +15,18 @@ except ImportError:
 from mongoengine import ReferenceField
 from wtforms import fields as f, validators
 
-from flask_mongoengine.wtf.fields import (BinaryField, DictField,
-                                          ModelSelectField,
-                                          ModelSelectMultipleField,
-                                          NoneStringField)
+from flask_mongoengine.wtf.fields import (
+    BinaryField,
+    DictField,
+    ModelSelectField,
+    ModelSelectMultipleField,
+    NoneStringField,
+)
 from flask_mongoengine.wtf.models import ModelForm
 
 __all__ = (
-    'model_fields', 'model_form',
+    "model_fields",
+    "model_form",
 )
 
 
@@ -34,6 +38,7 @@ def converts(*args):
     def _inner(func):
         func._converter_for = frozenset(args)
         return func
+
     return _inner
 
 
@@ -44,7 +49,7 @@ class ModelConverter(object):
 
         for name in dir(self):
             obj = getattr(self, name)
-            if hasattr(obj, '_converter_for'):
+            if hasattr(obj, "_converter_for"):
                 for classname in obj._converter_for:
                     converters[classname] = obj
 
@@ -52,33 +57,33 @@ class ModelConverter(object):
 
     def convert(self, model, field, field_args):
         kwargs = {
-            'label': getattr(field, 'verbose_name', field.name),
-            'description': getattr(field, 'help_text', None) or '',
-            'validators': getattr(field, 'validators', None) or [],
-            'filters': getattr(field, 'filters', None) or [],
-            'default': field.default,
+            "label": getattr(field, "verbose_name", field.name),
+            "description": getattr(field, "help_text", None) or "",
+            "validators": getattr(field, "validators", None) or [],
+            "filters": getattr(field, "filters", None) or [],
+            "default": field.default,
         }
         if field_args:
             kwargs.update(field_args)
 
-        if kwargs['validators']:
+        if kwargs["validators"]:
             # Create a copy of the list since we will be modifying it.
-            kwargs['validators'] = list(kwargs['validators'])
+            kwargs["validators"] = list(kwargs["validators"])
 
         if field.required:
-            kwargs['validators'].append(validators.InputRequired())
+            kwargs["validators"].append(validators.InputRequired())
         else:
-            kwargs['validators'].append(validators.Optional())
+            kwargs["validators"].append(validators.Optional())
 
         ftype = type(field).__name__
 
         if field.choices:
-            kwargs['choices'] = field.choices
+            kwargs["choices"] = field.choices
 
             if ftype in self.converters:
                 kwargs["coerce"] = self.coerce(ftype)
-            multiple_field = kwargs.pop('multiple', False)
-            radio_field = kwargs.pop('radio', False)
+            multiple_field = kwargs.pop("multiple", False)
+            radio_field = kwargs.pop("radio", False)
             if multiple_field:
                 return f.SelectMultipleField(**kwargs)
             if radio_field:
@@ -87,7 +92,7 @@ class ModelConverter(object):
 
         ftype = type(field).__name__
 
-        if hasattr(field, 'to_form_field'):
+        if hasattr(field, "to_form_field"):
             return field.to_form_field(model, kwargs)
 
         if ftype in self.converters:
@@ -96,122 +101,124 @@ class ModelConverter(object):
     @classmethod
     def _string_common(cls, model, field, kwargs):
         if field.max_length or field.min_length:
-            kwargs['validators'].append(
-                validators.Length(max=field.max_length or -1,
-                                  min=field.min_length or -1))
+            kwargs["validators"].append(
+                validators.Length(
+                    max=field.max_length or -1, min=field.min_length or -1
+                )
+            )
 
     @classmethod
     def _number_common(cls, model, field, kwargs):
         if field.max_value or field.min_value:
-            kwargs['validators'].append(
-                validators.NumberRange(max=field.max_value,
-                                       min=field.min_value))
+            kwargs["validators"].append(
+                validators.NumberRange(max=field.max_value, min=field.min_value)
+            )
 
-    @converts('StringField')
+    @converts("StringField")
     def conv_String(self, model, field, kwargs):
         if field.regex:
-            kwargs['validators'].append(validators.Regexp(regex=field.regex))
+            kwargs["validators"].append(validators.Regexp(regex=field.regex))
         self._string_common(model, field, kwargs)
-        password_field = kwargs.pop('password', False)
-        textarea_field = kwargs.pop('textarea', False) or not field.max_length
+        password_field = kwargs.pop("password", False)
+        textarea_field = kwargs.pop("textarea", False) or not field.max_length
         if password_field:
             return f.PasswordField(**kwargs)
         if textarea_field:
             return f.TextAreaField(**kwargs)
         return f.StringField(**kwargs)
 
-    @converts('URLField')
+    @converts("URLField")
     def conv_URL(self, model, field, kwargs):
-        kwargs['validators'].append(validators.URL())
+        kwargs["validators"].append(validators.URL())
         self._string_common(model, field, kwargs)
         return NoneStringField(**kwargs)
 
-    @converts('EmailField')
+    @converts("EmailField")
     def conv_Email(self, model, field, kwargs):
-        kwargs['validators'].append(validators.Email())
+        kwargs["validators"].append(validators.Email())
         self._string_common(model, field, kwargs)
         return NoneStringField(**kwargs)
 
-    @converts('IntField')
+    @converts("IntField")
     def conv_Int(self, model, field, kwargs):
         self._number_common(model, field, kwargs)
         return f.IntegerField(**kwargs)
 
-    @converts('FloatField')
+    @converts("FloatField")
     def conv_Float(self, model, field, kwargs):
         self._number_common(model, field, kwargs)
         return f.FloatField(**kwargs)
 
-    @converts('DecimalField')
+    @converts("DecimalField")
     def conv_Decimal(self, model, field, kwargs):
         self._number_common(model, field, kwargs)
         return f.DecimalField(**kwargs)
 
-    @converts('BooleanField')
+    @converts("BooleanField")
     def conv_Boolean(self, model, field, kwargs):
         return f.BooleanField(**kwargs)
 
-    @converts('DateTimeField')
+    @converts("DateTimeField")
     def conv_DateTime(self, model, field, kwargs):
         return f.DateTimeField(**kwargs)
 
-    @converts('BinaryField')
+    @converts("BinaryField")
     def conv_Binary(self, model, field, kwargs):
         # TODO: may be set file field that will save file`s data to MongoDB
         if field.max_bytes:
-            kwargs['validators'].append(validators.Length(max=field.max_bytes))
+            kwargs["validators"].append(validators.Length(max=field.max_bytes))
         return BinaryField(**kwargs)
 
-    @converts('DictField')
+    @converts("DictField")
     def conv_Dict(self, model, field, kwargs):
         return DictField(**kwargs)
 
-    @converts('ListField')
+    @converts("ListField")
     def conv_List(self, model, field, kwargs):
         if isinstance(field.field, ReferenceField):
             return ModelSelectMultipleField(model=field.field.document_type, **kwargs)
         if field.field.choices:
-            kwargs['multiple'] = True
+            kwargs["multiple"] = True
             return self.convert(model, field.field, kwargs)
         field_args = kwargs.pop("field_args", {})
         unbound_field = self.convert(model, field.field, field_args)
         unacceptable = {
-            'validators': [],
-            'filters': [],
-            'min_entries': kwargs.get('min_entries', 0)
+            "validators": [],
+            "filters": [],
+            "min_entries": kwargs.get("min_entries", 0),
         }
         kwargs.update(unacceptable)
         return f.FieldList(unbound_field, **kwargs)
 
-    @converts('SortedListField')
+    @converts("SortedListField")
     def conv_SortedList(self, model, field, kwargs):
         # TODO: sort functionality, may be need sortable widget
         return self.conv_List(model, field, kwargs)
 
-    @converts('GeoLocationField')
+    @converts("GeoLocationField")
     def conv_GeoLocation(self, model, field, kwargs):
         # TODO: create geo field and widget (also GoogleMaps)
         return
 
-    @converts('ObjectIdField')
+    @converts("ObjectIdField")
     def conv_ObjectId(self, model, field, kwargs):
         return
 
-    @converts('EmbeddedDocumentField')
+    @converts("EmbeddedDocumentField")
     def conv_EmbeddedDocument(self, model, field, kwargs):
         kwargs = {
-            'validators': [],
-            'filters': [],
-            'default': field.default or field.document_type_obj,
+            "validators": [],
+            "filters": [],
+            "default": field.default or field.document_type_obj,
         }
         form_class = model_form(field.document_type_obj, field_args={})
         return f.FormField(form_class, **kwargs)
 
-    @converts('ReferenceField')
+    @converts("ReferenceField")
     def conv_Reference(self, model, field, kwargs):
         return ModelSelectField(model=field.document_type, **kwargs)
 
-    @converts('GenericReferenceField')
+    @converts("GenericReferenceField")
     def conv_GenericReference(self, model, field, kwargs):
         return
 
@@ -221,7 +228,7 @@ class ModelConverter(object):
             "BooleanField": bool,
             "FloatField": float,
             "DecimalField": decimal.Decimal,
-            "ObjectIdField": ObjectId
+            "ObjectIdField": ObjectId,
         }
         return coercions.get(field_type, unicode)
 
@@ -233,8 +240,9 @@ def model_fields(model, only=None, exclude=None, field_args=None, converter=None
     See `model_form` docstring for description of parameters.
     """
     from mongoengine.base import BaseDocument, DocumentMetaclass
+
     if not isinstance(model, (BaseDocument, DocumentMetaclass)):
-        raise TypeError('model must be a mongoengine Document schema')
+        raise TypeError("model must be a mongoengine Document schema")
 
     converter = converter or ModelConverter()
     field_args = field_args or {}
@@ -257,7 +265,14 @@ def model_fields(model, only=None, exclude=None, field_args=None, converter=None
     return field_dict
 
 
-def model_form(model, base_class=ModelForm, only=None, exclude=None, field_args=None, converter=None):
+def model_form(
+    model,
+    base_class=ModelForm,
+    only=None,
+    exclude=None,
+    field_args=None,
+    converter=None,
+):
     """
     Create a wtforms Form for a given mongoengine Document schema::
 
@@ -283,5 +298,5 @@ def model_form(model, base_class=ModelForm, only=None, exclude=None, field_args=
         not set, ``ModelConverter`` is used.
     """
     field_dict = model_fields(model, only, exclude, field_args, converter)
-    field_dict['model_class'] = model
-    return type(model.__name__ + 'Form', (base_class,), field_dict)
+    field_dict["model_class"] = model
+    return type(model.__name__ + "Form", (base_class,), field_dict)

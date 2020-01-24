@@ -3,13 +3,23 @@ from pymongo import ReadPreference, uri_parser
 
 
 __all__ = (
-    'create_connections', 'get_connection_settings', 'InvalidSettingsError',
+    "create_connections",
+    "get_connection_settings",
+    "InvalidSettingsError",
 )
 
 
-MONGODB_CONF_VARS = ('MONGODB_ALIAS', 'MONGODB_DB', 'MONGODB_HOST', 'MONGODB_IS_MOCK',
-                     'MONGODB_PASSWORD', 'MONGODB_PORT', 'MONGODB_USERNAME',
-                     'MONGODB_CONNECT', 'MONGODB_TZ_AWARE')
+MONGODB_CONF_VARS = (
+    "MONGODB_ALIAS",
+    "MONGODB_DB",
+    "MONGODB_HOST",
+    "MONGODB_IS_MOCK",
+    "MONGODB_PASSWORD",
+    "MONGODB_PORT",
+    "MONGODB_USERNAME",
+    "MONGODB_CONNECT",
+    "MONGODB_TZ_AWARE",
+)
 
 
 class InvalidSettingsError(Exception):
@@ -23,37 +33,45 @@ def _sanitize_settings(settings):
     # Remove the "MONGODB_" prefix and make all settings keys lower case.
     resolved_settings = {}
     for k, v in settings.items():
-        if k.startswith('MONGODB_'):
-            k = k[len('MONGODB_'):]
+        if k.startswith("MONGODB_"):
+            k = k[len("MONGODB_") :]
         k = k.lower()
         resolved_settings[k] = v
 
     # Handle uri style connections
-    if "://" in resolved_settings.get('host', ''):
+    if "://" in resolved_settings.get("host", ""):
         # this section pulls the database name from the URI
         # PyMongo requires URI to start with mongodb:// to parse
         # this workaround allows mongomock to work
-        uri_to_check = resolved_settings['host']
+        uri_to_check = resolved_settings["host"]
 
-        if uri_to_check.startswith('mongomock://'):
-            uri_to_check = uri_to_check.replace('mongomock://', 'mongodb://')
+        if uri_to_check.startswith("mongomock://"):
+            uri_to_check = uri_to_check.replace("mongomock://", "mongodb://")
 
         uri_dict = uri_parser.parse_uri(uri_to_check)
-        resolved_settings['db'] = uri_dict['database']
+        resolved_settings["db"] = uri_dict["database"]
 
     # Add a default name param or use the "db" key if exists
-    if resolved_settings.get('db'):
-        resolved_settings['name'] = resolved_settings.pop('db')
+    if resolved_settings.get("db"):
+        resolved_settings["name"] = resolved_settings.pop("db")
     else:
-        resolved_settings['name'] = 'test'
+        resolved_settings["name"] = "test"
 
     # Add various default values.
-    resolved_settings['alias'] = resolved_settings.get('alias', mongoengine.DEFAULT_CONNECTION_NAME)  # TODO do we have to specify it here? MongoEngine should take care of that
-    resolved_settings['host'] = resolved_settings.get('host', 'localhost')  # TODO this is the default host in pymongo.mongo_client.MongoClient, we may not need to explicitly set a default here
-    resolved_settings['port'] = resolved_settings.get('port', 27017)  # TODO this is the default port in pymongo.mongo_client.MongoClient, we may not need to explicitly set a default here
+    resolved_settings["alias"] = resolved_settings.get(
+        "alias", mongoengine.DEFAULT_CONNECTION_NAME
+    )  # TODO do we have to specify it here? MongoEngine should take care of that
+    resolved_settings["host"] = resolved_settings.get(
+        "host", "localhost"
+    )  # TODO this is the default host in pymongo.mongo_client.MongoClient, we may not need to explicitly set a default here
+    resolved_settings["port"] = resolved_settings.get(
+        "port", 27017
+    )  # TODO this is the default port in pymongo.mongo_client.MongoClient, we may not need to explicitly set a default here
 
     # Default to ReadPreference.PRIMARY if no read_preference is supplied
-    resolved_settings['read_preference'] = resolved_settings.get('read_preference', ReadPreference.PRIMARY)
+    resolved_settings["read_preference"] = resolved_settings.get(
+        "read_preference", ReadPreference.PRIMARY
+    )
 
     # Clean up empty values
     for k, v in list(resolved_settings.items()):
@@ -72,8 +90,8 @@ def get_connection_settings(config):
     prefixed by "MONGODB_", e.g. "MONGODB_HOST", "MONGODB_PORT", etc.
     """
     # Sanitize all the settings living under a "MONGODB_SETTINGS" config var
-    if 'MONGODB_SETTINGS' in config:
-        settings = config['MONGODB_SETTINGS']
+    if "MONGODB_SETTINGS" in config:
+        settings = config["MONGODB_SETTINGS"]
 
         # If MONGODB_SETTINGS is a list of settings dicts, sanitize each
         # dict separately.
@@ -91,7 +109,9 @@ def get_connection_settings(config):
     # If "MONGODB_SETTINGS" doesn't exist, sanitize the "MONGODB_" keys
     # as if they all describe a single connection.
     else:
-        config = dict((k, v) for k, v in config.items() if k in MONGODB_CONF_VARS)  # ugly dict comprehention in order to support python 2.6
+        config = dict(
+            (k, v) for k, v in config.items() if k in MONGODB_CONF_VARS
+        )  # ugly dict comprehention in order to support python 2.6
         return _sanitize_settings(config)
 
 
@@ -102,7 +122,7 @@ def create_connections(config):
     """
     # Validate that the config is a dict
     if config is None or not isinstance(config, dict):
-        raise InvalidSettingsError('Invalid application configuration')
+        raise InvalidSettingsError("Invalid application configuration")
 
     # Get sanitized connection settings based on the config
     conn_settings = get_connection_settings(config)
@@ -112,7 +132,7 @@ def create_connections(config):
     if isinstance(conn_settings, list):
         connections = {}
         for each in conn_settings:
-            alias = each['alias']
+            alias = each["alias"]
             connections[alias] = _connect(each)
         return connections
 
@@ -124,5 +144,5 @@ def _connect(conn_settings):
     """Given a dict of connection settings, create a connection to
     MongoDB by calling mongoengine.connect and return its result.
     """
-    db_name = conn_settings.pop('name')
+    db_name = conn_settings.pop("name")
     return mongoengine.connect(db_name, **conn_settings)

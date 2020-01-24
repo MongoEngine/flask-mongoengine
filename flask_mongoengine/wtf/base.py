@@ -1,6 +1,6 @@
 from mongoengine.base import BaseField
 
-__all__ = ('WtfBaseField')
+__all__ = "WtfBaseField"
 
 
 class WtfBaseField(BaseField):
@@ -17,9 +17,8 @@ class WtfBaseField(BaseField):
 
     def __init__(self, validators=None, filters=None, **kwargs):
 
-        self.validators = \
-            self._ensure_callable_or_list(validators, 'validators')
-        self.filters = self._ensure_callable_or_list(filters, 'filters')
+        self.validators = self._ensure_callable_or_list(validators, "validators")
+        self.filters = self._ensure_callable_or_list(filters, "filters")
 
         BaseField.__init__(self, **kwargs)
 

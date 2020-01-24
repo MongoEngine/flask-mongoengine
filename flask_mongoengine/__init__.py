@@ -6,9 +6,7 @@ import inspect
 import mongoengine
 from flask import Flask, abort, current_app
 from mongoengine.base.fields import BaseField
-from mongoengine.errors import (
-    DoesNotExist,
-)
+from mongoengine.errors import DoesNotExist
 from mongoengine.queryset import QuerySet
 
 from .connection import *
@@ -24,7 +22,7 @@ def get_version():
     """Return the VERSION as a string, e.g. for VERSION == (0, 9, 2),
     return '0.9.2'.
     """
-    return '.'.join(map(str, VERSION))
+    return ".".join(map(str, VERSION))
 
 
 __version__ = get_version()
@@ -88,7 +86,7 @@ def _include_mongoengine(obj):
 
 def current_mongoengine_instance():
     """Return a MongoEngine instance associated with current Flask app."""
-    me = current_app.extensions.get('mongoengine', {})
+    me = current_app.extensions.get("mongoengine", {})
     for k, v in me.items():
         if isinstance(k, MongoEngine):
             return k
@@ -109,22 +107,22 @@ class MongoEngine(object):
 
     def init_app(self, app, config=None):
         if not app or not isinstance(app, Flask):
-            raise Exception('Invalid Flask application instance')
+            raise Exception("Invalid Flask application instance")
 
         self.app = app
 
-        app.extensions = getattr(app, 'extensions', {})
+        app.extensions = getattr(app, "extensions", {})
 
         # Make documents JSON serializable
         override_json_encoder(app)
 
-        if 'mongoengine' not in app.extensions:
-            app.extensions['mongoengine'] = {}
+        if "mongoengine" not in app.extensions:
+            app.extensions["mongoengine"] = {}
 
-        if self in app.extensions['mongoengine']:
+        if self in app.extensions["mongoengine"]:
             # Raise an exception if extension already initialized as
             # potentially new configuration would not be loaded.
-            raise Exception('Extension already initialized')
+            raise Exception("Extension already initialized")
 
         if not config:
             # If not passed a config then we read the connection settings
@@ -136,8 +134,8 @@ class MongoEngine(object):
 
         # Store objects in application instance so that multiple apps do not
         # end up accessing the same objects.
-        s = {'app': app, 'conn': connections}
-        app.extensions['mongoengine'][self] = s
+        s = {"app": app, "conn": connections}
+        app.extensions["mongoengine"][self] = s
 
     @property
     def connection(self):
@@ -145,7 +143,7 @@ class MongoEngine(object):
         Return MongoDB connection(s) associated with this MongoEngine
         instance.
         """
-        return current_app.extensions['mongoengine'][self]['conn']
+        return current_app.extensions["mongoengine"][self]["conn"]
 
 
 class BaseQuerySet(QuerySet):
@@ -159,7 +157,7 @@ class BaseQuerySet(QuerySet):
         try:
             return self.get(*args, **kwargs)
         except DoesNotExist:
-            message = kwargs.get('message', None)
+            message = kwargs.get("message", None)
             abort(404, message) if message else abort(404)
 
     def first_or_404(self, message=None):
@@ -181,29 +179,29 @@ class BaseQuerySet(QuerySet):
         """
         # TODO this doesn't sound useful at all - remove in next release?
         item = self.get(id=doc_id)
-        count = getattr(item, field_name + "_count", '')
+        count = getattr(item, field_name + "_count", "")
         total = total or count or len(getattr(item, field_name))
-        return ListFieldPagination(self, doc_id, field_name, page, per_page,
-                                   total=total)
+        return ListFieldPagination(
+            self, doc_id, field_name, page, per_page, total=total
+        )
 
 
 class Document(mongoengine.Document):
     """Abstract document with extra helpers in the queryset class"""
 
-    meta = {'abstract': True,
-            'queryset_class': BaseQuerySet}
+    meta = {"abstract": True, "queryset_class": BaseQuerySet}
 
     def paginate_field(self, field_name, page, per_page, total=None):
         """Paginate items within a list field."""
         # TODO this doesn't sound useful at all - remove in next release?
-        count = getattr(self, field_name + "_count", '')
+        count = getattr(self, field_name + "_count", "")
         total = total or count or len(getattr(self, field_name))
-        return ListFieldPagination(self.__class__.objects, self.pk, field_name,
-                                   page, per_page, total=total)
+        return ListFieldPagination(
+            self.__class__.objects, self.pk, field_name, page, per_page, total=total
+        )
 
 
 class DynamicDocument(mongoengine.DynamicDocument):
     """Abstract Dynamic document with extra helpers in the queryset class"""
 
-    meta = {'abstract': True,
-            'queryset_class': BaseQuerySet}
+    meta = {"abstract": True, "queryset_class": BaseQuerySet}
