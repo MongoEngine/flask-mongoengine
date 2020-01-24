@@ -6,25 +6,24 @@ from tests import FlaskMongoEngineTestCase
 
 
 class SessionTestCase(FlaskMongoEngineTestCase):
-
     def setUp(self):
         super(SessionTestCase, self).setUp()
-        self.db_name = 'test_db'
-        self.app.config['MONGODB_DB'] = self.db_name
-        self.app.config['TESTING'] = True
+        self.db_name = "test_db"
+        self.app.config["MONGODB_DB"] = self.db_name
+        self.app.config["TESTING"] = True
         db = MongoEngine(self.app)
         self.app.session_interface = MongoEngineSessionInterface(db)
 
-        @self.app.route('/')
+        @self.app.route("/")
         def index():
             session["a"] = "hello session"
             return session["a"]
 
-        @self.app.route('/check-session')
+        @self.app.route("/check-session")
         def check_session():
             return "session: %s" % session["a"]
 
-        @self.app.route('/check-session-database')
+        @self.app.route("/check-session-database")
         def check_session_database():
             sessions = self.app.session_interface.cls.objects.count()
             return "sessions: %s" % sessions
@@ -39,18 +38,18 @@ class SessionTestCase(FlaskMongoEngineTestCase):
 
     def test_setting_session(self):
         c = self.app.test_client()
-        resp = c.get('/')
+        resp = c.get("/")
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.data.decode('utf-8'), 'hello session')
+        self.assertEqual(resp.data.decode("utf-8"), "hello session")
 
-        resp = c.get('/check-session')
+        resp = c.get("/check-session")
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.data.decode('utf-8'), 'session: hello session')
+        self.assertEqual(resp.data.decode("utf-8"), "session: hello session")
 
-        resp = c.get('/check-session-database')
+        resp = c.get("/check-session-database")
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.data.decode('utf-8'), 'sessions: 1')
+        self.assertEqual(resp.data.decode("utf-8"), "sessions: 1")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

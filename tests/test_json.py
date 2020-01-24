@@ -13,7 +13,6 @@ class DummyEncoder(flask.json.JSONEncoder):
 
 
 class JSONAppTestCase(FlaskMongoEngineTestCase):
-
     def dictContains(self, superset, subset):
         for k, v in subset.items():
             if not superset[k] == v:
@@ -25,8 +24,8 @@ class JSONAppTestCase(FlaskMongoEngineTestCase):
 
     def setUp(self):
         super(JSONAppTestCase, self).setUp()
-        self.app.config['MONGODB_DB'] = 'test_db'
-        self.app.config['TESTING'] = True
+        self.app.config["MONGODB_DB"] = "test_db"
+        self.app.config["TESTING"] = True
         self.app.json_encoder = DummyEncoder
         db = MongoEngine()
         db.init_app(self.app)
@@ -38,4 +37,4 @@ class JSONAppTestCase(FlaskMongoEngineTestCase):
 
         # Since the class is dynamically derrived, must compare class names
         # rather than class objects.
-        self.assertEqual(json_encoder_name, 'MongoEngineJSONEncoder')
+        self.assertEqual(json_encoder_name, "MongoEngineJSONEncoder")
