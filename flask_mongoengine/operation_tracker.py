@@ -14,7 +14,7 @@ import bson
 import pymongo.collection
 import pymongo.cursor
 import pymongo.helpers
-
+import pymongo.command_cursor
 
 __all__ = [
     "queries",
@@ -32,7 +32,7 @@ _original_methods = {
     "update": pymongo.collection.Collection.update,
     "remove": pymongo.collection.Collection.remove,
     "refresh": pymongo.cursor.Cursor._refresh,
-    "_unpack_response": pymongo.helpers._unpack_response,
+    "_unpack_response": pymongo.command_cursor.CommandCursor._unpack_response,
 }
 
 queries = []
@@ -48,7 +48,6 @@ if sys.version_info >= (3, 0):
 # Wrap helpers._unpack_response for getting response size
 @functools.wraps(_original_methods["_unpack_response"])
 def _unpack_response(response, *args, **kwargs):
-
     result = _original_methods["_unpack_response"](response, *args, **kwargs)
     response_sizes.append(sys.getsizeof(response, len(response)) / 1024.0)
     return result
@@ -226,8 +225,8 @@ def install_tracker():
         pymongo.collection.Collection.remove = _remove
     if pymongo.cursor.Cursor._refresh != _cursor_refresh:
         pymongo.cursor.Cursor._refresh = _cursor_refresh
-    if pymongo.helpers._unpack_response != _unpack_response:
-        pymongo.helpers._unpack_response = _unpack_response
+    if pymongo.command_cursor.CommandCursor._unpack_response != _unpack_response:
+        pymongo.command_cursor.CommandCursor._unpack_response = _unpack_response
 
 
 def uninstall_tracker():
@@ -239,8 +238,10 @@ def uninstall_tracker():
         pymongo.collection.Collection.remove = _original_methods["remove"]
     if pymongo.cursor.Cursor._refresh == _cursor_refresh:
         pymongo.cursor.Cursor._refresh = _original_methods["cursor_refresh"]
-    if pymongo.helpers._unpack_response == _unpack_response:
-        pymongo.helpers._unpack_response = _original_methods["_unpack_response"]
+    if pymongo.command_cursor.CommandCursor._unpack_response == _unpack_response:
+        pymongo.command_cursor.CommandCursor._unpack_response = _original_methods[
+            "_unpack_response"
+        ]
 
 
 def reset():
