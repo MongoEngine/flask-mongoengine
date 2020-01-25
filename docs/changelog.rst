@@ -12,6 +12,9 @@ Development
 - BREAKING CHANGE: Minimum Flask-WTF version set to v0.14 (#355)
 - BREAKING CHANGE: Minimum mongoengine version set to v0.19 (#355)
 - BREAKING CHANGE: Minimum mongodb version set to v4.0 (#355)
+- BREAKING CHANGE: Pymongo support < 3.6.0 dropped. (#372)
+- FIXED: Pymongo old method monkey patching (#325, #346, #372)
+- FIXED: Examples works again (#372)
 - CHANGED: Code reformatted with black, pre-commit implemented
   in project and CI/CD (#366)
 - CHANGED: Developers dependencies extracted to separate file (#367)
