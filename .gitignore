@@ -15,3 +15,5 @@ venv/
 .pydevproject
 .tox
 .eggs
+.idea
+.vscode

@@ -5,9 +5,9 @@ class ModelForm(FlaskForm):
     """A WTForms mongoengine model form"""
 
     def __init__(self, formdata=None, **kwargs):
-        self.instance = (kwargs.pop('instance', None) or kwargs.get('obj'))
+        self.instance = kwargs.pop("instance", None) or kwargs.get("obj")
         if self.instance and not formdata:
-            kwargs['obj'] = self.instance
+            kwargs["obj"] = self.instance
         self.formdata = formdata
         super(ModelForm, self).__init__(formdata, **kwargs)
 

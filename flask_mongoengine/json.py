@@ -10,12 +10,14 @@ def _make_encoder(superclass):
         A JSONEncoder which provides serialization of MongoEngine
         documents and queryset objects.
         """
+
         def default(self, obj):
             if isinstance(obj, BaseDocument):
                 return json_util._json_convert(obj.to_mongo())
             elif isinstance(obj, QuerySet):
                 return json_util._json_convert(obj.as_pymongo())
             return superclass.default(self, obj)
+
     return MongoEngineJSONEncoder
 
 

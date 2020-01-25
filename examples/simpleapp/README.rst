@@ -12,4 +12,3 @@ A simple one file app - to help get you started
 	python ./examples/simpleapp/app.py
 
 3. Point your browser to localhost:4000/
-

@@ -4,46 +4,41 @@ sudo: false
 language: python
 
 python:
-- '2.7'
-- '3.3'
-- '3.4'
-- '3.5'
-- pypy
-- pypy3
+  - '3.6'
+  - '3.7'
+  - '3.8'
+  - pypy3
+
+jobs:
+  include:
+    - language: python
+      python: 3.6
+      name: "linting"
+      script:
+        - tox -e lint
 
 env:
-- MONGOENGINE=0.8
-- MONGOENGINE=0.9
-- MONGOENGINE=0.10.0
-- MONGOENGINE=dev
+  - MONGOENGINE=latest_pip
+  - MONGOENGINE=dev
 
 services:
-- mongodb
-
-addons:
-  apt:
-    sources:
-    - mongodb-3.0-precise
-    packages:
-    - mongodb-org-server
-    - mongodb-org-shell
+  - mongodb
 
 install:
-- travis_retry pip install --upgrade pip
-- travis_retry pip install coveralls
-- travis_retry pip install flake8
-- travis_retry pip install tox>=1.9
-- travis_retry pip install virtualenv
-- travis_retry tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- -e test
+  - travis_retry pip install --upgrade pip
+  - travis_retry pip install coveralls
+  - travis_retry pip install flake8
+  - travis_retry pip install tox>=3.14
+  - travis_retry pip install virtualenv
 
 # Cache dependencies installed via pip
 cache: pip
 
 script:
-- tox -e $(echo py$TRAVIS_PYTHON_VERSION-me$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage
+  - tox -e $(echo py$TRAVIS_PYTHON_VERSION-me_$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage
 
 after_success:
-- coveralls --verbose
+  - coveralls --verbose
 
 notifications:
   irc: irc.freenode.org#flask-mongoengine
@@ -51,8 +46,8 @@ notifications:
 # Only run builds on the master branch and GitHub releases (tagged as vX.Y.Z)
 branches:
   only:
-  - master
-  - /^v.*$/
+    - master
+    - /^v.*$/
 
 # Whenever a new release is created via GitHub, publish it on PyPI.
 deploy:
@@ -71,5 +66,5 @@ deploy:
   on:
     tags: true
     condition: "$MONGOENGINE = dev"
-    python: 2.7
+    python: 3.5
     repo: MongoEngine/flask-mongoengine

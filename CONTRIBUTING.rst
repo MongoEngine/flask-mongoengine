@@ -20,7 +20,7 @@ post to the `user group <http://groups.google.com/group/mongoengine-users>`
 Supported Interpreters
 ----------------------
 
-Flask-MongoEngine supports CPython 2.6 and newer. Language
+Flask-MongoEngine supports CPython 3.6 and newer. Language
 features not supported by all interpreters can not be used.
 
 Style Guide
@@ -28,6 +28,13 @@ Style Guide
 
 MongoEngine aims to follow `PEP8 <http://www.python.org/dev/peps/pep-0008/>`_
 including 4 space indents and 79 character line limits.
+
+But as this project is less maintained as we wish several changes was introduced in version 1.0.0:
+
+1. Code formatting now is completely done by `black <https://github.com/psf/black>`_ and following black's style implementation of `PEP8 <http://www.python.org/dev/peps/pep-0008/>`_. Target python version is python 3.6.
+2. Code formatting should be done before passing any new merge requests (after 1st Jan 2020).
+3. Code style should use f-strings python 3.6 feature if possible.
+4. Docs formattings should be checked and formatted with `pre-commit <https://pre-commit.com/>`_ plugin before submit.
 
 Testing
 -------

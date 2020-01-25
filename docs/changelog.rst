@@ -4,13 +4,57 @@ Changelog
 
 Development
 ===========
-- (Fill this out as you fix issues and develop features).
+- BREAKING CHANGE: Dropped Python v2.6, v2.7, v3.2, v3.3,
+  v3.4, v3.5 (#355, #366)
+- BREAKING CHANGE: Added tests support for python versions:
+  v3.6, v3.7, v3.8 (#355, #366)
+- BREAKING CHANGE: Minimum Flask version set to v1.1 (#355)
+- BREAKING CHANGE: Minimum Flask-WTF version set to v0.14 (#355)
+- BREAKING CHANGE: Minimum mongoengine version set to v0.19 (#355)
+- BREAKING CHANGE: Minimum mongodb version set to v4.0 (#355)
+- CHANGED: Code reformatted with black, pre-commit implemented
+  in project and CI/CD (#366)
+- CHANGED: Developers dependencies extracted to separate file (#367)
+- CHANGED: Internal test engine switched from nose to pytest (#357)
+- DROPPED: Internal check with flake8-import-order dropped, as not
+  compatible with modern editors (#358)
+- UPDATED: Functions `get_or_404`, `first_or_404` now accepts `message`
+  argument, and will display custom message if specified. (#351)
+- UPDATED: `get_or_404` will raise 404 error only on `DoesNotExist` exception,
+  other exceptions should be captured by user. (#360)
+- RESTORED: Changelog for v0.9.2, v0.9.3, v0.9.4, v0.9.5 (#370)
+
+Tests and development for old packages versions dropped to minimize tests
+footprint.
+
+Use version 0.9.5 if old dependencies required.
+
+Changes in 0.9.5
+================
+- Disable flake8 on travis.
+- Correct `Except` clauses in code.
+- Fix warning about undefined unicode variable in orm.py with python 3
+
+Changes in 0.9.4
+================
+- ADDED: Support for `MONGODB_CONNECT` mongodb parameter (#321)
+- ADDED: Support for `MONGODB_TZ_AWARE` mongodb parameter.
+
+Changes in 0.9.3
+================
+- Fix test and mongomock (#304)
+- Run Travis builds in a container-based environment (#301)
+
+Changes in 0.9.2
+================
+- Travis CI/CD pipeline update to automatically publish 0.9.1.
 
 Changes in 0.9.1
 ================
 - Fixed setup.py for various platforms (#298).
 - Added Flask-WTF v0.14 support (#294).
-- MongoEngine instance now holds a reference to a particular Flask app it was initialized with (#261).
+- MongoEngine instance now holds a reference to a particular Flask app it was
+  initialized with (#261).
 
 Changes in 0.9.0
 ================
@@ -49,7 +93,8 @@ Changes in 0.8
 - Various bugfixes, code cleanup and documentation improvements
 - Move from deprecated flask.ext.* to flask_* syntax in imports
 - Added independent connection handler for FlaskMongoEngine
-- All MongoEngine connection calls are proxied via FlaskMongoEngine connection handler
+- All MongoEngine connection calls are proxied via FlaskMongoEngine connection
+  handler
 - Added backward compatibility for settings key names
 - Added support for MongoMock and temporary test DB
 - Fixed issue with multiple DB support

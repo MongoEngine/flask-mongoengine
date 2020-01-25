@@ -91,7 +91,9 @@ Custom Queryset
 flask-mongoengine attaches the following methods to Mongoengine's default QuerySet:
 
 * **get_or_404**: works like .get(), but calls abort(404) if the object DoesNotExist.
+  Optional arguments: *message* - custom message to display.
 * **first_or_404**: same as above, except for .first().
+  Optional arguments: *message* - custom message to display.
 * **paginate**: paginates the QuerySet. Takes two arguments, *page* and *per_page*.
 * **paginate_field**: paginates a field from one document in the QuerySet.
   Arguments: *field_name*, *doc_id*, *page*, *per_page*.
@@ -181,7 +183,7 @@ Parameters allow the user to provide hints if the conversion is not implicit::
     PostForm = model_form(Post, field_args={'title': {'textarea': True}})
 
 Supported parameters:
-    
+
 For fields with `choices`:
 
 - `multiple` to use a SelectMultipleField
@@ -191,6 +193,10 @@ For `StringField`:
 
 - `password` to use a PasswordField
 - `textarea` to use a TextAreaField
+
+For `ListField`:
+
+- `min_entries` to set the minimal number of entries
 
 (By default, a StringField is converted into a TextAreaField if and only if it has no max_length.)
 
