@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+import datetime
 import os
 import sys
-import datetime
+
 import flask
 
 sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), "../../")))
@@ -44,7 +45,7 @@ class Todo(db.Document):
 def index():
     # As a list to test debug toolbar
     Todo.objects().delete()  # Removes
-    Todo(title="Simple todo A ПЫЩЬ!", text="12345678910").save()  # Insert
+    Todo(title="Simple todo A", text="12345678910").save()  # Insert
     Todo(title="Simple todo B", text="12345678910").save()  # Insert
     Todo.objects(title__contains="B").update(set__text="Hello world")  # Update
     todos = Todo.objects.all()

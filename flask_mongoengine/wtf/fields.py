@@ -5,8 +5,8 @@ import json
 import sys
 from gettext import gettext as _
 
-from mongoengine.queryset import DoesNotExist
 import six
+from mongoengine.queryset import DoesNotExist
 from wtforms import widgets
 from wtforms.fields import SelectFieldBase, StringField, TextAreaField
 from wtforms.validators import ValidationError

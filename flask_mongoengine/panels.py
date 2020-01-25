@@ -4,7 +4,6 @@ from jinja2 import ChoiceLoader, PackageLoader
 
 from flask_mongoengine import operation_tracker
 
-
 package_loader = PackageLoader("flask_mongoengine", "templates")
 
 

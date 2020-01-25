@@ -1,6 +1,7 @@
 import unittest
 
 from flask import session
+
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from tests import FlaskMongoEngineTestCase
 
