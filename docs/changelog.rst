@@ -15,6 +15,7 @@ Development
 - BREAKING CHANGE: Pymongo support < 3.6.0 dropped. (#372)
 - FIXED: Pymongo old method monkey patching (#325, #346, #372)
 - FIXED: Examples works again (#372)
+- FIXED: Use fldt.$ to avoid double jQuery.noConflict(true) (#313)
 - CHANGED: Code reformatted with black, pre-commit implemented
   in project and CI/CD (#366)
 - CHANGED: Developers dependencies extracted to separate file (#367)
