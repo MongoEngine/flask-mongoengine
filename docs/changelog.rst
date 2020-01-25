@@ -22,11 +22,32 @@ Development
   argument, and will display custom message if specified. (#351)
 - UPDATED: `get_or_404` will raise 404 error only on `DoesNotExist` exception,
   other exceptions should be captured by user. (#360)
+- RESTORED: Changelog for v0.9.2, v0.9.3, v0.9.4, v0.9.5 (#370)
 
 Tests and development for old packages versions dropped to minimize tests
 footprint.
 
 Use version 0.9.5 if old dependencies required.
+
+Changes in 0.9.5
+================
+- Disable flake8 on travis.
+- Correct `Except` clauses in code.
+- Fix warning about undefined unicode variable in orm.py with python 3
+
+Changes in 0.9.4
+================
+- ADDED: Support for `MONGODB_CONNECT` mongodb parameter (#321)
+- ADDED: Support for `MONGODB_TZ_AWARE` mongodb parameter.
+
+Changes in 0.9.3
+================
+- Fix test and mongomock (#304)
+- Run Travis builds in a container-based environment (#301)
+
+Changes in 0.9.2
+================
+- Travis CI/CD pipeline update to automatically publish 0.9.1.
 
 Changes in 0.9.1
 ================
