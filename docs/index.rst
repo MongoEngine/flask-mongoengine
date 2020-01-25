@@ -59,7 +59,7 @@ arguments should be provided `'MONGODB_SETTINGS'` dictionary wih `app.config`.::
     }
 
 Uri style connections are also supported, just supply the uri as the :attr:`host`
-in the `'MONGODB_SETTINGS'` dictionary with `app.config`. **Note that database name from uri has priority over name.** ::
+in the `'MONGODB_SETTINGS'` dictionary with `app.config`. **Note that database name from uri has priority over name.** If uri presents and doesn't contain database name db setting entirely ignore and db name set to 'test'. ::
 
     app.config['MONGODB_SETTINGS'] = {
         'db': 'project1',
