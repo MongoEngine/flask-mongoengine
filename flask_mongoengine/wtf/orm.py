@@ -3,15 +3,9 @@ Tools for generating forms based on mongoengine Document schemas.
 """
 import decimal
 import sys
+from collections import OrderedDict
 
 from bson import ObjectId
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    # Use bson's SON implementation instead
-    from bson import SON as OrderedDict
-
 from mongoengine import ReferenceField
 from wtforms import fields as f, validators
 

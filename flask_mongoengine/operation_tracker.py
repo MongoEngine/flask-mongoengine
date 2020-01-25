@@ -2,19 +2,15 @@ import copy
 import functools
 import inspect
 import os
+import socketserver
 import sys
 import time
 
-try:
-    import SocketServer
-except ImportError:
-    import socketserver as SocketServer
-
 import bson
 import pymongo.collection
+import pymongo.command_cursor
 import pymongo.cursor
 import pymongo.helpers
-import pymongo.command_cursor
 
 __all__ = [
     "queries",
@@ -268,7 +264,7 @@ def _tidy_stacktrace():
     """
     Tidy the stack_trace
     """
-    socketserver_path = os.path.realpath(os.path.dirname(SocketServer.__file__))
+    socketserver_path = os.path.realpath(os.path.dirname(socketserver.__file__))
     pymongo_path = os.path.realpath(os.path.dirname(pymongo.__file__))
     paths = ["/site-packages/", "/flaskext/", socketserver_path, pymongo_path]
     internal = False

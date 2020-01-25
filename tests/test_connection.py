@@ -1,13 +1,12 @@
 import mongoengine
+import pymongo
 from mongoengine.context_managers import switch_db
 from nose import SkipTest
 from nose.tools import assert_raises
-import pymongo
 from pymongo.errors import InvalidURI
 from pymongo.read_preferences import ReadPreference
 
 from flask_mongoengine import MongoEngine
-
 from tests import FlaskMongoEngineTestCase
 
 

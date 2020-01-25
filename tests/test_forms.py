@@ -4,9 +4,9 @@ import unittest
 
 import bson
 import flask
+import wtforms
 from mongoengine import queryset_manager
 from werkzeug.datastructures import MultiDict
-import wtforms
 
 from flask_mongoengine import MongoEngine
 from flask_mongoengine.wtf import model_form

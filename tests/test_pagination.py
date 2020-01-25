@@ -1,4 +1,5 @@
 import unittest
+
 from werkzeug.exceptions import NotFound
 
 from flask_mongoengine import ListFieldPagination, MongoEngine, Pagination

@@ -26,6 +26,7 @@ Development
   argument, and will display custom message if specified. (#351)
 - UPDATED: `get_or_404` will raise 404 error only on `DoesNotExist` exception,
   other exceptions should be captured by user. (#360)
+- UPDATED: Fix imports order, drop imports for python 2.7 (#373)
 - RESTORED: Changelog for v0.9.2, v0.9.3, v0.9.4, v0.9.5 (#370)
 
 Tests and development for old packages versions dropped to minimize tests
