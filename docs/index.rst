@@ -183,7 +183,7 @@ Parameters allow the user to provide hints if the conversion is not implicit::
     PostForm = model_form(Post, field_args={'title': {'textarea': True}})
 
 Supported parameters:
-    
+
 For fields with `choices`:
 
 - `multiple` to use a SelectMultipleField

@@ -16,3 +16,4 @@ venv/
 .tox
 .eggs
 .idea
+.vscode

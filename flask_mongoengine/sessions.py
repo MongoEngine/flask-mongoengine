@@ -13,10 +13,10 @@ if sys.version_info >= (3, 0):
 
 
 class MongoEngineSession(CallbackDict, SessionMixin):
-
     def __init__(self, initial=None, sid=None):
         def on_update(self):
             self.modified = True
+
         CallbackDict.__init__(self, initial, on_update)
         self.sid = sid
         self.modified = False
@@ -25,7 +25,7 @@ class MongoEngineSession(CallbackDict, SessionMixin):
 class MongoEngineSessionInterface(SessionInterface):
     """SessionInterface for mongoengine"""
 
-    def __init__(self, db, collection='session'):
+    def __init__(self, db, collection="session"):
         """
         The MongoSessionInterface
 
@@ -34,17 +34,21 @@ class MongoEngineSessionInterface(SessionInterface):
         """
 
         if not isinstance(collection, basestring):
-            raise ValueError('collection argument should be string or unicode')
+            raise ValueError("collection argument should be string or unicode")
 
         class DBSession(db.Document):
             sid = db.StringField(primary_key=True)
             data = db.DictField()
             expiration = db.DateTimeField()
             meta = {
-                'allow_inheritance': False,
-                'collection': collection,
-                'indexes': [{'fields': ['expiration'],
-                             'expireAfterSeconds': 60 * 60 * 24 * 7 * 31}]
+                "allow_inheritance": False,
+                "collection": collection,
+                "indexes": [
+                    {
+                        "fields": ["expiration"],
+                        "expireAfterSeconds": 60 * 60 * 24 * 7 * 31,
+                    }
+                ],
             }
 
         self.cls = DBSession
@@ -52,8 +56,8 @@ class MongoEngineSessionInterface(SessionInterface):
     def get_expiration_time(self, app, session):
         if session.permanent:
             return app.permanent_session_lifetime
-        if 'SESSION_TTL' in app.config:
-            return datetime.timedelta(**app.config['SESSION_TTL'])
+        if "SESSION_TTL" in app.config:
+            return datetime.timedelta(**app.config["SESSION_TTL"])
         return datetime.timedelta(days=1)
 
     def open_session(self, app, request):
@@ -68,7 +72,9 @@ class MongoEngineSessionInterface(SessionInterface):
                     expiration = expiration.replace(tzinfo=utc)
 
                 if expiration > datetime.datetime.utcnow().replace(tzinfo=utc):
-                    return MongoEngineSession(initial=stored_session.data, sid=stored_session.sid)
+                    return MongoEngineSession(
+                        initial=stored_session.data, sid=stored_session.sid
+                    )
 
         return MongoEngineSession(sid=str(uuid.uuid4()))
 
@@ -81,10 +87,17 @@ class MongoEngineSessionInterface(SessionInterface):
                 response.delete_cookie(app.session_cookie_name, domain=domain)
             return
 
-        expiration = datetime.datetime.utcnow().replace(tzinfo=utc) + self.get_expiration_time(app, session)
+        expiration = datetime.datetime.utcnow().replace(
+            tzinfo=utc
+        ) + self.get_expiration_time(app, session)
 
         if session.modified:
             self.cls(sid=session.sid, data=session, expiration=expiration).save()
 
-        response.set_cookie(app.session_cookie_name, session.sid,
-                            expires=expiration, httponly=httponly, domain=domain)
+        response.set_cookie(
+            app.session_cookie_name,
+            session.sid,
+            expires=expiration,
+            httponly=httponly,
+            domain=domain,
+        )

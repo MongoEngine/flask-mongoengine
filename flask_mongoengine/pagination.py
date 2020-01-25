@@ -7,7 +7,6 @@ __all__ = ("Pagination", "ListFieldPagination")
 
 
 class Pagination(object):
-
     def __init__(self, iterable, page, per_page):
 
         if page < 1:
@@ -38,8 +37,9 @@ class Pagination(object):
 
     def prev(self, error_out=False):
         """Returns a :class:`Pagination` object for the previous page."""
-        assert self.iterable is not None, ('an object is required '
-                                           'for this method to work')
+        assert self.iterable is not None, (
+            "an object is required " "for this method to work"
+        )
         iterable = self.iterable
         if isinstance(iterable, QuerySet):
             iterable._skip = None
@@ -58,8 +58,9 @@ class Pagination(object):
 
     def next(self, error_out=False):
         """Returns a :class:`Pagination` object for the next page."""
-        assert self.iterable is not None, ('an object is required '
-                                           'for this method to work')
+        assert self.iterable is not None, (
+            "an object is required " "for this method to work"
+        )
         iterable = self.iterable
         if isinstance(iterable, QuerySet):
             iterable._skip = None
@@ -76,8 +77,7 @@ class Pagination(object):
         """Number of the next page"""
         return self.page + 1
 
-    def iter_pages(self, left_edge=2, left_current=2,
-                   right_current=5, right_edge=2):
+    def iter_pages(self, left_edge=2, left_current=2, right_current=5, right_edge=2):
         """Iterates over the page numbers in the pagination.  The four
         parameters control the thresholds how many numbers should be produced
         from the sides.  Skipped page numbers are represented as `None`.
@@ -104,10 +104,11 @@ class Pagination(object):
         last = 0
         for num in range(1, self.pages + 1):
             if (
-                    num <= left_edge
-                    or num > self.pages - right_edge
-                    or (num >= self.page - left_current
-                        and num <= self.page + right_current)
+                num <= left_edge
+                or num > self.pages - right_edge
+                or (
+                    num >= self.page - left_current and num <= self.page + right_current
+                )
             ):
                 if last + 1 != num:
                     yield None
@@ -118,9 +119,7 @@ class Pagination(object):
 
 
 class ListFieldPagination(Pagination):
-
-    def __init__(self, queryset, doc_id, field_name, page, per_page,
-                 total=None):
+    def __init__(self, queryset, doc_id, field_name, page, per_page, total=None):
         """Allows an array within a document to be paginated.
 
         Queryset must contain the document which has the array we're
@@ -146,22 +145,37 @@ class ListFieldPagination(Pagination):
 
         qs = queryset(pk=doc_id)
         self.items = getattr(qs.fields(**field_attrs).first(), field_name)
-        self.total = total or len(getattr(qs.fields(**{field_name: 1}).first(),
-                                          field_name))
+        self.total = total or len(
+            getattr(qs.fields(**{field_name: 1}).first(), field_name)
+        )
 
         if not self.items and page != 1:
             abort(404)
 
     def prev(self, error_out=False):
         """Returns a :class:`Pagination` object for the previous page."""
-        assert self.items is not None, ('a query object is required '
-                                        'for this method to work')
-        return self.__class__(self.queryset, self.doc_id, self.field_name,
-                              self.page - 1, self.per_page, self.total)
+        assert self.items is not None, (
+            "a query object is required " "for this method to work"
+        )
+        return self.__class__(
+            self.queryset,
+            self.doc_id,
+            self.field_name,
+            self.page - 1,
+            self.per_page,
+            self.total,
+        )
 
     def next(self, error_out=False):
         """Returns a :class:`Pagination` object for the next page."""
-        assert self.items is not None, ('a query object is required '
-                                        'for this method to work')
-        return self.__class__(self.queryset, self.doc_id, self.field_name,
-                              self.page + 1, self.per_page, self.total)
+        assert self.items is not None, (
+            "a query object is required " "for this method to work"
+        )
+        return self.__class__(
+            self.queryset,
+            self.doc_id,
+            self.field_name,
+            self.page + 1,
+            self.per_page,
+            self.total,
+        )

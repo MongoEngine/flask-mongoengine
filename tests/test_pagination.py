@@ -6,13 +6,12 @@ from tests import FlaskMongoEngineTestCase
 
 
 class PaginationTestCase(FlaskMongoEngineTestCase):
-
     def setUp(self):
         super(PaginationTestCase, self).setUp()
-        self.db_name = 'test_db'
-        self.app.config['MONGODB_DB'] = self.db_name
-        self.app.config['TESTING'] = True
-        self.app.config['CSRF_ENABLED'] = False
+        self.db_name = "test_db"
+        self.app.config["MONGODB_DB"] = self.db_name
+        self.app.config["TESTING"] = True
+        self.app.config["CSRF_ENABLED"] = False
         self.db = MongoEngine()
         self.db.init_app(self.app)
 
@@ -23,7 +22,7 @@ class PaginationTestCase(FlaskMongoEngineTestCase):
             self.db.connection.client.drop_database(self.db_name)
 
     def test_queryset_paginator(self):
-        with self.app.test_request_context('/'):
+        with self.app.test_request_context("/"):
             db = self.db
 
             class Post(db.Document):
@@ -48,7 +47,7 @@ class PaginationTestCase(FlaskMongoEngineTestCase):
 
     def test_list_field_pagination(self):
 
-        with self.app.test_request_context('/'):
+        with self.app.test_request_context("/"):
             db = self.db
 
             class Post(db.Document):
@@ -57,20 +56,23 @@ class PaginationTestCase(FlaskMongoEngineTestCase):
                 comment_count = db.IntField()
 
             comments = ["comment: %s" % i for i in range(42)]
-            post = Post(title="post has comments", comments=comments,
-                        comment_count=len(comments)).save()
+            post = Post(
+                title="post has comments",
+                comments=comments,
+                comment_count=len(comments),
+            ).save()
 
             # Check without providing a total
-            paginator = ListFieldPagination(Post.objects, post.id, "comments",
-                                            1, 10)
+            paginator = ListFieldPagination(Post.objects, post.id, "comments", 1, 10)
             self._test_paginator(paginator)
 
             # Check with providing a total (saves a query)
-            paginator = ListFieldPagination(Post.objects, post.id, "comments",
-                                            1, 10, post.comment_count)
+            paginator = ListFieldPagination(
+                Post.objects, post.id, "comments", 1, 10, post.comment_count
+            )
             self._test_paginator(paginator)
 
-            paginator = post.paginate_field('comments', 1, 10)
+            paginator = post.paginate_field("comments", 1, 10)
             self._test_paginator(paginator)
 
     def _test_paginator(self, paginator):
@@ -92,8 +94,9 @@ class PaginationTestCase(FlaskMongoEngineTestCase):
                 self.assertTrue(paginator.has_next)
 
             if i == 3:
-                self.assertEqual([None, 2, 3, 4, None],
-                                 list(paginator.iter_pages(0, 1, 1, 0)))
+                self.assertEqual(
+                    [None, 2, 3, 4, None], list(paginator.iter_pages(0, 1, 1, 0))
+                )
 
             self.assertEqual(i, paginator.page)
             self.assertEqual(i - 1, paginator.prev_num)
@@ -104,5 +107,5 @@ class PaginationTestCase(FlaskMongoEngineTestCase):
                 paginator = paginator.next()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

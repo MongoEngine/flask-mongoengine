@@ -12,7 +12,8 @@ from wtforms.fields import SelectFieldBase, StringField, TextAreaField
 from wtforms.validators import ValidationError
 
 __all__ = (
-    'ModelSelectField', 'QuerySetSelectField',
+    "ModelSelectField",
+    "QuerySetSelectField",
 )
 
 if sys.version_info >= (3, 0):
@@ -35,11 +36,19 @@ class QuerySetSelectField(SelectFieldBase):
     being `None`.  The label for the blank choice can be set by specifying the
     `blank_text` parameter.
     """
+
     widget = widgets.Select()
 
-    def __init__(self, label=u'', validators=None, queryset=None,
-                 label_attr='', allow_blank=False, blank_text=u'---',
-                 **kwargs):
+    def __init__(
+        self,
+        label="",
+        validators=None,
+        queryset=None,
+        label_attr="",
+        allow_blank=False,
+        blank_text="---",
+        **kwargs,
+    ):
 
         super(QuerySetSelectField, self).__init__(label, validators, **kwargs)
         self.label_attr = label_attr
@@ -49,7 +58,7 @@ class QuerySetSelectField(SelectFieldBase):
 
     def iter_choices(self):
         if self.allow_blank:
-            yield (u'__None', self.blank_text, self.data is None)
+            yield ("__None", self.blank_text, self.data is None)
 
         if self.queryset is None:
             return
@@ -65,7 +74,7 @@ class QuerySetSelectField(SelectFieldBase):
 
     def process_formdata(self, valuelist):
         if valuelist:
-            if valuelist[0] == '__None':
+            if valuelist[0] == "__None":
                 self.data = None
             else:
                 if self.queryset is None:
@@ -81,7 +90,7 @@ class QuerySetSelectField(SelectFieldBase):
     def pre_validate(self, form):
         if not self.allow_blank or self.data is not None:
             if not self.data:
-                raise ValidationError(_(u'Not a valid choice'))
+                raise ValidationError(_("Not a valid choice"))
 
     def _is_selected(self, item):
         return item == self.data
@@ -91,18 +100,25 @@ class QuerySetSelectMultipleField(QuerySetSelectField):
 
     widget = widgets.Select(multiple=True)
 
-    def __init__(self, label=u'', validators=None, queryset=None,
-                 label_attr='', allow_blank=False, blank_text=u'---',
-                 **kwargs):
+    def __init__(
+        self,
+        label="",
+        validators=None,
+        queryset=None,
+        label_attr="",
+        allow_blank=False,
+        blank_text="---",
+        **kwargs,
+    ):
 
         super(QuerySetSelectMultipleField, self).__init__(
-            label, validators, queryset, label_attr, allow_blank, blank_text,
-            **kwargs)
+            label, validators, queryset, label_attr, allow_blank, blank_text, **kwargs
+        )
 
     def process_formdata(self, valuelist):
 
         if valuelist:
-            if valuelist[0] == '__None':
+            if valuelist[0] == "__None":
                 self.data = None
             else:
                 if not self.queryset:
@@ -127,18 +143,24 @@ class ModelSelectField(QuerySetSelectField):
     Like a QuerySetSelectField, except takes a model class instead of a
     queryset and lists everything in it.
     """
-    def __init__(self, label=u'', validators=None, model=None, **kwargs):
-        queryset = kwargs.pop('queryset', model.objects)
-        super(ModelSelectField, self).__init__(label, validators, queryset=queryset, **kwargs)
+
+    def __init__(self, label="", validators=None, model=None, **kwargs):
+        queryset = kwargs.pop("queryset", model.objects)
+        super(ModelSelectField, self).__init__(
+            label, validators, queryset=queryset, **kwargs
+        )
 
 
 class ModelSelectMultipleField(QuerySetSelectMultipleField):
     """
     Allows multiple select
     """
-    def __init__(self, label=u'', validators=None, model=None, **kwargs):
-        queryset = kwargs.pop('queryset', model.objects)
-        super(ModelSelectMultipleField, self).__init__(label, validators, queryset=queryset, **kwargs)
+
+    def __init__(self, label="", validators=None, model=None, **kwargs):
+        queryset = kwargs.pop("queryset", model.objects)
+        super(ModelSelectMultipleField, self).__init__(
+            label, validators, queryset=queryset, **kwargs
+        )
 
 
 class JSONField(TextAreaField):
@@ -146,27 +168,28 @@ class JSONField(TextAreaField):
         if self.raw_data:
             return self.raw_data[0]
         else:
-            return self.data and unicode(json.dumps(self.data)) or u''
+            return self.data and unicode(json.dumps(self.data)) or ""
 
     def process_formdata(self, value):
         if value:
             try:
                 self.data = json.loads(value[0])
             except ValueError:
-                raise ValueError(self.gettext(u'Invalid JSON data.'))
+                raise ValueError(self.gettext("Invalid JSON data."))
 
 
 class DictField(JSONField):
     def process_formdata(self, value):
         super(DictField, self).process_formdata(value)
         if value and not isinstance(self.data, dict):
-            raise ValueError(self.gettext(u'Not a valid dictionary.'))
+            raise ValueError(self.gettext("Not a valid dictionary."))
 
 
 class NoneStringField(StringField):
     """
     Custom StringField that counts "" as None
     """
+
     def process_formdata(self, valuelist):
         if valuelist:
             self.data = valuelist[0]
@@ -178,9 +201,10 @@ class BinaryField(TextAreaField):
     """
     Custom TextAreaField that converts its value with binary_type.
     """
+
     def process_formdata(self, valuelist):
         if valuelist:
             if six.PY3:
-                self.data = six.binary_type(valuelist[0], 'utf-8')
+                self.data = six.binary_type(valuelist[0], "utf-8")
             else:
                 self.data = six.binary_type(valuelist[0])

@@ -12,4 +12,3 @@ A simple multi file app - to help get you started
 	python ./examples/biggerapp/app.py
 
 3. Point your browser to localhost:4000/
-

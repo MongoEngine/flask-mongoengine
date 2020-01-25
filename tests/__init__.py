@@ -8,8 +8,8 @@ class FlaskMongoEngineTestCase(unittest.TestCase):
 
     def setUp(self):
         self.app = flask.Flask(__name__)
-        self.app.config['MONGODB_DB'] = 'test_db'
-        self.app.config['TESTING'] = True
+        self.app.config["MONGODB_DB"] = "test_db"
+        self.app.config["TESTING"] = True
         self.ctx = self.app.app_context()
         self.ctx.push()
         # Mongoengine keep a global state of the connections that must be
