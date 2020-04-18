@@ -194,7 +194,7 @@ def _cursor_refresh(cursor_self):
         query_data["operation"] = "command"
         # Handle count as a special case
         if "count" in query_son:
-            # Information is in a different format to a standar query
+            # Information is in a different format to a standard query
             query_data["collection"] = query_son["count"]
             query_data["operation"] = "count"
             query_data["skip"] = query_son.get("skip")
