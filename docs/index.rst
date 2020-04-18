@@ -7,6 +7,13 @@ For more information on MongoEngine please check out the `MongoEngine Documentat
 It handles connection management for your app.
 You can also use `WTForms <http://wtforms.simplecodes.com/>`_ as model forms for your models.
 
+Pre-requisite
+=============
+
+Make sure you have `wheel` installed::
+
+    pip install wheel
+
 Installing Flask-MongoEngine
 ============================
 
