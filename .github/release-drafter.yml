@@ -1,0 +1,30 @@
+categories:
+  - title: 'Breaking Changes'
+    labels:
+      - 'log:breaking-change'
+  - title: 'Added'
+    labels:
+      - 'log:added'
+  - title: 'Changed'
+    labels:
+      - 'log:changed'
+  - title: 'Fixed'
+    labels:
+      - 'log:fixed'
+  - title: 'Deprecated'
+    labels:
+      - 'log:deprecated'
+  - title: 'Removed'
+    labels:
+      - 'log:removed'
+exclude-labels:
+  - 'log:skip-changelog'
+sort-by: 'title'
+template: |
+  ## Changes
+
+  $CHANGES
+
+  ## This release is made by wonderful contributors:
+
+  $CONTRIBUTORS
