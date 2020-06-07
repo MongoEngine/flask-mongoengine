@@ -1,25 +1,30 @@
-# Use a container-based environment
-sudo: false
+dist: xenial
+os: linux
 
 language: python
-
-python:
-  - '3.6'
-  - '3.7'
-  - '3.8'
-  - pypy3
 
 jobs:
   include:
     - language: python
       python: 3.6
       name: "linting"
-      script:
-        - tox -e lint
-
-env:
-  - MONGOENGINE=latest_pip
-  - MONGOENGINE=dev
+      env: TOXENV=lint
+    - language: python
+      python: 3.6
+      name: "Test on python 3.6"
+      env: TOXENV=py36
+    - language: python
+      python: 3.7
+      name: "Test on python 3.7"
+      env: TOXENV=py37
+    - language: python
+      python: 3.8
+      name: "Test on python 3.8"
+      env: TOXENV=py38
+    - language: python
+      python: pypy3
+      name: "Test on python pypy3"
+      env: TOXENV=pypy3
 
 services:
   - mongodb
@@ -31,11 +36,8 @@ install:
   - travis_retry pip install tox>=3.14
   - travis_retry pip install virtualenv
 
-# Cache dependencies installed via pip
-cache: pip
-
 script:
-  - tox -e $(echo py$TRAVIS_PYTHON_VERSION-me_$MONGOENGINE | tr -d . | sed -e 's/pypypy/pypy/') -- --with-coverage
+  - tox
 
 after_success:
   - coveralls --verbose
@@ -60,11 +62,8 @@ deploy:
   distributions: "sdist bdist_wheel"
 
   # only deploy on tagged commits (aka GitHub releases) and only for the
-  # parent repo's builds running Python 2.7 along with dev MongoEngine (we run
-  # Travis against many different Python and MongoEngine versions and we don't
-  # want the deploy to occur multiple times).
+  # parent repo's builds running Python 3.6
   on:
     tags: true
-    condition: "$MONGOENGINE = dev"
-    python: 3.5
+    python: 3.6
     repo: MongoEngine/flask-mongoengine
