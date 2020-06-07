@@ -104,7 +104,7 @@ class MongoEngine(object):
 
     def init_app(self, app, config=None):
         if not app or not isinstance(app, Flask):
-            raise Exception("Invalid Flask application instance")
+            raise TypeError("Invalid Flask application instance")
 
         self.app = app
 
@@ -119,7 +119,7 @@ class MongoEngine(object):
         if self in app.extensions["mongoengine"]:
             # Raise an exception if extension already initialized as
             # potentially new configuration would not be loaded.
-            raise Exception("Extension already initialized")
+            raise ValueError("Extension already initialized")
 
         if not config:
             # If not passed a config then we read the connection settings
