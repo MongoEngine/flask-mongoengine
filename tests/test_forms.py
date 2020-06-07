@@ -371,7 +371,7 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
         with self.app.test_request_context("/"):
             db = self.db
 
-            choices = (("male", "Male"), ("female", "Female"), ("other", "Other"))
+            choices = [("male", "Male"), ("female", "Female"), ("other", "Other")]
 
             class Poll(db.Document):
                 answer = db.StringField(choices=choices)
