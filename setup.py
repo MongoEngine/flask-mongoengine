@@ -1,4 +1,3 @@
-import io
 import os
 from setuptools import setup
 
@@ -10,7 +9,7 @@ description = (
 
 # Load index.rst as long_description
 doc_path = os.path.join(os.path.dirname(__file__), "docs", "index.rst")
-long_description = io.open(doc_path, encoding="utf-8").read()
+long_description = open(doc_path, encoding="utf-8").read()
 
 # Stops exit traceback on tests
 try:
@@ -33,7 +32,7 @@ init = os.path.join(os.path.dirname(__file__), "flask_mongoengine", "__init__.py
 version_line = list(filter(lambda l: l.startswith("VERSION"), open(init)))[0]
 version = get_version(eval(version_line.split("=")[-1]))
 
-test_requirements = ["coverage", "nose", "rednose"]
+test_requirements = ["coverage", "nose", "pytest", "pytest-cov"]
 
 setup(
     name="flask-mongoengine",
@@ -42,7 +41,6 @@ setup(
     license="BSD",
     author="Ross Lawley",
     author_email="ross.lawley@gmail.com",
-    test_suite="nose.collector",
     zip_safe=False,
     platforms="any",
     install_requires=[
@@ -63,11 +61,15 @@ setup(
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: Implementation :: PyPy"
+        "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
         "Topic :: Software Development :: Libraries :: Python Modules",
+        "Framework :: Flask",
     ],
 )
