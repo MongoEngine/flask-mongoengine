@@ -17,3 +17,5 @@ venv/
 .eggs
 .idea
 .vscode
+htmlcov/
+coverage.xml

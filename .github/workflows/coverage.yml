@@ -1,4 +1,5 @@
-name: CI Tests
+name: Send Coverage to different analitic engines
+# Only for last versions of python and mongo
 
 on:
   push:
@@ -11,25 +12,16 @@ on:
       - "*"
 
 jobs:
-  build:
+  coverage:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        mongodb-version: [3.6, 4.0, 4.2]
+        mongodb-version: [4.2]
         include:
-          - name: "ubuntu-py36"
-            python: "3.6"
-            tox_env: "py36"
-          - name: "ubuntu-py37"
-            python: "3.7"
-            tox_env: "py37"
-          - name: "ubuntu-py38"
+          - name: "coverage"
             python: "3.8"
             tox_env: "py38"
-          - name: "ubuntu-pypy3"
-            python: "pypy3"
-            tox_env: "pypy3"
 
     steps:
     - uses: actions/checkout@v2
@@ -46,4 +38,15 @@ jobs:
       with:
         mongodb-version: ${{ matrix.mongodb-version }}
     - name: Test build
-      run: "tox -e ${{ matrix.tox_env }}"
+      run: "tox -e ${{ matrix.tox_env }} -- --cov-report=xml --cov-report=html"
+    - name: Send coverage report to codecov
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./coverage.xml
+    - name: Send coverage report to codeclimate
+      uses: paambaati/codeclimate-action@v2.6.0
+      with:
+        coverageCommand: echo "Ignore rerun"
+        coverageLocations: ${{github.workspace}}/coverage.xml:coverage.py
+      env:
+        CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
