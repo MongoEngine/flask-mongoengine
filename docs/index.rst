@@ -170,7 +170,7 @@ flask-mongoengine automatically generates WTForms from MongoEngine models::
         lang = db.StringField(max_length=3)
 
     class Post(db.Document):
-        title = db.StringField(max_length=120, required=True, validators=[validators.InputRequired(message=u'Missing title.'),])
+        title = db.StringField(max_length=120, required=True, validators=[validators.InputRequired(message='Missing title.'),])
         author = db.ReferenceField(User)
         tags = db.ListField(db.StringField(max_length=30))
         content = db.EmbeddedDocumentField(Content)

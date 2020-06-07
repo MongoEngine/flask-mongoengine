@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # flask-script documentation build configuration file, created by
 # sphinx-quickstart on Wed Jun 23 08:26:41 2010.
 #
@@ -40,8 +38,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Flask-MongoEngine'
-copyright = u'2010-2020, Streetlife and others'
+project = 'Flask-MongoEngine'
+copyright = '2010-2020, Streetlife and others'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -183,8 +181,8 @@ htmlhelp_basename = 'flask-mongoenginedoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'flask-mongoengine.tex', u'Flask-MongoEngine Documentation',
-   u'Ross Lawley', 'manual'),
+  ('index', 'flask-mongoengine.tex', 'Flask-MongoEngine Documentation',
+   'Ross Lawley', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -216,6 +214,6 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'flask-mongoengine', u'Flask-MongoEngine Documentation',
-     [u'Ross Lawley', u'Dan Jacob', u'Marat Khabibullin'], 1)
+    ('index', 'flask-mongoengine', 'Flask-MongoEngine Documentation',
+     ['Ross Lawley', 'Dan Jacob', 'Marat Khabibullin'], 1)
 ]

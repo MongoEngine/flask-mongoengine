@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import math
 
 from flask import abort
