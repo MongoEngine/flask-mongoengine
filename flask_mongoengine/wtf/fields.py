@@ -5,7 +5,6 @@ import json
 import sys
 from gettext import gettext as _
 
-import six
 from mongoengine.queryset import DoesNotExist
 from wtforms import widgets
 from wtforms.fields import SelectFieldBase, StringField, TextAreaField
@@ -204,7 +203,4 @@ class BinaryField(TextAreaField):
 
     def process_formdata(self, valuelist):
         if valuelist:
-            if six.PY3:
-                self.data = six.binary_type(valuelist[0], "utf-8")
-            else:
-                self.data = six.binary_type(valuelist[0])
+            self.data = bytes(valuelist[0], "utf-8")
