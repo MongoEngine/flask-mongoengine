@@ -12,14 +12,14 @@ on:
       - "*"
 
 jobs:
-  build:
+  linting:
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
           - name: "linting"
             python: "3.8"
-            os: ubuntu-latest
             tox_env: "lint"
 
     steps:

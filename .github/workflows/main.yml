@@ -12,6 +12,7 @@ on:
 
 jobs:
   build:
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -19,19 +20,15 @@ jobs:
         include:
           - name: "ubuntu-py36"
             python: "3.6"
-            os: ubuntu-latest
             tox_env: "py36"
           - name: "ubuntu-py37"
             python: "3.7"
-            os: ubuntu-latest
             tox_env: "py37"
           - name: "ubuntu-py38"
             python: "3.8"
-            os: ubuntu-latest
             tox_env: "py38"
           - name: "ubuntu-pypy3"
             python: "pypy3"
-            os: ubuntu-latest
             tox_env: "pypy3"
 
     steps:
