@@ -50,7 +50,6 @@ setup(
         "WTForms[email]>=2.3.1",
         "Flask-WTF>=0.14.3",
         "mongoengine>=0.20",
-        "six",
     ],
     packages=["flask_mongoengine", "flask_mongoengine.wtf"],
     include_package_data=True,
