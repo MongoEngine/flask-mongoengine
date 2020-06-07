@@ -6,7 +6,8 @@ from collections import OrderedDict
 
 from bson import ObjectId
 from mongoengine import ReferenceField
-from wtforms import fields as f, validators
+from wtforms import fields as f
+from wtforms import validators
 
 from flask_mongoengine.wtf.fields import (
     BinaryField,
@@ -221,7 +222,7 @@ class ModelConverter(object):
     def conv_GenericReference(self, model, field, kwargs):
         return
 
-    @converts('FileField')
+    @converts("FileField")
     def conv_File(self, model, field, kwargs):
         return f.FileField(**kwargs)
 
