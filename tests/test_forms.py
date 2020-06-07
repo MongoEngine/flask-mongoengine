@@ -534,6 +534,31 @@ class WTFormsAppTestCase(FlaskMongoEngineTestCase):
             form = PostForm()
             self.assertTrue("content-text" in "%s" % form.content.text)
 
+    def test_form_label_modifier(self):
+        with self.app.test_request_context("/"):
+            db = self.db
+
+            class FoodItem(db.Document):
+                title = db.StringField()
+
+            class FoodStore(db.Document):
+                title = db.StringField(max_length=120, required=True)
+                food_items = db.ListField(db.ReferenceField(FoodItem))
+
+                def food_items_label_modifier(obj):
+                    return obj.title
+
+            fruit_names = ["banana", "apple", "pear"]
+
+            food_items = [FoodItem(title=name).save() for name in fruit_names]
+
+            FoodStore(title="John's fruits", food_items=food_items).save()
+
+            FoodStoreForm = model_form(FoodStore)
+            form = FoodStoreForm()
+
+            assert [obj.label.text for obj in form.food_items] == fruit_names
+
 
 if __name__ == "__main__":
     unittest.main()

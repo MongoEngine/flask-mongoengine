@@ -46,6 +46,7 @@ class QuerySetSelectField(SelectFieldBase):
         label_attr="",
         allow_blank=False,
         blank_text="---",
+        label_modifier=None,
         **kwargs,
     ):
 
@@ -53,6 +54,7 @@ class QuerySetSelectField(SelectFieldBase):
         self.label_attr = label_attr
         self.allow_blank = allow_blank
         self.blank_text = blank_text
+        self.label_modifier = label_modifier
         self.queryset = queryset
 
     def iter_choices(self):
@@ -64,7 +66,12 @@ class QuerySetSelectField(SelectFieldBase):
 
         self.queryset.rewind()
         for obj in self.queryset:
-            label = self.label_attr and getattr(obj, self.label_attr) or obj
+            label = (
+                self.label_modifier(obj)
+                if self.label_modifier
+                else (self.label_attr and getattr(obj, self.label_attr) or obj)
+            )
+
             if isinstance(self.data, list):
                 selected = obj in self.data
             else:
