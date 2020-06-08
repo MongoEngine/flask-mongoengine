@@ -96,6 +96,7 @@ class MongoEngine(object):
         _include_mongoengine(self)
 
         self.app = None
+        self.config = config
         self.Document = Document
         self.DynamicDocument = DynamicDocument
 
@@ -121,9 +122,12 @@ class MongoEngine(object):
             # potentially new configuration would not be loaded.
             raise ValueError("Extension already initialized")
 
-        if not config:
-            # If not passed a config then we read the connection settings
-            # from the app config.
+        if config:
+            # Passed config have max priority, over init config.
+            self.config = config
+
+        if not self.config:
+            # If no configs passed, use app.config.
             config = app.config
 
         # Obtain db connection(s)
