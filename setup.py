@@ -32,7 +32,7 @@ init = os.path.join(os.path.dirname(__file__), "flask_mongoengine", "__init__.py
 version_line = list(filter(lambda l: l.startswith("VERSION"), open(init)))[0]
 version = get_version(eval(version_line.split("=")[-1]))
 
-test_requirements = ["coverage", "nose", "pytest", "pytest-cov"]
+test_requirements = ["coverage", "pytest", "pytest-cov"]
 
 setup(
     name="flask-mongoengine",
