@@ -11,6 +11,7 @@ from flask_mongoengine import MongoEngine
 def app():
     app = Flask(__name__)
     app.config["TESTING"] = True
+    app.config["WTF_CSRF_ENABLED"] = False
 
     with app.app_context():
         yield app
