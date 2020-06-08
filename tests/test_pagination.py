@@ -1,112 +1,84 @@
-import unittest
-
+import pytest
 from werkzeug.exceptions import NotFound
 
-from flask_mongoengine import ListFieldPagination, MongoEngine, Pagination
-from tests import FlaskMongoEngineTestCase
+from flask_mongoengine import ListFieldPagination, Pagination
 
 
-class PaginationTestCase(FlaskMongoEngineTestCase):
-    def setUp(self):
-        super(PaginationTestCase, self).setUp()
-        self.db_name = "test_db"
-        self.app.config["MONGODB_DB"] = self.db_name
-        self.app.config["TESTING"] = True
-        self.app.config["CSRF_ENABLED"] = False
-        self.db = MongoEngine()
-        self.db.init_app(self.app)
+def test_queryset_paginator(app, todo):
+    Todo = todo
+    for i in range(42):
+        Todo(title="post: %s" % i).save()
 
-    def tearDown(self):
-        try:
-            self.db.connection.drop_database(self.db_name)
-        except Exception:
-            self.db.connection.client.drop_database(self.db_name)
+    with pytest.raises(NotFound):
+        Pagination(iterable=Todo.objects, page=0, per_page=10)
 
-    def test_queryset_paginator(self):
-        with self.app.test_request_context("/"):
-            db = self.db
+    with pytest.raises(NotFound):
+        Pagination(iterable=Todo.objects, page=6, per_page=10)
 
-            class Post(db.Document):
-                title = db.StringField(required=True, max_length=200)
-
-            for i in range(42):
-                Post(title="post: %s" % i).save()
-
-        self.assertRaises(NotFound, Pagination, Post.objects, 0, 10)
-        self.assertRaises(NotFound, Pagination, Post.objects, 6, 10)
-
-        paginator = Pagination(Post.objects, 1, 10)
-        self._test_paginator(paginator)
-
-    def test_paginate_plain_list(self):
-
-        self.assertRaises(NotFound, Pagination, range(1, 42), 0, 10)
-        self.assertRaises(NotFound, Pagination, range(1, 42), 6, 10)
-
-        paginator = Pagination(range(1, 42), 1, 10)
-        self._test_paginator(paginator)
-
-    def test_list_field_pagination(self):
-
-        with self.app.test_request_context("/"):
-            db = self.db
-
-            class Post(db.Document):
-                title = db.StringField(required=True, max_length=200)
-                comments = db.ListField(db.StringField())
-                comment_count = db.IntField()
-
-            comments = ["comment: %s" % i for i in range(42)]
-            post = Post(
-                title="post has comments",
-                comments=comments,
-                comment_count=len(comments),
-            ).save()
-
-            # Check without providing a total
-            paginator = ListFieldPagination(Post.objects, post.id, "comments", 1, 10)
-            self._test_paginator(paginator)
-
-            # Check with providing a total (saves a query)
-            paginator = ListFieldPagination(
-                Post.objects, post.id, "comments", 1, 10, post.comment_count
-            )
-            self._test_paginator(paginator)
-
-            paginator = post.paginate_field("comments", 1, 10)
-            self._test_paginator(paginator)
-
-    def _test_paginator(self, paginator):
-        self.assertEqual(5, paginator.pages)
-        self.assertEqual([1, 2, 3, 4, 5], list(paginator.iter_pages()))
-
-        for i in [1, 2, 3, 4, 5]:
-
-            if i == 1:
-                self.assertRaises(NotFound, paginator.prev)
-                self.assertFalse(paginator.has_prev)
-            else:
-                self.assertTrue(paginator.has_prev)
-
-            if i == 5:
-                self.assertRaises(NotFound, paginator.next)
-                self.assertFalse(paginator.has_next)
-            else:
-                self.assertTrue(paginator.has_next)
-
-            if i == 3:
-                self.assertEqual(
-                    [None, 2, 3, 4, None], list(paginator.iter_pages(0, 1, 1, 0))
-                )
-
-            self.assertEqual(i, paginator.page)
-            self.assertEqual(i - 1, paginator.prev_num)
-            self.assertEqual(i + 1, paginator.next_num)
-
-            # Paginate to the next page
-            if i < 5:
-                paginator = paginator.next()
+    paginator = Pagination(Todo.objects, 1, 10)
+    _test_paginator(paginator)
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_paginate_plain_list():
+    with pytest.raises(NotFound):
+        Pagination(iterable=range(1, 42), page=0, per_page=10)
+
+    with pytest.raises(NotFound):
+        Pagination(iterable=range(1, 42), page=6, per_page=10)
+
+    paginator = Pagination(range(1, 42), 1, 10)
+    _test_paginator(paginator)
+
+
+def test_list_field_pagination(app, todo):
+    Todo = todo
+
+    comments = ["comment: %s" % i for i in range(42)]
+    todo = Todo(
+        title="todo has comments", comments=comments, comment_count=len(comments),
+    ).save()
+
+    # Check without providing a total
+    paginator = ListFieldPagination(Todo.objects, todo.id, "comments", 1, 10)
+    _test_paginator(paginator)
+
+    # Check with providing a total (saves a query)
+    paginator = ListFieldPagination(
+        Todo.objects, todo.id, "comments", 1, 10, todo.comment_count
+    )
+    _test_paginator(paginator)
+
+    paginator = todo.paginate_field("comments", 1, 10)
+    _test_paginator(paginator)
+
+
+def _test_paginator(paginator):
+    assert 5 == paginator.pages
+    assert [1, 2, 3, 4, 5] == list(paginator.iter_pages())
+
+    for i in [1, 2, 3, 4, 5]:
+
+        if i == 1:
+            assert not paginator.has_prev
+            with pytest.raises(NotFound):
+                paginator.prev()
+        else:
+            assert paginator.has_prev
+
+        if i == 5:
+            assert not paginator.has_next
+            with pytest.raises(NotFound):
+                paginator.next()
+        else:
+            assert paginator.has_next
+
+        if i == 3:
+            assert [None, 2, 3, 4, None] == list(paginator.iter_pages(0, 1, 1, 0))
+
+        assert i == paginator.page
+        assert i - 1 == paginator.prev_num
+        assert i + 1 == paginator.next_num
+
+        # Paginate to the next page
+        if i < 5:
+            paginator = paginator.next()

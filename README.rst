@@ -26,7 +26,7 @@ You can install this package using pypi: ``pip install flask-mongoengine``
 Tests
 =====
 To run the test suite, ensure you are running a local copy of Flask-MongoEngine
-and run: ``python setup.py nosetests``.
+and simply run: ``pytest``.
 
 To run the test suite on every supported versions of Python, PyPy and MongoEngine you can use ``tox``.
 Ensure tox and each supported Python, PyPy versions are installed in your environment:
@@ -38,11 +38,7 @@ Ensure tox and each supported Python, PyPy versions are installed in your enviro
     # Run the test suites
     $ tox
 
-To run a single or selected test suits, use the nosetest convention. E.g.
-
-.. code-block:: shell
-
-    $ python setup.py nosetests --tests tests/example_test.py:ExampleTestClass.example_test_method
+To run a single or selected test suits, use pytest `-k` option.
 
 Contributing
 ============

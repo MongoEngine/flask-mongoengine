@@ -1,75 +1,45 @@
-import datetime
-
 import flask
+import pytest
 from bson import ObjectId
 
-from flask_mongoengine import MongoEngine
-from tests import FlaskMongoEngineTestCase
+
+@pytest.fixture(autouse=True)
+def setup_endpoints(app, todo):
+    Todo = todo
+
+    @app.route("/")
+    def index():
+        return "\n".join(x.title for x in Todo.objects)
+
+    @app.route("/add", methods=["POST"])
+    def add():
+        form = flask.request.form
+        todo = Todo(title=form["title"], text=form["text"])
+        todo.save()
+        return "added"
+
+    @app.route("/show/<id>/")
+    def show(id):
+        todo = Todo.objects.get_or_404(id=id)
+        return "\n".join([todo.title, todo.text])
 
 
-class BasicAppTestCase(FlaskMongoEngineTestCase):
-    def setUp(self):
-        super(BasicAppTestCase, self).setUp()
-        db = MongoEngine()
+def test_with_id(app, todo):
+    Todo = todo
+    client = app.test_client()
+    response = client.get("/show/%s/" % ObjectId())
+    assert response.status_code == 404
 
-        class Todo(db.Document):
-            title = db.StringField(max_length=60)
-            text = db.StringField()
-            done = db.BooleanField(default=False)
-            pub_date = db.DateTimeField(default=datetime.datetime.now)
+    client.post("/add", data={"title": "First Item", "text": "The text"})
 
-        db.init_app(self.app)
+    response = client.get("/show/%s/" % Todo.objects.first_or_404().id)
+    assert response.status_code == 200
+    assert response.data.decode("utf-8") == "First Item\nThe text"
 
-        Todo.drop_collection()
-        self.Todo = Todo
 
-        @self.app.route("/")
-        def index():
-            return "\n".join(x.title for x in self.Todo.objects)
-
-        @self.app.route("/add", methods=["POST"])
-        def add():
-            form = flask.request.form
-            todo = self.Todo(title=form["title"], text=form["text"])
-            todo.save()
-            return "added"
-
-        @self.app.route("/show/<id>/")
-        def show(id):
-            todo = self.Todo.objects.get_or_404(id=id)
-            return "\n".join([todo.title, todo.text])
-
-        self.db = db
-
-    def test_connection_default(self):
-        self.app.config["MONGODB_SETTINGS"] = {}
-        self.app.config["TESTING"] = True
-
-        db = MongoEngine()
-        # Disconnect to drop connection from setup.
-        db.disconnect()
-        db.init_app(self.app)
-
-    def test_with_id(self):
-        c = self.app.test_client()
-        resp = c.get("/show/%s/" % ObjectId())
-        self.assertEqual(resp.status_code, 404)
-
-        c.post("/add", data={"title": "First Item", "text": "The text"})
-
-        resp = c.get("/show/%s/" % self.Todo.objects.first_or_404().id)
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.data.decode("utf-8"), "First Item\nThe text")
-
-    def test_basic_insert(self):
-        c = self.app.test_client()
-        c.post("/add", data={"title": "First Item", "text": "The text"})
-        c.post("/add", data={"title": "2nd Item", "text": "The text"})
-        rv = c.get("/")
-        self.assertEqual(rv.data.decode("utf-8"), "First Item\n2nd Item")
-
-    def test_request_context(self):
-        with self.app.test_request_context():
-            todo = self.Todo(title="Test", text="test")
-            todo.save()
-            self.assertEqual(self.Todo.objects.count(), 1)
+def test_basic_insert(app):
+    client = app.test_client()
+    client.post("/add", data={"title": "First Item", "text": "The text"})
+    client.post("/add", data={"title": "2nd Item", "text": "The text"})
+    response = client.get("/")
+    assert response.data.decode("utf-8") == "First Item\n2nd Item"
