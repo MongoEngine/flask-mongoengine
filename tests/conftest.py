@@ -45,5 +45,7 @@ def todo(db):
         text = mongoengine.StringField()
         done = mongoengine.BooleanField(default=False)
         pub_date = mongoengine.DateTimeField(default=datetime.utcnow)
+        comments = mongoengine.ListField(mongoengine.StringField())
+        comment_count = mongoengine.IntField()
 
     return Todo
