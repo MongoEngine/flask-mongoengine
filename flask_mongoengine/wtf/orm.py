@@ -162,6 +162,10 @@ class ModelConverter(object):
     def conv_DateTime(self, model, field, kwargs):
         return f.DateTimeField(**kwargs)
 
+    @converts("DateField")
+    def conv_Date(self, model, field, kwargs):
+        return f.DateField(**kwargs)
+
     @converts("BinaryField")
     def conv_Binary(self, model, field, kwargs):
         # TODO: may be set file field that will save file`s data to MongoDB
