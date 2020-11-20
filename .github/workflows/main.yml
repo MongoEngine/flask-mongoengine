@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mongodb-version: [3.6, 4.0, 4.2]
+        mongodb-version: [3.6, 4.0, 4.2, 4.4]
         include:
           - name: "ubuntu-py36"
             python: "3.6"
@@ -27,6 +27,9 @@ jobs:
           - name: "ubuntu-py38"
             python: "3.8"
             tox_env: "py38"
+          - name: "ubuntu-py39"
+            python: "3.9"
+            tox_env: "py39"
           - name: "ubuntu-pypy3"
             python: "pypy3"
             tox_env: "pypy3"
