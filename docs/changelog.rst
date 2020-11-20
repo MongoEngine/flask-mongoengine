@@ -2,35 +2,10 @@
 Changelog
 =========
 
-Development
-===========
-- BREAKING CHANGE: Dropped Python v2.6, v2.7, v3.2, v3.3,
-  v3.4, v3.5 (#355, #366)
-- BREAKING CHANGE: Added tests support for python versions:
-  v3.6, v3.7, v3.8 (#355, #366)
-- BREAKING CHANGE: Minimum Flask version set to v1.1 (#355)
-- BREAKING CHANGE: Minimum Flask-WTF version set to v0.14 (#355)
-- BREAKING CHANGE: Minimum mongoengine version set to v0.19 (#355)
-- BREAKING CHANGE: Minimum mongodb version set to v4.0 (#355)
-- BREAKING CHANGE: Pymongo support < 3.6.0 dropped. (#372)
-- FIXED: Pymongo old method monkey patching (#325, #346, #372)
-- FIXED: Examples works again (#372)
-- FIXED: Use fldt.$ to avoid double jQuery.noConflict(true) (#313)
-- CHANGED: Code reformatted with black, pre-commit implemented
-  in project and CI/CD (#366)
-- CHANGED: Developers dependencies extracted to separate file (#367)
-- CHANGED: Internal test engine switched from nose to pytest (#357)
-- DROPPED: Internal check with flake8-import-order dropped, as not
-  compatible with modern editors (#358)
-- UPDATED: Functions `get_or_404`, `first_or_404` now accepts `message`
-  argument, and will display custom message if specified. (#351)
-- UPDATED: `get_or_404` will raise 404 error only on `DoesNotExist` exception,
-  other exceptions should be captured by user. (#360)
-- UPDATED: Fix imports order, drop imports for python 2.7 (#373)
-- RESTORED: Changelog for v0.9.2, v0.9.3, v0.9.4, v0.9.5 (#370)
-
-Tests and development for old packages versions dropped to minimize tests
-footprint.
+Changes in 1.0.0
+================
+Changelog maintenance automated and latest changelog available at
+`github release page <https://github.com/MongoEngine/flask-mongoengine/releases>`_.
 
 Use version 0.9.5 if old dependencies required.
 

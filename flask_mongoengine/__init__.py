@@ -12,13 +12,11 @@ from .pagination import *
 from .sessions import *
 from .wtf import WtfBaseField
 
-VERSION = (0, 9, 5)
+VERSION = (1, 0, 0)
 
 
 def get_version():
-    """Return the VERSION as a string, e.g. for VERSION == (0, 9, 2),
-    return '0.9.2'.
-    """
+    """Return the VERSION as a string."""
     return ".".join(map(str, VERSION))
 
 
