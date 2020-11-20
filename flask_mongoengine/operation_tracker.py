@@ -250,8 +250,7 @@ def reset():
 
 
 def _get_ordering(son):
-    """Helper function to extract formatted ordering from dict.
-    """
+    """Helper function to extract formatted ordering from dict."""
 
     def fmt(field, direction):
         return "{0}{1}".format({-1: "-", 1: "+"}[direction], field)
