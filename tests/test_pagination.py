@@ -35,7 +35,9 @@ def test_list_field_pagination(app, todo):
 
     comments = ["comment: %s" % i for i in range(42)]
     todo = Todo(
-        title="todo has comments", comments=comments, comment_count=len(comments),
+        title="todo has comments",
+        comments=comments,
+        comment_count=len(comments),
     ).save()
 
     # Check without providing a total
