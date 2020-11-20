@@ -10,6 +10,7 @@ description = (
 # Load index.rst as long_description
 doc_path = os.path.join(os.path.dirname(__file__), "docs", "index.rst")
 long_description = open(doc_path, encoding="utf-8").read()
+long_description_content_type = "text/x-rst"
 
 # Stops exit traceback on tests
 try:
