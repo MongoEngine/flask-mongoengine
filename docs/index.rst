@@ -44,10 +44,10 @@ Or, if you are setting up your database before your app is initialized, as is th
     db.init_app(app)
 
 
-By default, Flask-MongoEngine assumes that the :program:`mongod` instance is running
+By default, Flask-MongoEngine assumes that the `mongod` instance is running
 on **localhost** on port **27017**, and you wish to connect to the database named **test**.
 
-If MongoDB is running elsewhere, you should provide the :attr:`host` and :attr:`port` settings
+If MongoDB is running elsewhere, you should provide the `host` and `port` settings
 in  the `'MONGODB_SETTINGS'` dictionary wih `app.config`.::
 
     app.config['MONGODB_SETTINGS'] = {
@@ -56,7 +56,7 @@ in  the `'MONGODB_SETTINGS'` dictionary wih `app.config`.::
         'port': 12345
     }
 
-If the database requires authentication, the :attr:`username` and :attr:`password`
+If the database requires authentication, the `username` and `password`
 arguments should be provided `'MONGODB_SETTINGS'` dictionary wih `app.config`.::
 
     app.config['MONGODB_SETTINGS'] = {
@@ -65,7 +65,7 @@ arguments should be provided `'MONGODB_SETTINGS'` dictionary wih `app.config`.::
         'password':'pwd123'
     }
 
-Uri style connections are also supported, just supply the uri as the :attr:`host`
+Uri style connections are also supported, just supply the uri as the `host`
 in the `'MONGODB_SETTINGS'` dictionary with `app.config`. **Note that database name from uri has priority over name.** If uri presents and doesn't contain database name db setting entirely ignore and db name set to 'test'. ::
 
     app.config['MONGODB_SETTINGS'] = {
