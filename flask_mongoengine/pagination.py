@@ -15,11 +15,7 @@ class Pagination(object):
         self.iterable = iterable
         self.page = page
         self.per_page = per_page
-
-        if isinstance(iterable, QuerySet):
-            self.total = iterable.count()
-        else:
-            self.total = len(iterable)
+        self.total = len(iterable)
 
         start_index = (page - 1) * per_page
         end_index = page * per_page
