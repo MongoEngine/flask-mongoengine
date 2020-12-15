@@ -44,6 +44,7 @@ setup(
     author_email="ross.lawley@gmail.com",
     zip_safe=False,
     platforms="any",
+    python_requires=">=3.6",
     install_requires=[
         "Flask>=1.1.2",
         "WTForms[email]>=2.3.1",
