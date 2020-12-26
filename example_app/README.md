@@ -7,7 +7,8 @@ system to be opened (for development needs).
 
 Usage:
 
-1. From example_app folder just run `docker-compose up`.
+1. From flask-mongoengine root folder just run `docker-compose up`.
 2. Wait until dependencies downloaded and containers up and running.
 3. Open `http://localhost:8000/` to check the app.
 4. Hit `ctrl+c` in terminal window to stop docker-compose.
+5. You can use this app for live flask-mongoengine development and testing.
