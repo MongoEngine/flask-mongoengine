@@ -38,8 +38,8 @@
         <tr>
             <th>Time (ms)</th>
             <th>Size</th>
-            {% if title == 'Queries' %}
             <th>Operation</th>
+            {% if title == 'Queries' %}
             <th>Collection</th>
             <th>Query</th>
             <th>Ordering</th>
@@ -48,12 +48,10 @@
             <th>Data</th>
             {% elif title == 'Inserts' %}
             <th>Document</th>
-            <th>Safe</th>
             {% elif title == 'Removes' %}
             <th>Query / Id</th>
-            <th>Safe</th>
             {% elif title == 'Updates' %}
-            <th>Query</th>
+            <th>Filter</th>
             <th>Update</th>
             <th>Safe</th>
             <th>Multi</th>
@@ -68,33 +66,31 @@
                 <td {% if query.time > slow_query_limit %}style="color:red;" {% endif %}>
                 {{ query.time|round(3) }}</td>
                 <td>{{ query.size|round(2) }}Kb</td>
+                <td>{{ query.operation|title }}</td>
                 {% if title == "Queries" %}
                     {% set colspan = 10 %}
-                    <td>{{ query.operation|title }}</td>
                     <td>{{ query.collection }}</td>
-                    <td class="code">{% if query.query %}{{ query.query|safe }}{% endif %}</td>
+                    <td class="code">{% if query.query %}{{ query.query|pprint }}{% endif %}</td>
                     <td class="code">{% if query.ordering %}{{ query.ordering }}{% endif %}</td>
                     <td>{% if query.skip %}{{ query.skip }}{% endif %}</td>
                     <td>{% if query.limit %}{{ query.limit }}{% endif %}</td>
                     <td><a href="javascript:void(0);" class="mongo-toggle-data" data-row="mongo-data-{{ loop.index }}">Toggle</a></td>
                 {% elif title == "Inserts" %}
-                {% set colspan = 5 %}
-                <td class="code fifty"></pre>{{ query.document|safe }}</pre>
+                {% set colspan = 5   %}
+                <td class="code fifty"><pre>{{ query.document|pprint }}</pre>
                 </td>
-                <td>{{ query.safe }}</td>
                 {% elif title == 'Removes' %}
                 {% set colspan = 5 %}
                 <td class="code thirty">
-                    <pre>{{ query.spec_or_id|safe }}</pre>
+                    <pre>{{ query.spec_or_id|pprint }}</pre>
                 </td>
-                <td class="code thirty"><pre>{{ query.safe }}</pre></td>
                 {% elif title == 'Updates' %}
                 {% set colspan = 8 %}
                 <td class="code thirty">
-                    <pre>{{ query.spec|safe }}</pre>
+                    <pre>{{ query.flt|pprint }}</pre>
                 </td>
                 <td class="code thirty">
-                    <pre>{{ query.document|safe }}</pre>
+                    <pre>{{ query.upd|pprint }}</pre>
                 </td>
                 <td>{{ query.safe }}</td>
                 <td>{{ query.multi }}</td>
@@ -105,12 +101,12 @@
             {% if title == "Queries" %}
             <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }} mongo-data" id="mongo-data-{{ loop.index }}">
                 <td colspan="{{ colspan }}">
-                    <code><pre>{{ query.data|pprint }}</pre></code>
+                    <pre>{{ query.data|pprint }}</pre>
                 </td>
             </tr>
             {% endif %}
             <tr class="{{ loop.cycle('flDebugOdd','flDebugEven') }} mongo-stack-trace" id="mongo-{{  title|lower }}-{{ loop.index }}">
-                <td colspan="{{ colspan}} ">
+                <td colspan="{{ colspan }} ">
                     <table>
                         <thead>
                             <tr>
