@@ -37,9 +37,9 @@ class Pagination(object):
 
     def prev(self, error_out=False):
         """Returns a :class:`Pagination` object for the previous page."""
-        assert self.iterable is not None, (
-            "an object is required " "for this method to work"
-        )
+        assert (
+            self.iterable is not None
+        ), "an object is required for this method to work"
         iterable = self.iterable
         if isinstance(iterable, QuerySet):
             iterable._skip = None
@@ -58,9 +58,9 @@ class Pagination(object):
 
     def next(self, error_out=False):
         """Returns a :class:`Pagination` object for the next page."""
-        assert self.iterable is not None, (
-            "an object is required " "for this method to work"
-        )
+        assert (
+            self.iterable is not None
+        ), "an object is required for this method to work"
         iterable = self.iterable
         if isinstance(iterable, QuerySet):
             iterable._skip = None
@@ -154,9 +154,9 @@ class ListFieldPagination(Pagination):
 
     def prev(self, error_out=False):
         """Returns a :class:`Pagination` object for the previous page."""
-        assert self.items is not None, (
-            "a query object is required " "for this method to work"
-        )
+        assert (
+            self.items is not None
+        ), "a query object is required for this method to work"
         return self.__class__(
             self.queryset,
             self.doc_id,
@@ -168,9 +168,9 @@ class ListFieldPagination(Pagination):
 
     def next(self, error_out=False):
         """Returns a :class:`Pagination` object for the next page."""
-        assert self.items is not None, (
-            "a query object is required " "for this method to work"
-        )
+        assert (
+            self.items is not None
+        ), "a query object is required for this method to work"
         return self.__class__(
             self.queryset,
             self.doc_id,
