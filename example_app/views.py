@@ -8,6 +8,9 @@ def index():
     Todo.objects().delete()  # Removes
     Todo(title="Simple todo A", text="12345678910").save()  # Insert
     Todo(title="Simple todo B", text="12345678910").save()  # Insert
+    # Bulk insert
+    bulk = (Todo(title="Bulk 1"), Todo(title="Bulk 2"))
+    Todo.objects().insert(bulk)
     Todo.objects(title__contains="B").update(set__text="Hello world")  # Update
     todos = list(Todo.objects[:10])
     todos = Todo.objects.all()
