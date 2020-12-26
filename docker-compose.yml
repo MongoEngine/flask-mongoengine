@@ -4,7 +4,6 @@ volumes:
 
 services:
   mongo:
-    container_name: mongo
     image: mongo:4.4
     volumes:
       - db_data:/data/db/
@@ -15,13 +14,12 @@ services:
   flask:
     build:
       context: .
-      dockerfile: ./compose/flask/Dockerfile
+      dockerfile: ./example_app/compose/flask/Dockerfile
     depends_on:
       - mongo
-    container_name: flask
-    command: python app.py
+    command: python ./example_app/app.py
     ports:
       - 8000:8000
     volumes:
-      - ./:/app
+      - ./:/flask_mongoengine
     restart: always
