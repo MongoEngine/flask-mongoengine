@@ -43,9 +43,6 @@ updates = []
 removes = []
 response_sizes = []
 
-if sys.version_info >= (3, 0):
-    unicode = str
-
 
 # Wrap helpers._unpack_response for getting response size
 @functools.wraps(_original_methods["_unpack_response"])
@@ -581,13 +578,6 @@ def _tidy_stacktrace():
             hidden = True
         if not text:
             text = ""
-        else:
-            if sys.version_info >= (3, 0):
-                text = "".join(text).strip()
-            else:
-                try:
-                    text = unicode("".join(text).strip())
-                except Exception:
-                    pass
+        text = "".join(text).strip()
         trace.append((path, line_no, func_name, text, hidden))
     return trace, internal

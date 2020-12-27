@@ -1,5 +1,4 @@
 import datetime
-import sys
 import uuid
 
 from bson.tz_util import utc
@@ -7,9 +6,6 @@ from flask.sessions import SessionInterface, SessionMixin
 from werkzeug.datastructures import CallbackDict
 
 __all__ = ("MongoEngineSession", "MongoEngineSessionInterface")
-
-if sys.version_info >= (3, 0):
-    basestring = str
 
 
 class MongoEngineSession(CallbackDict, SessionMixin):
@@ -33,8 +29,8 @@ class MongoEngineSessionInterface(SessionInterface):
         :param collection: The session collection name defaults to "session"
         """
 
-        if not isinstance(collection, basestring):
-            raise ValueError("collection argument should be string or unicode")
+        if not isinstance(collection, str):
+            raise ValueError("Collection argument should be string")
 
         class DBSession(db.Document):
             sid = db.StringField(primary_key=True)
@@ -82,6 +78,8 @@ class MongoEngineSessionInterface(SessionInterface):
         domain = self.get_cookie_domain(app)
         httponly = self.get_cookie_httponly(app)
 
+        # If the session is modified to be empty, remove the cookie.
+        # If the session is empty, return without setting the cookie.
         if not session:
             if session.modified:
                 response.delete_cookie(app.session_cookie_name, domain=domain)
