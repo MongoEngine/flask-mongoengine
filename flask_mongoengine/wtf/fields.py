@@ -2,7 +2,6 @@
 Useful form fields for use with the mongoengine.
 """
 import json
-import sys
 from gettext import gettext as _
 
 from mongoengine.queryset import DoesNotExist
@@ -14,9 +13,6 @@ __all__ = (
     "ModelSelectField",
     "QuerySetSelectField",
 )
-
-if sys.version_info >= (3, 0):
-    unicode = str
 
 
 class QuerySetSelectField(SelectFieldBase):
@@ -171,10 +167,11 @@ class ModelSelectMultipleField(QuerySetSelectMultipleField):
 
 class JSONField(TextAreaField):
     def _value(self):
+        # TODO: Investigate why raw mentioned.
         if self.raw_data:
             return self.raw_data[0]
         else:
-            return self.data and unicode(json.dumps(self.data)) or ""
+            return self.data and json.dumps(self.data) or ""
 
     def process_formdata(self, value):
         if value:
