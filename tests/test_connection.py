@@ -1,5 +1,4 @@
 import mongoengine
-import pymongo
 import pytest
 from mongoengine.connection import ConnectionFailure
 from mongoengine.context_managers import switch_db
@@ -281,46 +280,27 @@ def test_multiple_connections(app):
         assert doc is not None
 
 
-def test_ignored_mongodb_prefix_config(app):
-    """Config starting by MONGODB_ but not used by flask-mongoengine
-    should be ignored.
-    """
+def test_incorrect_value_with_mongodb_prefix__should_trigger_mongoengine_raise(app):
     db = MongoEngine()
     app.config["MONGODB_HOST"] = "mongodb://localhost:27017/flask_mongoengine_test_db"
     # Invalid host, should trigger exception if used
     app.config["MONGODB_TEST_HOST"] = "dummy://localhost:27017/test"
-    db.init_app(app)
-
-    connection = mongoengine.get_connection()
-    mongo_engine_db = mongoengine.get_db()
-    assert isinstance(mongo_engine_db, Database)
-    assert isinstance(connection, MongoClient)
-    assert mongo_engine_db.name == "flask_mongoengine_test_db"
-    assert connection.HOST == "localhost"
-    assert connection.PORT == 27017
+    with pytest.raises(ConnectionFailure):
+        db.init_app(app)
 
 
 def test_connection_kwargs(app):
     """Make sure additional connection kwargs work."""
-
-    # Figure out whether to use "MAX_POOL_SIZE" or "MAXPOOLSIZE" based
-    # on PyMongo version (former was changed to the latter as described
-    # in https://jira.mongodb.org/browse/PYTHON-854)
-    # TODO remove once PyMongo < 3.0 support is dropped
-    if pymongo.version_tuple[0] >= 3:
-        MAX_POOL_SIZE_KEY = "MAXPOOLSIZE"
-    else:
-        MAX_POOL_SIZE_KEY = "MAX_POOL_SIZE"
 
     app.config["MONGODB_SETTINGS"] = {
         "ALIAS": "tz_aware_true",
         "DB": "flask_mongoengine_test_db",
         "TZ_AWARE": True,
         "READ_PREFERENCE": ReadPreference.SECONDARY,
-        MAX_POOL_SIZE_KEY: 10,
+        "MAXPOOLSIZE": 10,
     }
     db = MongoEngine(app)
 
-    assert db.connection.codec_options.tz_aware
-    # assert db.connection.max_pool_size == 10
-    assert db.connection.read_preference == ReadPreference.SECONDARY
+    assert db.connection["tz_aware_true"].codec_options.tz_aware
+    assert db.connection["tz_aware_true"].max_pool_size == 10
+    assert db.connection["tz_aware_true"].read_preference == ReadPreference.SECONDARY
