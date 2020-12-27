@@ -18,7 +18,7 @@ def current_mongoengine_instance():
             return k
 
 
-class MongoEngine(object):
+class MongoEngine:
     """Main class used for initialization of Flask-MongoEngine."""
 
     def __init__(self, app=None, config=None):
@@ -110,7 +110,7 @@ class MongoEngine(object):
         app.extensions["mongoengine"][self] = s
 
     @property
-    def connection(self):
+    def connection(self) -> dict:
         """
         Return MongoDB connection(s) associated with this MongoEngine
         instance.
