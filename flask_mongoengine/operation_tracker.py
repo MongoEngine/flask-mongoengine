@@ -18,7 +18,6 @@ __all__ = [
     "updates",
     "removes",
     "install_tracker",
-    "uninstall_tracker",
     "reset",
     "response_sizes",
 ]
@@ -486,33 +485,6 @@ def install_tracker():
         pymongo.command_cursor.CommandCursor._unpack_response = _unpack_response
 
 
-def uninstall_tracker():
-    if pymongo.collection.Collection.insert == _insert:
-        pymongo.collection.Collection.insert = _original_methods["insert"]
-    if pymongo.collection.Collection.insert_one == _insert_one:
-        pymongo.collection.Collection.insert_one = _original_methods["insert_one"]
-    if pymongo.collection.Collection.insert_many == _insert_many:
-        pymongo.collection.Collection.insert_many = _original_methods["insert_many"]
-    if pymongo.collection.Collection.update == _update:
-        pymongo.collection.Collection.update = _original_methods["update"]
-    if pymongo.collection.Collection.update_one == _update_one:
-        pymongo.collection.Collection.update_one = _original_methods["update_one"]
-    if pymongo.collection.Collection.update_many == _update_many:
-        pymongo.collection.Collection.update_many = _original_methods["update_many"]
-    if pymongo.collection.Collection.remove == _remove:
-        pymongo.collection.Collection.remove = _original_methods["remove"]
-    if pymongo.collection.Collection.delete_one == _delete_one:
-        pymongo.collection.Collection.delete_one = _original_methods["delete_one"]
-    if pymongo.collection.Collection.delete_many == _delete_many:
-        pymongo.collection.Collection.delete_many = _original_methods["delete_many"]
-    if pymongo.cursor.Cursor._refresh == _cursor_refresh:
-        pymongo.cursor.Cursor._refresh = _original_methods["cursor_refresh"]
-    if pymongo.command_cursor.CommandCursor._unpack_response == _unpack_response:
-        pymongo.command_cursor.CommandCursor._unpack_response = _original_methods[
-            "_unpack_response"
-        ]
-
-
 def reset():
     global queries, inserts, updates, removes, response_sizes
     queries = []
@@ -548,7 +520,8 @@ def _tidy_stacktrace():
             fname = sys._getframe(i).f_code.co_filename
             if ".html" in fname:
                 fnames.append(fname)
-        except Exception:
+        # Stack can have not enough frames
+        except ValueError:
             break
     fnames = list(set(fnames))
     trace = []

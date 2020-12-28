@@ -18,10 +18,7 @@ def _maybe_patch_jinja_loader(jinja_env):
 
 
 class MongoDebugPanel(DebugPanel):
-    """Panel that shows information about MongoDB operations (including stack)
-
-    Adapted from https://github.com/hmarr/django-debug-toolbar-mongo
-    """
+    """Panel that shows information about MongoDB operations."""
 
     name = "MongoDB"
     has_content = True
@@ -34,33 +31,38 @@ class MongoDebugPanel(DebugPanel):
     def process_request(self, request):
         operation_tracker.reset()
 
-    def nav_title(self):
-        return "MongoDB"
+    def nav_title(self) -> str:
+        return self.name
 
-    def nav_subtitle(self):
-        attrs = ["queries", "inserts", "updates", "removes"]
-        ops = sum(
-            sum((1 for o in getattr(operation_tracker, a) if not o["internal"]))
-            for a in attrs
-        )
-        total_time = sum(
-            sum(o["time"] for o in getattr(operation_tracker, a)) for a in attrs
-        )
-        return "{0} operations in {1:.2f}ms".format(ops, total_time)
+    def nav_subtitle(self) -> str:
+        """Count operations and total time, excluding any toolbar related operations."""
+        total_time = 0
+        operations_count = 0
+        for query_type in {"queries", "inserts", "updates", "removes"}:
+            for operation in getattr(operation_tracker, query_type):
+                if operation.get("internal", False):
+                    continue
 
-    def title(self):
+                operations_count += 1
+                total_time += operation.get("time", 0)
+
+        return "{0} operations in {1:.2f}ms".format(operations_count, total_time)
+
+    def title(self) -> str:
         return "MongoDB Operations"
 
-    def url(self):
+    def url(self) -> str:
         return ""
 
     def content(self):
-        context = self.context.copy()
-        context["queries"] = operation_tracker.queries
-        context["inserts"] = operation_tracker.inserts
-        context["updates"] = operation_tracker.updates
-        context["removes"] = operation_tracker.removes
-        context["slow_query_limit"] = current_app.config.get(
-            "MONGO_DEBUG_PANEL_SLOW_QUERY_LIMIT", 100
-        )
+        """Gather all template required variables in one dict."""
+        context = {
+            "queries": operation_tracker.queries,
+            "inserts": operation_tracker.inserts,
+            "updates": operation_tracker.updates,
+            "removes": operation_tracker.removes,
+            "slow_query_limit": current_app.config.get(
+                "MONGO_DEBUG_PANEL_SLOW_QUERY_LIMIT", 100
+            ),
+        }
         return self.render("panels/mongo-panel.html", context)
