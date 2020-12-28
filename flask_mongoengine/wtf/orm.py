@@ -56,7 +56,9 @@ class ModelConverter(object):
             kwargs.update(field_args)
 
         if kwargs["validators"]:
-            # Create a copy of the list since we will be modifying it.
+            # Create a copy of the list since we will be modifying it, and if
+            # validators set as shared list between fields - duplicates/conflicts may
+            # be created.
             kwargs["validators"] = list(kwargs["validators"])
 
         if field.required:
@@ -78,8 +80,6 @@ class ModelConverter(object):
             if radio_field:
                 return f.RadioField(**kwargs)
             return f.SelectField(**kwargs)
-
-        ftype = type(field).__name__
 
         if hasattr(field, "to_form_field"):
             return field.to_form_field(model, kwargs)

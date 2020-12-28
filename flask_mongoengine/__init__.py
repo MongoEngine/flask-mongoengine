@@ -70,13 +70,12 @@ def _include_mongoengine(obj):
     """
     # TODO why do we need this? What's wrong with importing from the
     # original modules?
-    for module in (mongoengine, mongoengine.fields):
-        for attr_name in module.__all__:
-            if not hasattr(obj, attr_name):
-                setattr(obj, attr_name, getattr(module, attr_name))
+    for attr_name in mongoengine.__all__:
+        if not hasattr(obj, attr_name):
+            setattr(obj, attr_name, getattr(mongoengine, attr_name))
 
-                # patch BaseField if available
-                _patch_base_field(obj, attr_name)
+            # patch BaseField if available
+            _patch_base_field(obj, attr_name)
 
 
 def current_mongoengine_instance():
