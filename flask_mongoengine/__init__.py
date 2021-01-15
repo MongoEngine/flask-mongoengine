@@ -125,10 +125,10 @@ class MongoEngine(object):
 
         if not self.config:
             # If no configs passed, use app.config.
-            config = app.config
+            self.config = app.config
 
         # Obtain db connection(s)
-        connections = create_connections(config)
+        connections = create_connections(self.config)
 
         # Store objects in application instance so that multiple apps do not
         # end up accessing the same objects.
