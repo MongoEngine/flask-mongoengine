@@ -13,10 +13,9 @@ class ModelForm(FlaskForm):
         super(ModelForm, self).__init__(formdata, **kwargs)
 
     def save(self, commit=True, **kwargs):
-        if self.instance:
-            self.populate_obj(self.instance)
-        else:
-            self.instance = self.model_class(**self.data)
+        if not self.instance:
+            self.instance = self.model_class()
+        self.populate_obj(self.instance)
 
         if commit:
             self.instance.save(**kwargs)
