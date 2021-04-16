@@ -147,7 +147,7 @@ class MongoEngine(object):
 class BaseQuerySet(QuerySet):
     """Mongoengine's queryset extended with handy extras."""
 
-    def get_or_404(self, *args, **kwargs):
+    def get_or_404(self, *args, message_404=None, **kwargs):
         """
         Get a document and raise a 404 Not Found error if it doesn't
         exist.
@@ -155,8 +155,7 @@ class BaseQuerySet(QuerySet):
         try:
             return self.get(*args, **kwargs)
         except DoesNotExist:
-            message = kwargs.get("message", None)
-            abort(404, message) if message else abort(404)
+            abort(404, message_404) if message_404 else abort(404)
 
     def first_or_404(self, message=None):
         """Same as get_or_404, but uses .first, not .get."""
