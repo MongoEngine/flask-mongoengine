@@ -1,9 +1,16 @@
-from datetime import timedelta, datetime
+"""MongoDB Session Interface"""
+import typing as t
+from datetime import datetime, timedelta
 import uuid
 
 from bson.tz_util import utc
 from flask.sessions import SessionInterface, SessionMixin
 from werkzeug.datastructures import CallbackDict
+
+# Type checking
+if t.TYPE_CHECKING:
+    from flask.app import Flask
+    from flask.wrappers import Request, Response
 
 __all__ = ("MongoEngineSession", "MongoEngineSessionInterface")
 
@@ -49,52 +56,67 @@ class MongoEngineSessionInterface(SessionInterface):
 
         self.cls = DBSession
 
-    def get_expiration_time(self, app, session) -> timedelta:
+    def get_expiration_time(self, app: "Flask", session: SessionMixin) -> datetime:
+        now = datetime.utcnow().replace(tzinfo=utc)
         if session.permanent:
-            return app.permanent_session_lifetime
+            return now + app.permanent_session_lifetime
         # Fallback to 1 day session ttl, if SESSION_TTL not set.
-        return timedelta(**app.config.get("SESSION_TTL", {"days": 1}))
+        return now + timedelta(**app.config.get("SESSION_TTL", {"days": 1}))
 
-    def open_session(self, app, request):
-        sid = request.cookies.get(app.session_cookie_name)
-        if sid:
-            stored_session = self.cls.objects(sid=sid).first()
-
-            if stored_session:
-                expiration = stored_session.expiration
-
-                if not expiration.tzinfo:
-                    expiration = expiration.replace(tzinfo=utc)
-
-                if expiration > datetime.utcnow().replace(tzinfo=utc):
-                    return MongoEngineSession(
-                        initial=stored_session.data, sid=stored_session.sid
-                    )
-
+    def open_session(self, app: "Flask", request: "Request") -> MongoEngineSession:
+        val = request.cookies.get(self.get_cookie_name(app))
+        if not val:
+            return MongoEngineSession(sid=str(uuid.uuid4()))
+        stored_session = self.cls.objects(sid=val).first()
+        if not stored_session:
+            return MongoEngineSession(sid=str(uuid.uuid4()))
+        expiration = stored_session.expiration
+        if not expiration.tzinfo:
+            expiration = expiration.replace(tzinfo=utc)
+        if expiration > datetime.utcnow().replace(tzinfo=utc):
+            return MongoEngineSession(
+                initial=stored_session.data, sid=stored_session.sid
+            )
         return MongoEngineSession(sid=str(uuid.uuid4()))
 
-    def save_session(self, app, session, response):
+    def save_session(  # type: ignore[override]
+        self, app: "Flask", session: MongoEngineSession, response: "Response"
+    ):
+        name = self.get_cookie_name(app)
         domain = self.get_cookie_domain(app)
-        httponly = self.get_cookie_httponly(app)
+        path = self.get_cookie_path(app)
+        secure = self.get_cookie_secure(app)
+        samesite = self.get_cookie_samesite(app)
 
         # If the session is modified to be empty, remove the cookie.
         # If the session is empty, return without setting the cookie.
         if not session:
             if session.modified:
-                response.delete_cookie(app.session_cookie_name, domain=domain)
+                response.delete_cookie(
+                    name, domain=domain, path=path, secure=secure, samesite=samesite
+                )
             return
 
-        expiration = datetime.utcnow().replace(tzinfo=utc) + self.get_expiration_time(
-            app, session
-        )
+        # Add a "Vary: Cookie" header if the session was accessed at all.
+        if session.accessed:
+            response.vary.add("Cookie")
+
+        if not self.should_set_cookie(app, session):
+            return
+
+        httponly = self.get_cookie_httponly(app)
+        expires = self.get_expiration_time(app, session)
 
         if session.modified:
-            self.cls(sid=session.sid, data=session, expiration=expiration).save()
+            self.cls(sid=session.sid, data=session, expiration=expires).save()
 
         response.set_cookie(
-            app.session_cookie_name,
-            session.sid,
-            expires=expiration,
+            key=name,
+            value=session.sid,
+            expires=expires,
             httponly=httponly,
             domain=domain,
+            path=path,
+            secure=secure,
+            samesite=samesite,
         )
