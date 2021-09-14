@@ -1,6 +1,6 @@
 import flask
 import pytest
-from bson import ObjectId
+from bson import ObjectId, DBRef
 
 
 @pytest.fixture(autouse=True)
@@ -22,6 +22,14 @@ def setup_endpoints(app, todo):
     def show(id):
         return flask.jsonify(result=Todo.objects.get_or_404(id=id))
 
+    @app.route("/object_id")
+    def object_id():
+        return flask.jsonify(result=ObjectId())
+
+    @app.route("/dbref")
+    def dbref():
+        return flask.jsonify(result=DBRef('Todo', ObjectId()))
+
 
 def test_with_id(app, todo):
     Todo = todo
@@ -30,6 +38,12 @@ def test_with_id(app, todo):
     assert response.status_code == 404
 
     response = client.post("/add", data={"title": "First Item", "text": "The text"})
+    assert response.status_code == 200
+
+    response = client.get("/dbref")
+    assert response.status_code == 200
+
+    response = client.get("/object_id")
     assert response.status_code == 200
 
     response = client.get("/show/%s/" % Todo.objects.first().id)
