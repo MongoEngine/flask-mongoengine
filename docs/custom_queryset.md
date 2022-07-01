@@ -16,7 +16,6 @@ Examples:
 # 404 if object doesn't exist
 def view_todo(todo_id):
     todo = Todo.objects.get_or_404(_id=todo_id)
-..
 
 # Paginate through todo
 def view_todos(page=1):
