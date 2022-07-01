@@ -35,15 +35,15 @@ class QuerySetSelectField(SelectFieldBase):
     widget = widgets.Select()
 
     def __init__(
-            self,
-            label="",
-            validators=None,
-            queryset=None,
-            label_attr="",
-            allow_blank=False,
-            blank_text="---",
-            label_modifier=None,
-            **kwargs,
+        self,
+        label="",
+        validators=None,
+        queryset=None,
+        label_attr="",
+        allow_blank=False,
+        blank_text="---",
+        label_modifier=None,
+        **kwargs,
     ):
 
         super(QuerySetSelectField, self).__init__(label, validators, **kwargs)
@@ -102,14 +102,14 @@ class QuerySetSelectMultipleField(QuerySetSelectField):
     widget = widgets.Select(multiple=True)
 
     def __init__(
-            self,
-            label="",
-            validators=None,
-            queryset=None,
-            label_attr="",
-            allow_blank=False,
-            blank_text="---",
-            **kwargs,
+        self,
+        label="",
+        validators=None,
+        queryset=None,
+        label_attr="",
+        allow_blank=False,
+        blank_text="---",
+        **kwargs,
     ):
 
         super(QuerySetSelectMultipleField, self).__init__(
