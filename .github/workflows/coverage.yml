@@ -1,4 +1,4 @@
-name: Send Coverage to different analitic engines
+name: Send Coverage to different analytic engines
 # Only for last versions of python and mongo
 
 on:
