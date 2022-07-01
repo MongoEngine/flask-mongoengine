@@ -15,6 +15,7 @@ You can also use `WTForms <http://wtforms.simplecodes.com/>`_ as model forms for
    wtf_forms
    session_interface
    debug_toolbar
+   example_app
    api/index
    AUTHORS
    changelog

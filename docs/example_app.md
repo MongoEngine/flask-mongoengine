@@ -1,4 +1,4 @@
-# Sample app
+# Example app
 
 A simple multi file app - to help get you started.
 
@@ -12,3 +12,7 @@ Usage:
 3. Open `http://localhost:8000/` to check the app.
 4. Hit `ctrl+c` in terminal window to stop docker-compose.
 5. You can use this app for live flask-mongoengine development and testing.
+
+```{note}
+Example app files located in ``example_app`` directory.
+```
