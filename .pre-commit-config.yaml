@@ -40,3 +40,7 @@ repos:
       - id: markdownlint
         args: [-f]
         exclude: ^(.github|tests)
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
