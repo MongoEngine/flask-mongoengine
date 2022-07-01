@@ -1,4 +1,4 @@
-from bson import json_util
+from bson import DBRef, ObjectId, json_util
 from flask.json import JSONEncoder
 from mongoengine.base import BaseDocument
 from mongoengine.queryset import QuerySet
@@ -16,6 +16,10 @@ def _make_encoder(superclass):
                 return json_util._json_convert(obj.to_mongo())
             elif isinstance(obj, QuerySet):
                 return json_util._json_convert(obj.as_pymongo())
+            elif isinstance(obj, DBRef):
+                return obj.id
+            elif isinstance(obj, ObjectId):
+                return obj.__str__()
             return superclass.default(self, obj)
 
     return MongoEngineJSONEncoder
