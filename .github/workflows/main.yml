@@ -31,13 +31,13 @@ jobs:
             python: "3.10"
             tox_env: "py310"
           - name: "ubuntu-pypy3"
-            python: "pypy3"
+            python: "pypy3.7"
             tox_env: "pypy3"
 
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
     - name: Install dependencies
