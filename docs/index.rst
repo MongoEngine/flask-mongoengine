@@ -18,3 +18,4 @@ You can also use `WTForms <http://wtforms.simplecodes.com/>`_ as model forms for
    api/index
    credits
    changelog
+   LICENSE
