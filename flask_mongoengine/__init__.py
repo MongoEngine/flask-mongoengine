@@ -145,7 +145,7 @@ class MongoEngine(object):
 
 
 class BaseQuerySet(QuerySet):
-    """Extends :class:`mongoengine.QuerySet` class with handly methods."""
+    """Extends :class:`~mongoengine.queryset.QuerySet` class with handly methods."""
 
     def _abort_404(self, _message_404):
         """Returns 404 error with message, if message provided.
@@ -158,9 +158,11 @@ class BaseQuerySet(QuerySet):
         """Get a document and raise a 404 Not Found error if it doesn't exist.
 
         :param _message_404: Message for 404 comment, not forwarded to
-            :func:`~QuerySet.get`
-        :param args: args list, silently forwarded to :func:`~QuerySet.get`
-        :param kwargs: keywords arguments, silently forwarded to :func:`~QuerySet.get`
+            :func:`~mongoengine.queryset.QuerySet.get`
+        :param args: args list, silently forwarded to
+            :func:`~mongoengine.queryset.QuerySet.get`
+        :param kwargs: keywords arguments, silently forwarded to
+            :func:`~mongoengine.queryset.QuerySet.get`
         """
         try:
             return self.get(*args, **kwargs)
@@ -168,11 +170,13 @@ class BaseQuerySet(QuerySet):
             self._abort_404(_message_404)
 
     def first_or_404(self, _message_404=None):
-        """Same as :func:`~BaseQuerySet.get_or_404`, but uses
-        :func:`~BaseQuerySet.first`, not :func:`~QuerySet.get`.
+        """
+        Same as :func:`~BaseQuerySet.get_or_404`, but uses
+        :func:`~mongoengine.queryset.QuerySet.first`, not
+        :func:`~mongoengine.queryset.QuerySet.get`.
 
         :param _message_404: Message for 404 comment, not forwarded to
-            :func:`~QuerySet.get`
+            :func:`~mongoengine.queryset.QuerySet.get`
         """
         return self.first() or self._abort_404(_message_404)
 

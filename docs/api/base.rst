@@ -63,4 +63,4 @@ Module contents
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
+   :private-members: _abort_404
