@@ -7,7 +7,7 @@ from flask_mongoengine import ListFieldPagination, Pagination
 def test_queryset_paginator(app, todo):
     Todo = todo
     for i in range(42):
-        Todo(title="post: %s" % i).save()
+        Todo(title=f"post: {i}").save()
 
     with pytest.raises(NotFound):
         Pagination(iterable=Todo.objects, page=0, per_page=10)
@@ -33,7 +33,7 @@ def test_paginate_plain_list():
 def test_list_field_pagination(app, todo):
     Todo = todo
 
-    comments = ["comment: %s" % i for i in range(42)]
+    comments = [f"comment: {i}" for i in range(42)]
     todo = Todo(
         title="todo has comments",
         comments=comments,

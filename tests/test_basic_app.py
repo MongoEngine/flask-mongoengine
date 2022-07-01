@@ -27,12 +27,12 @@ def setup_endpoints(app, todo):
 def test_with_id(app, todo):
     Todo = todo
     client = app.test_client()
-    response = client.get("/show/%s/" % ObjectId())
+    response = client.get(f"/show/{ObjectId()}/")
     assert response.status_code == 404
 
     client.post("/add", data={"title": "First Item", "text": "The text"})
 
-    response = client.get("/show/%s/" % Todo.objects.first_or_404().id)
+    response = client.get(f"/show/{Todo.objects.first_or_404().id}/")
     assert response.status_code == 200
     assert response.data.decode("utf-8") == "First Item\nThe text"
 
