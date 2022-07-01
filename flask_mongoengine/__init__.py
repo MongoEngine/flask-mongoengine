@@ -145,23 +145,40 @@ class MongoEngine(object):
 
 
 class BaseQuerySet(QuerySet):
-    """Mongoengine's queryset extended with handy extras."""
+    """Extends :class:`~mongoengine.queryset.QuerySet` class with handly methods."""
 
-    def get_or_404(self, *args, **kwargs):
+    def _abort_404(self, _message_404):
+        """Returns 404 error with message, if message provided.
+
+        :param _message_404: Message for 404 comment
         """
-        Get a document and raise a 404 Not Found error if it doesn't
-        exist.
+        abort(404, _message_404) if _message_404 else abort(404)
+
+    def get_or_404(self, *args, _message_404=None, **kwargs):
+        """Get a document and raise a 404 Not Found error if it doesn't exist.
+
+        :param _message_404: Message for 404 comment, not forwarded to
+            :func:`~mongoengine.queryset.QuerySet.get`
+        :param args: args list, silently forwarded to
+            :func:`~mongoengine.queryset.QuerySet.get`
+        :param kwargs: keywords arguments, silently forwarded to
+            :func:`~mongoengine.queryset.QuerySet.get`
         """
         try:
             return self.get(*args, **kwargs)
         except DoesNotExist:
-            message = kwargs.get("message", None)
-            abort(404, message) if message else abort(404)
+            self._abort_404(_message_404)
 
-    def first_or_404(self, message=None):
-        """Same as get_or_404, but uses .first, not .get."""
-        obj = self.first()
-        return obj if obj else abort(404, message) if message else abort(404)
+    def first_or_404(self, _message_404=None):
+        """
+        Same as :func:`~BaseQuerySet.get_or_404`, but uses
+        :func:`~mongoengine.queryset.QuerySet.first`, not
+        :func:`~mongoengine.queryset.QuerySet.get`.
+
+        :param _message_404: Message for 404 comment, not forwarded to
+            :func:`~mongoengine.queryset.QuerySet.get`
+        """
+        return self.first() or self._abort_404(_message_404)
 
     def paginate(self, page, per_page, **kwargs):
         """
