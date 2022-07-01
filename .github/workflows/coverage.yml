@@ -24,7 +24,7 @@ jobs:
             tox_env: "py38"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v1
       with:
@@ -34,17 +34,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install tox virtualenv
     - name: Start MongoDB
-      uses: supercharge/mongodb-github-action@1.3.0
+      uses: supercharge/mongodb-github-action@1.7.0
       with:
         mongodb-version: ${{ matrix.mongodb-version }}
     - name: Test build
       run: "tox -e ${{ matrix.tox_env }} -- --cov-report=xml --cov-report=html"
     - name: Send coverage report to codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
       with:
         file: ./coverage.xml
     - name: Send coverage report to codeclimate
-      uses: paambaati/codeclimate-action@v2.6.0
+      uses: paambaati/codeclimate-action@v3.0.0
       with:
         coverageCommand: echo "Ignore rerun"
         coverageLocations: ${{github.workspace}}/coverage.xml:coverage.py
