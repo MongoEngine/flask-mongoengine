@@ -60,13 +60,14 @@ def _sanitize_settings(settings):
     # Add various default values.
     resolved_settings["alias"] = resolved_settings.get(
         "alias", mongoengine.DEFAULT_CONNECTION_NAME
-    )  # TODO do we have to specify it here? MongoEngine should take care of that
-    resolved_settings["host"] = resolved_settings.get(
-        "host", "localhost"
-    )  # TODO this is the default host in pymongo.mongo_client.MongoClient, we may not need to explicitly set a default here
-    resolved_settings["port"] = resolved_settings.get(
-        "port", 27017
-    )  # TODO this is the default port in pymongo.mongo_client.MongoClient, we may not need to explicitly set a default here
+    )
+    # TODO do we have to specify it here? MongoEngine should take care of that
+    resolved_settings["host"] = resolved_settings.get("host", "localhost")
+    # TODO this is the default host in pymongo.mongo_client.MongoClient, we may
+    #  not need to explicitly set a default here
+    resolved_settings["port"] = resolved_settings.get("port", 27017)
+    # TODO this is the default port in pymongo.mongo_client.MongoClient, we may
+    #  not need to explicitly set a default here
 
     # Default to ReadPreference.PRIMARY if no read_preference is supplied
     resolved_settings["read_preference"] = resolved_settings.get(
@@ -86,7 +87,7 @@ def get_connection_settings(config):
     Given a config dict, return a sanitized dict of MongoDB connection
     settings that we can then use to establish connections. For new
     applications, settings should exist in a "MONGODB_SETTINGS" key, but
-    for backward compactibility we also support several config keys
+    for backward compatibility we also support several config keys
     prefixed by "MONGODB_", e.g. "MONGODB_HOST", "MONGODB_PORT", etc.
     """
     # Sanitize all the settings living under a "MONGODB_SETTINGS" config var
@@ -96,22 +97,12 @@ def get_connection_settings(config):
         # If MONGODB_SETTINGS is a list of settings dicts, sanitize each
         # dict separately.
         if isinstance(settings, list):
-            # List of connection settings.
-            settings_list = []
-            for setting in settings:
-                settings_list.append(_sanitize_settings(setting))
-            return settings_list
-
-        # Otherwise, it should be a single dict describing a single connection.
+            return [_sanitize_settings(setting) for setting in settings]
         else:
             return _sanitize_settings(settings)
 
-    # If "MONGODB_SETTINGS" doesn't exist, sanitize the "MONGODB_" keys
-    # as if they all describe a single connection.
     else:
-        config = dict(
-            (k, v) for k, v in config.items() if k in MONGODB_CONF_VARS
-        )  # ugly dict comprehention in order to support python 2.6
+        config = {k: v for k, v in config.items() if k in MONGODB_CONF_VARS}
         return _sanitize_settings(config)
 
 
@@ -142,7 +133,7 @@ def create_connections(config):
 
 def _connect(conn_settings):
     """Given a dict of connection settings, create a connection to
-    MongoDB by calling mongoengine.connect and return its result.
+    MongoDB by calling {func}`mongoengine.connect` and return its result.
     """
     db_name = conn_settings.pop("name")
     return mongoengine.connect(db_name, **conn_settings)
