@@ -86,7 +86,7 @@ class ModelConverter(object):
 
         if hasattr(field, "field") and type(field.field) == ReferenceField:
             kwargs["label_modifier"] = getattr(
-                model, field.name + "_label_modifier", None
+                model, f"{field.name}_label_modifier", None
             )
 
         if ftype in self.converters:
@@ -298,4 +298,4 @@ def model_form(
     """
     field_dict = model_fields(model, only, exclude, field_args, converter)
     field_dict["model_class"] = model
-    return type(model.__name__ + "Form", (base_class,), field_dict)
+    return type(f"{model.__name__}Form", (base_class,), field_dict)
