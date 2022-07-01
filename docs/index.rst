@@ -16,6 +16,6 @@ You can also use `WTForms <http://wtforms.simplecodes.com/>`_ as model forms for
    session_interface
    debug_toolbar
    api/index
-   credits
+   AUTHORS
    changelog
    LICENSE
