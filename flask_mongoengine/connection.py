@@ -86,9 +86,9 @@ def get_connection_settings(config):
     """
     Given a config dict, return a sanitized dict of MongoDB connection
     settings that we can then use to establish connections. For new
-    applications, settings should exist in a "MONGODB_SETTINGS" key, but
+    applications, settings should exist in a ``MONGODB_SETTINGS`` key, but
     for backward compatibility we also support several config keys
-    prefixed by "MONGODB_", e.g. "MONGODB_HOST", "MONGODB_PORT", etc.
+    prefixed by ``MONGODB_``, e.g. ``MONGODB_HOST``, ``MONGODB_PORT``, etc.
     """
     # Sanitize all the settings living under a "MONGODB_SETTINGS" config var
     if "MONGODB_SETTINGS" in config:
