@@ -1,7 +1,6 @@
 import mongoengine
 from pymongo import ReadPreference, uri_parser
 
-
 __all__ = (
     "create_connections",
     "get_connection_settings",

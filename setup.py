@@ -1,6 +1,6 @@
 import os
-from setuptools import setup
 
+from setuptools import setup
 
 description = (
     "Flask-MongoEngine is a Flask extension "
