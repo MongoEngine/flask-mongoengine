@@ -244,6 +244,7 @@ intersphinx_mapping = {
     "flask": ("https://flask.palletsprojects.com/en/2.1.x/", None),
     "werkzeug": ("https://werkzeug.palletsprojects.com/en/2.1.x/", None),
     "pymongo": ("https://pymongo.readthedocs.io/en/stable/", None),
+    "mongoengine": ("https://docs.mongoengine.org/", None),
 }
 myst_enable_extensions = [
     "tasklist",
@@ -251,3 +252,4 @@ myst_enable_extensions = [
     "fieldlist",
 ]
 myst_heading_anchors = 3
+suppress_warnings=["autodoc"]
