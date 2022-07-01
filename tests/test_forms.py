@@ -355,6 +355,19 @@ def test_modelradiofield(app, db):
         assert form.answer.choices == choices
 
 
+def test_filefield(app, db):
+    with app.test_request_context("/"):
+
+        class FileUpload(db.Document):
+            file = db.FileField()
+
+        FileUploadForm = model_form(FileUpload)
+
+        form = FileUploadForm(file=None)
+
+        assert isinstance(form.file.widget, wtforms.widgets.FileInput)
+
+
 def test_passwordfield(app, db):
     with app.test_request_context("/"):
 
