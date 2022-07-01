@@ -11,6 +11,7 @@
 
 import sys
 import os
+import flask_mongoengine
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -41,7 +42,6 @@ source_suffix = {
     ".md": "markdown",
 }
 
-
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
 
@@ -56,7 +56,6 @@ copyright = "2010-2020, Streetlife and others"
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-import flask_mongoengine  # noqa
 
 # The short X.Y version.
 version = flask_mongoengine.__version__
@@ -132,7 +131,10 @@ html_theme = "sphinx_rtd_theme"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-
+html_css_files = [
+    "css/custom.css",
+]
+html_style = "css/custom.css"
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 # html_last_updated_fmt = '%b %d, %Y'
@@ -238,6 +240,9 @@ man_pages = [
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
+    "flask": ("https://flask.palletsprojects.com/en/2.1.x/", None),
+    "werkzeug": ("https://werkzeug.palletsprojects.com/en/2.1.x/", None),
+    "pymongo": ("https://pymongo.readthedocs.io/en/stable/", None),
 }
 myst_enable_extensions = [
     "tasklist",
