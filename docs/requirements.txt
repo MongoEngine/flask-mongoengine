@@ -4,3 +4,5 @@ sphinx-autobuild>=2021.3.14
 Sphinx>=4.5.0
 sphinxcontrib-apidoc>=0.3.0
 sphinx-autodoc-typehints>=1.18.2
+pymongo>=3.10.1,<4.0.0
+Flask-DebugToolbar>=0.13.1
