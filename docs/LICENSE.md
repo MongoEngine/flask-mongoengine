@@ -1,6 +1,7 @@
-Copyright (c) 2010-2016 See AUTHORS.
+# BSD 3-Clause License
 
-Some rights reserved.
+Copyright (c) 2010-2022, the respective contributors, as shown by
+the [docs/credits.md](credits.md) file.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are

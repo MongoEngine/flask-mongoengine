@@ -1,7 +1,6 @@
 include MANIFEST.in
 include README.rst
-include LICENSE
-include AUTHORS
+include LICENSE.md
 recursive-include flask_mongoengine/templates *.html
 recursive-include docs *
 recursive-exclude docs *.pyc
