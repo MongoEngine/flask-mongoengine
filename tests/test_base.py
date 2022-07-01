@@ -1,6 +1,7 @@
 """Tests for base MongoEngine class."""
-from flask_mongoengine import MongoEngine
 import pytest
+
+from flask_mongoengine import MongoEngine
 
 
 def test_mongoengine_class__should_raise_type_error__if_config_not_dict():
