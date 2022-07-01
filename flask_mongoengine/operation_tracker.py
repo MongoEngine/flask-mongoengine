@@ -547,7 +547,7 @@ def _tidy_stacktrace():
         hidden = False
         if func_name == "<genexpr>":
             hidden = True
-        if any([p for p in paths if p in s_path]):
+        if any(p for p in paths if p in s_path):
             hidden = True
         if not text:
             text = ""
