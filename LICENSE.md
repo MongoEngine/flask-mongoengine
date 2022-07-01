@@ -1,7 +1,7 @@
 # BSD 3-Clause License
 
 Copyright (c) 2010-2022, the respective contributors, as shown by
-the [docs/credits.md](credits.md) file.
+the [AUTHORS.md](AUTHORS.md) file.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
