@@ -5,7 +5,7 @@ from views import index, pagination
 
 app = flask.Flask(__name__)
 app.config.from_object(__name__)
-app.config["MONGODB_SETTINGS"] = {"DB": "testing"}
+app.config["MONGODB_SETTINGS"] = {"DB": "testing", "host": "mongo"}
 app.config["TESTING"] = True
 app.config["SECRET_KEY"] = "flask+mongoengine=<3"
 app.debug = True
@@ -29,4 +29,4 @@ app.add_url_rule("/", view_func=index)
 app.add_url_rule("/pagination", view_func=pagination)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=4000)
+    app.run(host="0.0.0.0", port=8000)
