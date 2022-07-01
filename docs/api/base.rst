@@ -54,7 +54,13 @@ flask_mongoengine.sessions module
 Module contents
 ---------------
 
+.. note::
+   Parent `mongoengine <https://docs.mongoengine.org/>`_ project docs/docstrings has
+   some formatting issues. If class/function/method link not clickable, search on
+   provided parent documentation manually.
+
 .. automodule:: flask_mongoengine
    :members:
    :undoc-members:
    :show-inheritance:
+   :private-members:
