@@ -18,9 +18,6 @@ jobs:
       matrix:
         mongodb-version: [3.6, 4.0, 4.2, 4.4]
         include:
-          - name: "ubuntu-py36"
-            python: "3.6"
-            tox_env: "py36"
           - name: "ubuntu-py37"
             python: "3.7"
             tox_env: "py37"
@@ -30,6 +27,9 @@ jobs:
           - name: "ubuntu-py39"
             python: "3.9"
             tox_env: "py39"
+          - name: "ubuntu-py310"
+            python: "3.10"
+            tox_env: "py310"
           - name: "ubuntu-pypy3"
             python: "pypy3"
             tox_env: "pypy3"
