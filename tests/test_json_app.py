@@ -1,6 +1,6 @@
 import flask
 import pytest
-from bson import ObjectId, DBRef
+from bson import DBRef, ObjectId
 
 
 @pytest.fixture(autouse=True)
@@ -28,7 +28,7 @@ def setup_endpoints(app, todo):
 
     @app.route("/dbref")
     def dbref():
-        return flask.jsonify(result=DBRef('Todo', ObjectId()))
+        return flask.jsonify(result=DBRef("Todo", ObjectId()))
 
 
 def test_with_id(app, todo):
@@ -39,7 +39,7 @@ def test_with_id(app, todo):
 
     response = client.post("/add", data={"title": "First Item", "text": "The text"})
     assert response.status_code == 200
-    
+
     response = client.get("/dbref")
     assert response.status_code == 200
 
