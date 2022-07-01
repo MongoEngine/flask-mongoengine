@@ -526,3 +526,23 @@ def test_form_label_modifier(app, db):
         form = FoodStoreForm()
 
         assert [obj.label.text for obj in form.food_items] == fruit_names
+
+
+def test_csrf_token(app, db):
+    # fixes MongoEngine/flask-mongoengine#436
+    app.config["WTF_CSRF_ENABLED"] = True
+    with app.test_request_context("/"):
+
+        class DummyCSRF(wtforms.csrf.core.CSRF):
+            def generate_csrf_token(self, csrf_token_field):
+                return "dummytoken"
+
+        class MyModel(db.Document):
+            pass
+
+        form = model_form(MyModel)(
+            MultiDict({"csrf_token": "dummytoken"}), meta={"csrf_class": DummyCSRF}
+        )
+        assert "csrf_token" in form
+        assert form.validate()
+        form.save()
