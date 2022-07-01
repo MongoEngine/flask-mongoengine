@@ -45,6 +45,7 @@ jobs:
         file: ./coverage.xml
     - name: Send coverage report to codeclimate
       uses: paambaati/codeclimate-action@v3.0.0
+      continue-on-error: true
       with:
         coverageCommand: echo "Ignore rerun"
         coverageLocations: ${{github.workspace}}/coverage.xml:coverage.py
