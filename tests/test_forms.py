@@ -65,21 +65,19 @@ def test_emailfield(app, db):
 
         EmailForm = model_form(Email)
         form = EmailForm(instance=Email())
-        assert "None" not in "%s" % form.email
+        assert "None" not in f"{form.email}"
         assert form.validate()
 
         form = EmailForm(MultiDict({"email": ""}))
-        assert "None" not in "%s" % form.email
+        assert "None" not in f"{form.email}"
         assert form.validate()
-
-        # Ensure required works
 
         class Email(db.Document):
             email = db.EmailField(required=True)
 
         EmailForm = model_form(Email)
         form = EmailForm(MultiDict({"email": ""}))
-        assert "None" not in "%s" % form.email
+        assert "None" not in f"{form.email}"
         assert not form.validate()
 
 

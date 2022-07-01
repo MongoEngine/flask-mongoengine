@@ -17,7 +17,7 @@ def setup_endpoints(app, db):
 
     @app.route("/check-session")
     def check_session():
-        return "session: %s" % session["a"]
+        return f'session: {session["a"]}'
 
 
 @pytest.fixture

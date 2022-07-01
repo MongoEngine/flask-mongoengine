@@ -26,13 +26,13 @@ def setup_endpoints(app, todo):
 def test_with_id(app, todo):
     Todo = todo
     client = app.test_client()
-    response = client.get("/show/%s/" % ObjectId())
+    response = client.get(f"/show/{ObjectId()}/")
     assert response.status_code == 404
 
     response = client.post("/add", data={"title": "First Item", "text": "The text"})
     assert response.status_code == 200
 
-    response = client.get("/show/%s/" % Todo.objects.first().id)
+    response = client.get(f"/show/{Todo.objects.first().id}/")
     assert response.status_code == 200
 
     result = flask.json.loads(response.data).get("result")
