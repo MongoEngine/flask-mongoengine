@@ -19,7 +19,7 @@ jobs:
       matrix:
         include:
           - name: "linting"
-            python: "3.8"
+            python: "3.7"
             tox_env: "lint"
 
     steps:
