@@ -130,19 +130,11 @@ class DebugPanelCommandLogger(monitoring.CommandListener):
 
     def started(self, event):
         """Receives 'started' events. Required to track original request context."""
-        if event.command_name == "delete":
-            print(f"Command started command: {event.command}")
-            print(f"Command started database_name: {event.database_name}")
-
         self.started_operations_count += 1
         self.started_events[event.operation_id] = event
 
     def succeeded(self, event):
         """Receives 'succeeded' events. Required to track database answer to request."""
-        if event.command_name == "delete":
-            print(f"Command succeeded duration_micros {event.duration_micros}")
-            print(f"Command succeeded reply {event.reply}")
-
         self.succeeded_operations_count += 1
         self.route_db_response(event, True)
 
