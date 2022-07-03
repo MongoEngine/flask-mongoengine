@@ -170,6 +170,19 @@ class MongoDebugPanel(DebugPanel):
         _maybe_patch_jinja_loader(self.jinja_env)
 
     @property
+    def _context(self) -> dict:
+        """Context for rendering, as property for easy testing."""
+        return {
+            "queries": mongo_command_logger.queries,
+            "inserts": mongo_command_logger.inserts,
+            "updates": mongo_command_logger.updates,
+            "deletes": mongo_command_logger.deletes,
+            "slow_query_limit": current_app.config.get(
+                "MONGO_DEBUG_PANEL_SLOW_QUERY_LIMIT", 100
+            ),
+        }
+
+    @property
     def is_properly_configured(self) -> bool:
         """Checks that all required watchers registered before Flask application init."""
         if mongo_command_logger not in monitoring._LISTENERS.command_listeners:
@@ -206,13 +219,4 @@ class MongoDebugPanel(DebugPanel):
 
     def content(self):
         """Gathers all template required variables in one dict."""
-        context = {
-            "queries": mongo_command_logger.queries,
-            "inserts": mongo_command_logger.inserts,
-            "updates": mongo_command_logger.updates,
-            "deletes": mongo_command_logger.deletes,
-            "slow_query_limit": current_app.config.get(
-                "MONGO_DEBUG_PANEL_SLOW_QUERY_LIMIT", 100
-            ),
-        }
-        return self.render("panels/mongo-panel.html", context)
+        return self.render("panels/mongo-panel.html", self._context)
