@@ -3,8 +3,11 @@ import jinja2
 import pytest
 from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
+from flask_debugtoolbar.panels import DebugPanel
+from jinja2 import ChoiceLoader, DictLoader
+from pytest_mock import MockerFixture
 
-from flask_mongoengine.panels import MongoDebugPanel
+from flask_mongoengine.panels import MongoDebugPanel, _maybe_patch_jinja_loader
 
 
 @pytest.fixture()
@@ -32,6 +35,21 @@ def registered_monitoring():
     yield mongo_command_logger
     # Unregister listener between independent tests
     monitoring._LISTENERS.command_listeners.remove(mongo_command_logger)
+
+
+def test__maybe_patch_jinja_loader__replace_loader_when_initial_loader_is_not_choice_loader():
+    jinja2_env = jinja2.Environment()
+    assert not isinstance(jinja2_env.loader, ChoiceLoader)
+    _maybe_patch_jinja_loader(jinja2_env)
+    assert isinstance(jinja2_env.loader, ChoiceLoader)
+
+
+def test__maybe_patch_jinja_loader__extend_loader_when_initial_loader_is_choice_loader():
+    jinja2_env = jinja2.Environment(loader=ChoiceLoader([DictLoader({"1": "1"})]))
+    assert isinstance(jinja2_env.loader, ChoiceLoader)
+    assert len(jinja2_env.loader.loaders) == 1
+    _maybe_patch_jinja_loader(jinja2_env)
+    assert len(jinja2_env.loader.loaders) == 2
 
 
 class TestMongoDebugPanel:
@@ -100,3 +118,64 @@ class TestMongoDebugPanel:
             "deletes": [],
             "slow_query_limit": 100,
         }
+
+    def test__process_request__correctly_resets_monitoring__without_instance_replace(
+        self,
+        registered_monitoring,
+        app,
+        toolbar_with_no_flask,
+    ):
+        # sourcery skip: simplify-empty-collection-comparison
+        # Test setup
+        initial_id = id(registered_monitoring)
+        # Inject some fakes to monitoring engine
+        registered_monitoring.total_time = 1
+        registered_monitoring.started_operations_count = 1
+        registered_monitoring.succeeded_operations_count = 1
+        registered_monitoring.failed_operations_count = 1
+        registered_monitoring.queries = [1, 2]
+        registered_monitoring.inserts = [1, 2]
+        registered_monitoring.updates = [1, 2]
+        registered_monitoring.deletes = [1, 2]
+        registered_monitoring.unknown = [1, 2]
+        registered_monitoring.started_events = {1: 1, 2: 2}
+
+        # Pre-test validation
+        assert registered_monitoring.total_time == 1
+        assert registered_monitoring.started_operations_count == 1
+        assert registered_monitoring.succeeded_operations_count == 1
+        assert registered_monitoring.failed_operations_count == 1
+        assert registered_monitoring.queries == [1, 2]
+        assert registered_monitoring.inserts == [1, 2]
+        assert registered_monitoring.updates == [1, 2]
+        assert registered_monitoring.deletes == [1, 2]
+        assert registered_monitoring.unknown == [1, 2]
+        assert registered_monitoring.started_events == {1: 1, 2: 2}
+        toolbar_with_no_flask.process_request(None)
+
+        assert id(registered_monitoring) == initial_id
+        assert registered_monitoring.total_time == 0
+        assert registered_monitoring.started_operations_count == 0
+        assert registered_monitoring.succeeded_operations_count == 0
+        assert registered_monitoring.failed_operations_count == 0
+        assert registered_monitoring.queries == []
+        assert registered_monitoring.inserts == []
+        assert registered_monitoring.updates == []
+        assert registered_monitoring.deletes == []
+        assert registered_monitoring.unknown == []
+        assert registered_monitoring.started_events == {}
+
+    def test__content__calls_parent__render__function(
+        self,
+        app,
+        registered_monitoring,
+        toolbar_with_no_flask,
+        mocker: MockerFixture,
+    ):
+        spy = mocker.patch.object(DebugPanel, "render", autospec=True)
+        toolbar_with_no_flask.content()
+        spy.assert_called_with(
+            toolbar_with_no_flask,
+            "panels/mongo-panel.html",
+            toolbar_with_no_flask._context,
+        )
