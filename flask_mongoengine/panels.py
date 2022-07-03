@@ -152,7 +152,7 @@ def _maybe_patch_jinja_loader(jinja_env):
     if not isinstance(jinja_env.loader, ChoiceLoader):
         jinja_env.loader = ChoiceLoader([jinja_env.loader, package_loader])
     elif package_loader not in jinja_env.loader.loaders:
-        jinja_env.loader.loaders.append(package_loader)
+        jinja_env.loader.loaders += [package_loader]
 
 
 class MongoDebugPanel(DebugPanel):
