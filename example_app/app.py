@@ -1,7 +1,10 @@
 import flask
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db
+from pymongo import monitoring
 from views import index, pagination
+
+from flask_mongoengine.panels import mongo_command_logger
 
 app = flask.Flask(__name__)
 app.config.from_object(__name__)
@@ -20,7 +23,7 @@ app.config["DEBUG_TB_PANELS"] = (
 )
 app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
 DebugToolbarExtension(app)
-
+monitoring.register(mongo_command_logger)
 db.init_app(app)
 
 
