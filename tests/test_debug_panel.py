@@ -1,4 +1,8 @@
-"""Tests for ``MongoDebugPanel`` and related mongo events listener."""
+"""
+Tests for ``MongoDebugPanel`` and related mongo events listener.
+
+- Independent of global configuration by design.
+"""
 import jinja2
 import pytest
 from flask import Flask
@@ -179,3 +183,9 @@ class TestMongoDebugPanel:
             "panels/mongo-panel.html",
             toolbar_with_no_flask._context,
         )
+
+
+class TestMongoCommandLogger:
+    """By design tested with raw pymongo."""
+
+    pass
