@@ -19,10 +19,9 @@ app.config["DEBUG_TB_PANELS"] = (
     "flask_mongoengine.panels.MongoDebugPanel",
 )
 app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
+DebugToolbarExtension(app)
 
 db.init_app(app)
-
-DebugToolbarExtension(app)
 
 
 app.add_url_rule("/", view_func=index)
