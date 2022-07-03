@@ -1,4 +1,6 @@
 """Debug panel views and logic and related mongoDb event listeners."""
+__all__ = ["mongo_command_logger", "MongoDebugPanel"]
+import logging
 import sys
 from typing import List
 
@@ -7,8 +9,10 @@ from flask_debugtoolbar.panels import DebugPanel
 from jinja2 import ChoiceLoader, PackageLoader
 from pymongo import monitoring
 
+logger = logging.getLogger("flask_mongoengine")
 
-class DebugPanelCommandLogger(monitoring.CommandListener):
+
+class MongoCommandLogger(monitoring.CommandListener):
     """Receive point for :class:`~.pymongo.monitoring.CommandListener` events.
 
     Count and parse incoming events for display in debug panel.
@@ -139,8 +143,7 @@ class DebugPanelCommandLogger(monitoring.CommandListener):
         self.route_db_response(event, True)
 
 
-command_logger = DebugPanelCommandLogger()
-monitoring.register(command_logger)
+mongo_command_logger = MongoCommandLogger()
 
 
 def _maybe_patch_jinja_loader(jinja_env):
@@ -155,6 +158,10 @@ def _maybe_patch_jinja_loader(jinja_env):
 class MongoDebugPanel(DebugPanel):
     """Panel that shows information about MongoDB operations."""
 
+    config_error_message = (
+        "Pymongo monitoring configuration error. mongo_command_logger should be "
+        "registered before database connection."
+    )
     name = "MongoDB"
     has_content = True
 
@@ -162,9 +169,17 @@ class MongoDebugPanel(DebugPanel):
         super().__init__(*args, **kwargs)
         _maybe_patch_jinja_loader(self.jinja_env)
 
+    @property
+    def is_properly_configured(self) -> bool:
+        """Checks that all required watchers registered before Flask application init."""
+        if mongo_command_logger not in monitoring._LISTENERS.command_listeners:
+            logger.error(self.config_error_message)
+            return False
+        return True
+
     def process_request(self, request):
         """Resets logger stats between each request."""
-        command_logger.reset_tracker()
+        mongo_command_logger.reset_tracker()
 
     def nav_title(self) -> str:
         """Debug toolbar in the bottom right corner."""
@@ -172,9 +187,13 @@ class MongoDebugPanel(DebugPanel):
 
     def nav_subtitle(self) -> str:
         """Count operations total time."""
+        if not self.is_properly_configured:
+            self.has_content = False
+            return self.config_error_message
+
         return (
-            f"{command_logger.started_operations_count} operations, "
-            f"in {command_logger.total_time*0.001: .2f}ms"
+            f"{mongo_command_logger.started_operations_count} operations, "
+            f"in {mongo_command_logger.total_time * 0.001: .2f}ms"
         )
 
     def title(self) -> str:
@@ -188,10 +207,10 @@ class MongoDebugPanel(DebugPanel):
     def content(self):
         """Gathers all template required variables in one dict."""
         context = {
-            "queries": command_logger.queries,
-            "inserts": command_logger.inserts,
-            "updates": command_logger.updates,
-            "deletes": command_logger.deletes,
+            "queries": mongo_command_logger.queries,
+            "inserts": mongo_command_logger.inserts,
+            "updates": mongo_command_logger.updates,
+            "deletes": mongo_command_logger.deletes,
             "slow_query_limit": current_app.config.get(
                 "MONGO_DEBUG_PANEL_SLOW_QUERY_LIMIT", 100
             ),
