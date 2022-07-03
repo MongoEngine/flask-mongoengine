@@ -19,14 +19,6 @@ flask_mongoengine.json module
    :undoc-members:
    :show-inheritance:
 
-flask_mongoengine.operation_tracker module
-------------------------------------------
-
-.. automodule:: flask_mongoengine.operation_tracker
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 flask_mongoengine.pagination module
 -----------------------------------
 
@@ -39,7 +31,7 @@ flask_mongoengine.panels module
 -------------------------------
 
 .. automodule:: flask_mongoengine.panels
-   :members:
+   :members: MongoCommandLogger, MongoDebugPanel, mongo_command_logger
    :undoc-members:
    :show-inheritance:
 
