@@ -1,8 +1,5 @@
-import inspect
-
 import mongoengine
 from flask import Flask, abort, current_app
-from mongoengine.base.fields import BaseField
 from mongoengine.errors import DoesNotExist
 from mongoengine.queryset import QuerySet
 
@@ -10,7 +7,7 @@ from .connection import *
 from .json import override_json_encoder
 from .pagination import *
 from .sessions import *
-from .wtf import WtfBaseField
+from .wtf import db_fields
 
 VERSION = (1, 0, 0)
 
@@ -21,61 +18,6 @@ def get_version():
 
 
 __version__ = get_version()
-
-
-def _patch_base_field(obj, name):
-    """
-    If the object submitted has a class whose base class is
-    mongoengine.base.fields.BaseField, then monkey patch to
-    replace it with flask_mongoengine.wtf.WtfBaseField.
-
-    @note:  WtfBaseField is an instance of BaseField - but
-            gives us the flexibility to extend field parameters
-            and settings required of WTForm via model form generator.
-
-    @see: flask_mongoengine.wtf.base.WtfBaseField.
-    @see: model_form in flask_mongoengine.wtf.orm
-
-    @param obj: MongoEngine instance in which we should locate the class.
-    @param name: Name of an attribute which may or may not be a BaseField.
-    """
-    # TODO is there a less hacky way to accomplish the same level of
-    # extensibility/control?
-
-    # get an attribute of the MongoEngine class and return if it's not
-    # a class
-    cls = getattr(obj, name)
-    if not inspect.isclass(cls):
-        return
-
-    # if it is a class, inspect all of its parent classes
-    cls_bases = list(cls.__bases__)
-
-    # if any of them is a BaseField, replace it with WtfBaseField
-    for index, base in enumerate(cls_bases):
-        if base == BaseField:
-            cls_bases[index] = WtfBaseField
-            cls.__bases__ = tuple(cls_bases)
-            break
-
-    # re-assign the class back to the MongoEngine instance
-    delattr(obj, name)
-    setattr(obj, name, cls)
-
-
-def _include_mongoengine(obj):
-    """
-    Copy all of the attributes from mongoengine and mongoengine.fields
-    onto obj (which should be an instance of the MongoEngine class).
-    """
-    # TODO why do we need this? What's wrong with importing from the
-    # original modules?
-    for attr_name in mongoengine.__all__:
-        if not hasattr(obj, attr_name):
-            setattr(obj, attr_name, getattr(mongoengine, attr_name))
-
-            # patch BaseField if available
-            _patch_base_field(obj, attr_name)
 
 
 def current_mongoengine_instance():
@@ -90,10 +32,52 @@ class MongoEngine(object):
     """Main class used for initialization of Flask-MongoEngine."""
 
     def __init__(self, app=None, config=None):
-        _include_mongoengine(self)
+        # Extended database fields
+        self.BinaryField = db_fields.BinaryField
+        self.BooleanField = db_fields.BooleanField
+        self.CachedReferenceField = db_fields.CachedReferenceField
+        self.ComplexDateTimeField = db_fields.ComplexDateTimeField
+        self.DateField = db_fields.DateField
+        self.DateTimeField = db_fields.DateTimeField
+        self.DecimalField = db_fields.DecimalField
+        self.DictField = db_fields.DictField
+        self.DynamicField = db_fields.DynamicField
+        self.EmailField = db_fields.EmailField
+        self.EmbeddedDocumentField = db_fields.EmbeddedDocumentField
+        self.EmbeddedDocumentListField = db_fields.EmbeddedDocumentListField
+        self.EnumField = db_fields.EnumField
+        self.FileField = db_fields.FileField
+        self.FloatField = db_fields.FloatField
+        self.GenericEmbeddedDocumentField = db_fields.GenericEmbeddedDocumentField
+        self.GenericLazyReferenceField = db_fields.GenericLazyReferenceField
+        self.GenericReferenceField = db_fields.GenericReferenceField
+        self.GeoJsonBaseField = db_fields.GeoJsonBaseField
+        self.GeoPointField = db_fields.GeoPointField
+        self.ImageField = db_fields.ImageField
+        self.IntField = db_fields.IntField
+        self.LazyReferenceField = db_fields.LazyReferenceField
+        self.LineStringField = db_fields.LineStringField
+        self.ListField = db_fields.ListField
+        self.LongField = db_fields.LongField
+        self.MapField = db_fields.MapField
+        self.MultiLineStringField = db_fields.MultiLineStringField
+        self.MultiPointField = db_fields.MultiPointField
+        self.MultiPolygonField = db_fields.MultiPolygonField
+        self.ObjectIdField = db_fields.ObjectIdField
+        self.PointField = db_fields.PointField
+        self.PolygonField = db_fields.PolygonField
+        self.ReferenceField = db_fields.ReferenceField
+        self.SequenceField = db_fields.SequenceField
+        self.SortedListField = db_fields.SortedListField
+        self.StringField = db_fields.StringField
+        self.URLField = db_fields.URLField
+        self.UUIDField = db_fields.UUIDField
 
+        # Flask related data
         self.app = None
         self.config = config
+
+        # Extended documents classes
         self.Document = Document
         self.DynamicDocument = DynamicDocument
 
@@ -142,6 +126,15 @@ class MongoEngine(object):
         instance.
         """
         return current_app.extensions["mongoengine"][self]["conn"]
+
+    def __getattr__(self, attr_name):
+        """
+        Mongoengine backward compatibility handler.
+
+        Provide original :module:``mongoengine`` module methods/classes if they are not
+        modified by us, and not mapped directly.
+        """
+        return getattr(mongoengine, attr_name)
 
 
 class BaseQuerySet(QuerySet):
