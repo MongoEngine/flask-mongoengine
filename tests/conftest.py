@@ -3,8 +3,24 @@ from datetime import datetime
 import mongoengine
 import pytest
 from flask import Flask
+from pymongo import MongoClient
 
 from flask_mongoengine import MongoEngine
+
+
+@pytest.fixture(autouse=True, scope="session")
+def session_clean_up():
+    """Mandatory tests environment clean up before/after test session."""
+    client = MongoClient("localhost", 27017)
+    client.drop_database("flask_mongoengine_test_db")
+    client.drop_database("flask_mongoengine_test_db_1")
+    client.drop_database("flask_mongoengine_test_db_2")
+
+    yield
+
+    client.drop_database("flask_mongoengine_test_db")
+    client.drop_database("flask_mongoengine_test_db_1")
+    client.drop_database("flask_mongoengine_test_db_2")
 
 
 @pytest.fixture()
