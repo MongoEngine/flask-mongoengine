@@ -187,7 +187,7 @@ class BaseQuerySet(QuerySet):
         """
         # TODO this doesn't sound useful at all - remove in next release?
         item = self.get(id=doc_id)
-        count = getattr(item, field_name + "_count", "")
+        count = getattr(item, f"{field_name}_count", "")
         total = total or count or len(getattr(item, field_name))
         return ListFieldPagination(
             self, doc_id, field_name, page, per_page, total=total
@@ -202,7 +202,7 @@ class Document(mongoengine.Document):
     def paginate_field(self, field_name, page, per_page, total=None):
         """Paginate items within a list field."""
         # TODO this doesn't sound useful at all - remove in next release?
-        count = getattr(self, field_name + "_count", "")
+        count = getattr(self, f"{field_name}_count", "")
         total = total or count or len(getattr(self, field_name))
         return ListFieldPagination(
             self.__class__.objects, self.pk, field_name, page, per_page, total=total
