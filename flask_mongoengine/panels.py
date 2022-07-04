@@ -45,6 +45,7 @@ class MongoCommandLogger(monitoring.CommandListener):
                         "request_status": "Succeed" if request_status else "Failed",
                     }
                 )
+        logger.debug(f"Added record to 'deletes' section: {self.deletes[-1]}")
 
     def append_find_query(self, event, start_event, request_status):
         """Parse 'find' events to debug panel supported format."""
@@ -63,6 +64,7 @@ class MongoCommandLogger(monitoring.CommandListener):
                 "request_status": "Succeed" if request_status else "Failed",
             }
         )
+        logger.debug(f"Added record to 'Query' section: {self.queries[-1]}")
 
     def append_insert_query(self, event, start_event, request_status):
         """Parse 'insert' events to debug panel supported format."""
@@ -77,6 +79,7 @@ class MongoCommandLogger(monitoring.CommandListener):
                 "request_status": "Succeed" if request_status else "Failed",
             }
         )
+        logger.debug(f"Added record to 'Insert' section: {self.inserts[-1]}")
 
     def append_update_query(self, event, start_event, request_status):
         """Parse 'update' events to debug panel supported format."""
@@ -108,9 +111,11 @@ class MongoCommandLogger(monitoring.CommandListener):
                     "request_status": "Succeed" if request_status else "Failed",
                 }
             )
+        logger.debug(f"Added record to 'Updates' section: {self.updates[-1]}")
 
     def failed(self, event):
         """Receives 'failed' events. Required to track database answer to request."""
+        logger.debug(f"Received 'Failed' event from driver: {event}")
         self.failed_operations_count += 1
         self.route_db_response(event, False)
 
@@ -134,11 +139,13 @@ class MongoCommandLogger(monitoring.CommandListener):
 
     def started(self, event):
         """Receives 'started' events. Required to track original request context."""
+        logger.debug(f"Received 'Started' event from driver: {event}")
         self.started_operations_count += 1
         self.started_events[event.operation_id] = event
 
     def succeeded(self, event):
         """Receives 'succeeded' events. Required to track database answer to request."""
+        logger.debug(f"Received 'Succeeded' event from driver: {event}")
         self.succeeded_operations_count += 1
         self.route_db_response(event, True)
 
