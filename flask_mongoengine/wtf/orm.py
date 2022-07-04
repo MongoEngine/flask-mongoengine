@@ -85,7 +85,7 @@ class ModelConverter(object):
         if hasattr(field, "to_form_field"):
             return field.to_form_field(model, kwargs)
 
-        if hasattr(field, "field") and type(field.field) == ReferenceField:
+        if hasattr(field, "field") and isinstance(field.field, ReferenceField):
             kwargs["label_modifier"] = getattr(
                 model, f"{field.name}_label_modifier", None
             )
