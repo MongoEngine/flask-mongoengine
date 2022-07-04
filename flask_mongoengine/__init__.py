@@ -3,11 +3,11 @@ from flask import Flask, abort, current_app
 from mongoengine.errors import DoesNotExist
 from mongoengine.queryset import QuerySet
 
-from .connection import *
-from .json import override_json_encoder
-from .pagination import *
-from .sessions import *
-from .wtf import db_fields
+from flask_mongoengine.connection import *
+from flask_mongoengine.json import override_json_encoder
+from flask_mongoengine.pagination import *
+from flask_mongoengine.sessions import *
+from flask_mongoengine.wtf import db_fields
 
 VERSION = (1, 0, 0)
 
