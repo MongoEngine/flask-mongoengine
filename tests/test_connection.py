@@ -281,14 +281,12 @@ def test_multiple_connections(app):
         assert doc is not None
 
 
-def test_ingnored_mongodb_prefix_config(app):
+def test_ignored_mongodb_prefix_config(app):
     """Config starting by MONGODB_ but not used by flask-mongoengine
     should be ignored.
     """
     db = MongoEngine()
-    app.config[
-        "MONGODB_HOST"
-    ] = "mongodb://localhost:27017/flask_mongoengine_test_db_prod"
+    app.config["MONGODB_HOST"] = "mongodb://localhost:27017/flask_mongoengine_test_db"
     # Invalid host, should trigger exception if used
     app.config["MONGODB_TEST_HOST"] = "dummy://localhost:27017/test"
     db.init_app(app)
@@ -297,7 +295,7 @@ def test_ingnored_mongodb_prefix_config(app):
     mongo_engine_db = mongoengine.get_db()
     assert isinstance(mongo_engine_db, Database)
     assert isinstance(connection, MongoClient)
-    assert mongo_engine_db.name == "flask_mongoengine_test_db_prod"
+    assert mongo_engine_db.name == "flask_mongoengine_test_db"
     assert connection.HOST == "localhost"
     assert connection.PORT == 27017
 
@@ -316,7 +314,7 @@ def test_connection_kwargs(app):
 
     app.config["MONGODB_SETTINGS"] = {
         "ALIAS": "tz_aware_true",
-        "DB": "flask_mongoengine_testing_tz_aware",
+        "DB": "flask_mongoengine_test_db",
         "TZ_AWARE": True,
         "READ_PREFERENCE": ReadPreference.SECONDARY,
         MAX_POOL_SIZE_KEY: 10,
