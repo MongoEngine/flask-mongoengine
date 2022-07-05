@@ -30,6 +30,11 @@ Described approach change brings several side effects, that user should be aware
    project code quality.
 5. Mongo Debug Toolbar Panel can work without any usage of other
    ``flask_mongoengine`` functions.
+6. Mongo Debug Toolbar Panel do not split requests types anymore, this is because
+   now it handle any requests, including aggregations, collection creating/deleting
+   and any other, reported by [pymongo] monitoring. Making splitting of incomming
+   events will bring high complexity to parsers, as there are a lot of mongoDb
+   commmands exist.
 
 ## Installation
 
@@ -72,6 +77,11 @@ Working toolbar installation code can be found and tested in example_app, shippe
 project codebase.
 ```
 
+## Configuration
+
+You can add ``MONGO_DEBUG_PANEL_SLOW_QUERY_LIMIT`` variable to flask application
+config, to set a limit for queries highlight in web interface. By default, 100 ms.
+
 ## Usage
 
 ```{eval-rst}
@@ -79,8 +89,9 @@ project codebase.
   :target: _static/debug_toolbar.png
 ```
 
-In **Queries** and **Inserts** sections click **Toggle** in **Data** section to see
-more information about objects.
+- Mongo Debug Toolbar Panel logs every mongoDb query, in executed order.
+- You can expand ``Server command`` to check what command was send to server.
+- You can expand ``Response data`` to check raw response from server side.
 
 ## Known issues
 
