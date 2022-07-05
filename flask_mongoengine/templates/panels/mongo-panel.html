@@ -24,6 +24,7 @@
       <tr>
         <th>Time (ms)</th>
         <th>Size</th>
+        <th>Database</th>
         <th>Operation</th>
         <th>Collection</th>
         <th>Filter</th>
@@ -49,7 +50,8 @@
             {{ query.time|round(3) }}
           </td>
           <td>{{ query.size|round(2) }}Kb</td>
-          <td>{{ query.operation|title }}</td>
+          <td>{{ query.database }}</td>
+          <td>{{ query.operation }}</td>
           <td>{{ query.collection }}</td>
           <td>
             {% if query.filter %}
