@@ -205,8 +205,8 @@ class TestMongoCommandLogger:
         py_db.posts.insert_one(post)
         assert registered_monitoring.started_operations_count == 1
         assert registered_monitoring.succeeded_operations_count == 1
-        assert registered_monitoring.queries[0].time > 0
-        assert registered_monitoring.queries[0].size > 0
+        assert registered_monitoring.queries[0].time >= 0
+        assert registered_monitoring.queries[0].size >= 0
         assert registered_monitoring.queries[0].database == "pymongo_test_database"
         assert registered_monitoring.queries[0].collection == "posts"
         assert registered_monitoring.queries[0].command_name == "insert"
@@ -223,8 +223,8 @@ class TestMongoCommandLogger:
         assert registered_monitoring.started_operations_count == 2
         assert registered_monitoring.succeeded_operations_count == 1
         assert registered_monitoring.failed_operations_count == 1
-        assert registered_monitoring.queries[0].time > 0
-        assert registered_monitoring.queries[0].size > 0
+        assert registered_monitoring.queries[0].time >= 0
+        assert registered_monitoring.queries[0].size >= 0
         assert registered_monitoring.queries[0].database == "pymongo_test_database"
         assert registered_monitoring.queries[0].collection == "test"
         assert registered_monitoring.queries[0].command_name == "create"
@@ -232,8 +232,8 @@ class TestMongoCommandLogger:
         assert registered_monitoring.queries[0].server_command["create"] == "test"
         assert registered_monitoring.queries[0].server_response == {"ok": 1.0}
         assert registered_monitoring.queries[0].request_status == "Succeed"
-        assert registered_monitoring.queries[1].time > 0
-        assert registered_monitoring.queries[1].size > 0
+        assert registered_monitoring.queries[1].time >= 0
+        assert registered_monitoring.queries[1].size >= 0
         assert registered_monitoring.queries[1].database == "pymongo_test_database"
         assert registered_monitoring.queries[1].collection == "test"
         assert registered_monitoring.queries[1].command_name == "create"
