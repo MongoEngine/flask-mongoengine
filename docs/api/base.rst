@@ -7,41 +7,27 @@ flask_mongoengine.connection module
 -----------------------------------
 
 .. automodule:: flask_mongoengine.connection
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 flask_mongoengine.json module
 -----------------------------
 
 .. automodule:: flask_mongoengine.json
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 flask_mongoengine.pagination module
 -----------------------------------
 
 .. automodule:: flask_mongoengine.pagination
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 flask_mongoengine.panels module
 -------------------------------
 
 .. automodule:: flask_mongoengine.panels
-   :members: MongoCommandLogger, MongoDebugPanel, mongo_command_logger
-   :undoc-members:
-   :show-inheritance:
+   :member-order: bysource
 
 flask_mongoengine.sessions module
 ---------------------------------
 
 .. automodule:: flask_mongoengine.sessions
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 Module contents
 ---------------
@@ -52,7 +38,4 @@ Module contents
    provided parent documentation manually.
 
 .. automodule:: flask_mongoengine
-   :members:
-   :undoc-members:
-   :show-inheritance:
    :private-members: _abort_404
