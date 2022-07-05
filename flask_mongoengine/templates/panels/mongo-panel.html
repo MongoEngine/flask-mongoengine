@@ -124,7 +124,7 @@
           <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }} mongo-insert-data"
               id="mongo-insert-data-{{ loop.index }}">
             <td colspan="{{ colspan }}">
-              <pre>{{ query.document|pprint }}</pre>
+              <pre>{{ query.data|pprint }}</pre>
             </td>
           </tr>
         {% endif %}

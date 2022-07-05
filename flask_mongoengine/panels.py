@@ -115,9 +115,12 @@ class InsertQueryEvent(BaseLoggedEvents):
         return None
 
     @property
-    def document(self):
-        """Document inserted to database with operation."""
-        return self._command.get("documents")
+    def data(self):
+        """Data inserted to db with 'insert' or server response for failed operations."""
+        if self.operation == "insert":
+            return self._command.get("documents")
+        if self.operation == "create":
+            return self._raw_response
 
 
 class FindQueryEvent(BaseLoggedEvents):
@@ -152,7 +155,7 @@ class FindQueryEvent(BaseLoggedEvents):
 
     @property
     def data(self):
-        """Documents returned by succeeded operation."""
+        """Data returned by succeeded operation."""
         return self._raw_response.get("cursor", {}).get("firstBatch")
 
 
