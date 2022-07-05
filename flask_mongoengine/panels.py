@@ -2,7 +2,8 @@
 __all__ = ["mongo_command_logger", "MongoDebugPanel"]
 import logging
 import sys
-from typing import List
+from dataclasses import dataclass
+from typing import ClassVar, List, Sequence, Union
 
 from flask import current_app
 from flask_debugtoolbar.panels import DebugPanel
@@ -10,6 +11,203 @@ from jinja2 import ChoiceLoader, PackageLoader
 from pymongo import monitoring
 
 logger = logging.getLogger("flask_mongoengine")
+
+
+@dataclass
+class BaseLoggedEvents:
+    # noinspection PyUnresolvedReferences
+    """
+    Base pymongo event pair parser data class.
+
+    Responsible for parsing shared data for all subclasses.
+    Debug panel web interface use only not 'private' instance properties.
+
+    :param _event: Succeeded or Failed event object from pymongo monitoring.
+    :param _start_event: Started event object from pymongo monitoring.
+    :param _is_query_pass: Boolean status of db query reported by pymongo monitoring.
+    :param supported_operations: Class level collection of events, supported by
+        dataclass parser. Used in events routing. Except for :class:`UnknownQueryEvent`
+    """
+
+    _event: Union[monitoring.CommandSucceededEvent, monitoring.CommandFailedEvent]
+    _start_event: monitoring.CommandStartedEvent
+    _is_query_pass: bool
+    supported_operations: ClassVar[Sequence[str]]
+
+    @property
+    def _succeeded_event(self):
+        """Internal helper to get 'succeeded' event object. Just for code readability."""
+        return self._event if self._is_query_pass else None
+
+    @property
+    def _failed_event(self):
+        """Internal helper to get 'failed' event object. Just for code readability."""
+        return None if self._is_query_pass else self._event
+
+    @property
+    def time(self):
+        """Shared web interface data: query execution time."""
+        return self._event.duration_micros * 0.001
+
+    @property
+    def size(self):
+        """Shared web interface data: success query object size or zero for failed."""
+        return sys.getsizeof(self._event.reply, 0) / 1024 if self._is_query_pass else 0
+
+    @property
+    def database(self):
+        """Shared web interface data: query database target."""
+        return self._start_event.database_name
+
+    @property
+    def collection(self):
+        """Shared web interface data: query collection target."""
+        return self._start_event.command.get(self.operation)
+
+    @property
+    def operation(self):
+        """Shared web interface data: query db level operation/command name."""
+        return self._event.command_name
+
+    @property
+    def request_status(self):
+        """Shared web interface data: query execution status."""
+        return "Succeed" if self._is_query_pass else "Failed"
+
+
+class DeleteQueryEvent(BaseLoggedEvents):
+    """
+    Handle 'removes' only related properties parsing.
+
+    For init parameters and full explanation check base class :class:`BaseLoggedEvents`.
+    """
+
+    supported_operations = ("delete", "dropDatabase")
+
+    @property
+    def _delete_data(self):
+        """Internal extractor for 'delete' MongoDb statements."""
+        if self.operation != "delete":
+            return {}
+        try:
+            return self._start_event.command.get("deletes", [])[0]
+        except IndexError:
+            return {}
+
+    @property
+    def filter(self):
+        """Filter used before operation."""
+        return self._delete_data.get("q", "")
+
+
+class InsertQueryEvent(BaseLoggedEvents):
+    """
+    Handle 'insert' only related properties parsing.
+
+    For init parameters and full explanation check base class :class:`BaseLoggedEvents`.
+    """
+
+    supported_operations = ("insert", "create")
+
+    @property
+    def filter(self):
+        """Filter used before operation."""
+        return None
+
+    @property
+    def document(self):
+        """Document inserted to database with operation."""
+        return self._start_event.command.get("documents")
+
+
+class FindQueryEvent(BaseLoggedEvents):
+    """
+    Handle 'find' only related properties parsing.
+
+    For init parameters and full explanation check base class :class:`BaseLoggedEvents`.
+    """
+
+    supported_operations = ["find"]
+
+    @property
+    def sorting(self):
+        """Internal sorting statement extractor."""
+        _sorting = self._start_event.command.get("sort")
+        return _sorting.to_dict() if _sorting is not None else None
+
+    @property
+    def filter(self):
+        """Filter used before operation."""
+        return self._start_event.command.get("filter")
+
+    @property
+    def skip(self):
+        """Query 'skip' value."""
+        return self._start_event.command.get("skip")
+
+    @property
+    def limit(self):
+        """Query 'limit' value."""
+        return self._start_event.command.get("limit")
+
+    @property
+    def data(self):
+        """Documents returned by operation."""
+        return (
+            self._event.reply.get("cursor", {}).get("firstBatch")
+            if self._is_query_pass
+            else None
+        )
+
+
+class UpdateQueryEvent(BaseLoggedEvents):
+    """
+    Handle 'update' only related properties parsing.
+
+    For init parameters and full explanation check base class :class:`BaseLoggedEvents`.
+    """
+
+    supported_operations = ["update"]
+
+    @property
+    def _update_data(self):
+        """Internal extractor for 'update' MongoDb statements."""
+        if self.operation != "update":
+            return {}
+        try:
+            return self._start_event.command.get("updates", [])[0]
+        except IndexError:
+            return {}
+
+    @property
+    def filter(self):
+        """Filter used before operation."""
+        return self._update_data.get("q") if self._update_data else None
+
+    @property
+    def updates(self):
+        """Content of operation statement."""
+        return self._update_data.get("u") if self._update_data else None
+
+    @property
+    def multi(self):
+        """Is operation launched with 'multi' flag."""
+        return self._update_data.get("multi", False) if self._update_data else False
+
+    @property
+    def upsert(self):
+        """Is operation launched with 'upsert' flag."""
+        return self._update_data.get("upsert", False) if self._update_data else False
+
+
+class UnknownQueryEvent(BaseLoggedEvents):
+    """
+    Handle 'unknown' only related properties parsing.
+
+    For init parameters and full explanation check base class :class:`BaseLoggedEvents`.
+    """
+
+    supported_operations = []
 
 
 class MongoCommandLogger(monitoring.CommandListener):
@@ -31,86 +229,23 @@ class MongoCommandLogger(monitoring.CommandListener):
         self.started_events: dict = {}
 
     def append_delete_query(self, event, start_event, request_status):
-        """Parse 'remove' events to debug panel supported format."""
-        deletes = start_event.command.get("deletes", [])
-        if deletes:
-            for obj in deletes:
-                self.deletes.append(
-                    {
-                        "time": event.duration_micros * 0.001,
-                        "size": sys.getsizeof(event.reply, 0) / 1024,
-                        "operation": event.command_name,
-                        "collection": start_event.command.get("delete"),
-                        "filter": obj.get("q", ""),
-                        "request_status": "Succeed" if request_status else "Failed",
-                    }
-                )
+        """Pass 'remove' events to parser and include final result to final list."""
+        self.deletes.append(DeleteQueryEvent(event, start_event, request_status))
         logger.debug(f"Added record to 'deletes' section: {self.deletes[-1]}")
 
     def append_find_query(self, event, start_event, request_status):
-        """Parse 'find' events to debug panel supported format."""
-        sorting = start_event.command.get("sort")
-        self.queries.append(
-            {
-                "time": event.duration_micros * 0.001,
-                "size": sys.getsizeof(event.reply, 0) / 1024,
-                "operation": event.command_name,
-                "collection": start_event.command.get("find"),
-                "filter": start_event.command.get("filter"),
-                "sorting": sorting.to_dict() if sorting is not None else None,
-                "skip": start_event.command.get("skip"),
-                "limit": start_event.command.get("limit"),
-                "data": event.reply.get("cursor", {}).get("firstBatch"),
-                "request_status": "Succeed" if request_status else "Failed",
-            }
-        )
+        """Pass 'find' events to parser and include final result to final list."""
+        self.queries.append(FindQueryEvent(event, start_event, request_status))
         logger.debug(f"Added record to 'Query' section: {self.queries[-1]}")
 
     def append_insert_query(self, event, start_event, request_status):
-        """Parse 'insert' events to debug panel supported format."""
-        self.inserts.append(
-            {
-                "time": event.duration_micros * 0.001,
-                "size": sys.getsizeof(event.reply, 0) / 1024,
-                "operation": event.command_name,
-                "collection": start_event.command.get("insert"),
-                "filter": None,
-                "document": start_event.command.get("documents"),
-                "request_status": "Succeed" if request_status else "Failed",
-            }
-        )
+        """Pass 'insert' events to parser and include final result to final list."""
+        self.inserts.append(InsertQueryEvent(event, start_event, request_status))
         logger.debug(f"Added record to 'Insert' section: {self.inserts[-1]}")
 
     def append_update_query(self, event, start_event, request_status):
-        """Parse 'update' events to debug panel supported format."""
-        updates = start_event.command.get("updates", [])
-        if updates:
-            for update in updates:
-                self.updates.append(
-                    {
-                        "time": event.duration_micros * 0.001,
-                        "size": sys.getsizeof(event.reply, 0) / 1024,
-                        "operation": event.command_name,
-                        "collection": start_event.command.get("update"),
-                        "filter": update.get("q"),
-                        "updates": update.get("u"),
-                        "multi": update.get("multi", False),
-                        "upsert": update.get("upsert", False),
-                        "request_status": "Succeed" if request_status else "Failed",
-                    }
-                )
-        else:
-            self.updates.append(
-                {
-                    "time": event.duration_micros * 0.001,
-                    "size": sys.getsizeof(event.reply, 0) / 1024,
-                    "operation": event.command_name,
-                    "collection": start_event.command.get("find"),
-                    "filter": start_event.command.get("filter", ""),
-                    "data": start_event.command.get("updates"),
-                    "request_status": "Succeed" if request_status else "Failed",
-                }
-            )
+        """Pass 'update' events to parser and include final result to final list."""
+        self.updates.append(UpdateQueryEvent(event, start_event, request_status))
         logger.debug(f"Added record to 'Updates' section: {self.updates[-1]}")
 
     def failed(self, event):
@@ -128,13 +263,13 @@ class MongoCommandLogger(monitoring.CommandListener):
         self.total_time += event.duration_micros
         start_event = self.started_events.pop(event.operation_id, {})
 
-        if event.command_name == "delete":
+        if event.command_name in DeleteQueryEvent.supported_operations:
             self.append_delete_query(event, start_event, request_status)
-        elif event.command_name == "insert":
+        elif event.command_name in InsertQueryEvent.supported_operations:
             self.append_insert_query(event, start_event, request_status)
-        elif event.command_name == "find":
+        elif event.command_name in FindQueryEvent.supported_operations:
             self.append_find_query(event, start_event, request_status)
-        elif event.command_name == "update":
+        elif event.command_name in UpdateQueryEvent.supported_operations:
             self.append_update_query(event, start_event, request_status)
 
     def started(self, event):
@@ -192,6 +327,7 @@ class MongoDebugPanel(DebugPanel):
     @property
     def is_properly_configured(self) -> bool:
         """Checks that all required watchers registered before Flask application init."""
+        # noinspection PyProtectedMember
         if mongo_command_logger not in monitoring._LISTENERS.command_listeners:
             logger.error(self.config_error_message)
             return False
