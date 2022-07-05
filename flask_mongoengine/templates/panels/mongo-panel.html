@@ -1,167 +1,93 @@
-<style type="text/css">
-.code {
-    font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', 'Monaco', 'Courier New', monospace !important;
-}
-.mongo-stack-trace {
-    line-height: 2.3em !important;
-}
-.mongo-stack-trace tr {
-    border-top: 1px dotted #ccc !important;
-}
-.mongo-stack-trace table th {
-    text-align: left !important;
-}
+<style>
+  #flDebug .flDebugPanelContent {
+    overflow: scroll;
+    overflow-x: hidden;
+  }
 
-#flDebug .mongo-stack-trace, #flDebug .mongo-data, .mongo-op-table .toolbar-query {
-    display:none;
-}
+  #flDebug .mongo-raw-response-data, #flDebug .mongo-raw-command-data, .mongo-op-table {
+    display: none;
+  }
 
-#flDebug .mongo-stack-trace table tr.mongo-stack-trace-hide {
-    background: #eee!important;
-    display:none;
-}
-
-#flDebug .panelContent .mongo-op-table,
-#flDebug .panelContent .mongo-stack-trace table { display: table;}
-
-.mongo-op-table td.fifty {width: 50%; word-wrap: break-word;}
-.mongo-op-table td.thirty {width: 30%; word-wrap: break-word;}
+  #flDebug .panelContent .mongo-op-table,
+  #flDebug .panelContent .mongo-insert-data table {
+    display: table;
+  }
 
 </style>
 
-{% macro render_stats(title, queries, slow_query_limit=100) %}
+{% macro render_stats(title, queries, slow_query_limit) %}
 
-<h4>{{ title }}</h4>
-{% if queries %}
-<table class="mongo-op-table">
-    <thead>
-        <tr>
-            <th>Time (ms)</th>
-            <th>Size</th>
-            <th>Operation</th>
-            {% if title == 'Queries' %}
-            <th>Collection</th>
-            <th>Query</th>
-            <th>Ordering</th>
-            <th>Skip</th>
-            <th>Limit</th>
-            <th>Data</th>
-            {% elif title == 'Inserts' %}
-            <th>Document</th>
-            {% elif title == 'Removes' %}
-            <th>Query / Id</th>
-            {% elif title == 'Updates' %}
-            <th>Filter</th>
-            <th>Update</th>
-            <th>Safe</th>
-            <th>Multi</th>
-            <th>Upsert</th>
-            {% endif %}
-            <th>Stack Trace</th>
+  <h4>{{ title }}</h4>
+  {% if queries %}
+    <table class="mongo-op-table">
+      <thead>
+      <tr>
+        <th>Time (ms)</th>
+        <th>Size</th>
+        <th>Database</th>
+        <th>Collection</th>
+        <th>Command name</th>
+        <th>Operation id</th>
+        <th>Server command</th>
+        <th>Response data</th>
+        <th>Request status</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for query in queries %}
+        <tr class="{{ loop.cycle('flDebugOdd','flDebugEven') }}">
+          {% set colspan = 9 %}
+          <td {% if query.time > slow_query_limit %}style="color:red;" {% endif %}>
+            {{ query.time|round(3) }}
+          </td>
+          <td>{{ query.size|round(2) }}Kb</td>
+          <td>{{ query.database }}</td>
+          <td>{{ query.collection }}</td>
+          <td>{{ query.command_name }}</td>
+          <td>{{ query.operation_id }}</td>
+          <td>
+            <a href="javascript:void(0);" class="mongo-toggle-raw-command-data"
+               data-row="mongo-raw-command-data-{{ loop.index }}">Toggle</a>
+          </td>
+          <td>
+            <a href="javascript:void(0);" class="mongo-toggle-raw-response-data"
+               data-row="mongo-raw-response-data-{{ loop.index }}">Toggle</a>
+          </td>
+          <td>{{ query.request_status }}</td>
         </tr>
-    </thead>
-    <tbody>
-        {% for query in queries %}
-            <tr class="{{ loop.cycle('flDebugOdd','flDebugEven') }}{% if query.internal %} toolbar-query{% endif %}">
-                <td {% if query.time > slow_query_limit %}style="color:red;" {% endif %}>
-                {{ query.time|round(3) }}</td>
-                <td>{{ query.size|round(2) }}Kb</td>
-                <td>{{ query.operation|title }}</td>
-                {% if title == "Queries" %}
-                    {% set colspan = 10 %}
-                    <td>{{ query.collection }}</td>
-                    <td class="code">{% if query.query %}{{ query.query|pprint }}{% endif %}</td>
-                    <td class="code">{% if query.ordering %}{{ query.ordering }}{% endif %}</td>
-                    <td>{% if query.skip %}{{ query.skip }}{% endif %}</td>
-                    <td>{% if query.limit %}{{ query.limit }}{% endif %}</td>
-                    <td><a href="javascript:void(0);" class="mongo-toggle-data" data-row="mongo-data-{{ loop.index }}">Toggle</a></td>
-                {% elif title == "Inserts" %}
-                {% set colspan = 5   %}
-                <td class="code fifty"><pre>{{ query.document|pprint }}</pre>
-                </td>
-                {% elif title == 'Removes' %}
-                {% set colspan = 5 %}
-                <td class="code thirty">
-                    <pre>{{ query.spec_or_id|pprint }}</pre>
-                </td>
-                {% elif title == 'Updates' %}
-                {% set colspan = 8 %}
-                <td class="code thirty">
-                    <pre>{{ query.flt|pprint }}</pre>
-                </td>
-                <td class="code thirty">
-                    <pre>{{ query.upd|pprint }}</pre>
-                </td>
-                <td>{{ query.safe }}</td>
-                <td>{{ query.multi }}</td>
-                <td>{{ query.upsert }}</td>
-                {% endif %}
-                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="mongo-{{ title|lower }}-{{ loop.index }}">Toggle</a></td>
-            </tr>
-            {% if title == "Queries" %}
-            <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }} mongo-data" id="mongo-data-{{ loop.index }}">
-                <td colspan="{{ colspan }}">
-                    <pre>{{ query.data|pprint }}</pre>
-                </td>
-            </tr>
-            {% endif %}
-            <tr class="{{ loop.cycle('flDebugOdd','flDebugEven') }} mongo-stack-trace" id="mongo-{{  title|lower }}-{{ loop.index }}">
-                <td colspan="{{ colspan }} ">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Line</th>
-                                <th>File</th>
-                                <th>Function</th>
-                                <th>Code</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for line in query.stack_trace %}
-                            <tr {% if line.4 %}class="mongo-stack-trace-hide" {% endif %}>
-                                <td class="lineno">{{ line.1 }}</td>
-                                <td class="file">{{ line.0 }}</td>
-                                <td class="function">{{ line.2 }}</td>
-                                <td class="code">{{ line.3|safe }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="4">
-                                    <a href="javascript:void(0);" class="mongo-toggle-full-trace">Toggle full trace</a>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<p>No {{ title|lower }} recorded</p>
-{% endif %}
+
+        <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }} mongo-raw-command-data"
+            id="mongo-raw-command-data-{{ loop.index }}">
+          <td colspan="{{ colspan }}">
+            <pre>{{ query.server_command|pprint }}</pre>
+          </td>
+        </tr>
+
+        <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }} mongo-raw-response-data"
+            id="mongo-raw-response-data-{{ loop.index }}">
+          <td colspan="{{ colspan }}">
+            <pre>{{ query.server_response|pprint }}</pre>
+          </td>
+        </tr>
+
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No {{ title|lower }} recorded</p>
+  {% endif %}
 {% endmacro %}
 
-{{ render_stats("Queries", queries, slow_query_limit)}}
-{{ render_stats("Removes", removes, slow_query_limit)}}
-{{ render_stats("Inserts", inserts, slow_query_limit)}}
-{{ render_stats("Updates", updates, slow_query_limit)}}
+{{ render_stats("Queries", queries, slow_query_limit) }}
 
 <script>
-(function($) {
-
-    $('a.mongo-toggle-trace').click(function(){
-        $("#"+$(this).attr('data-row')).toggle();
-    });
-    $('a.mongo-toggle-data').click(function(){
-        $("#"+$(this).attr('data-row')).toggle();
+  (function ($) {
+    $('a.mongo-toggle-raw-command-data').click(function () {
+      $("#" + $(this).attr('data-row')).toggle();
     });
 
-    $('a.mongo-toggle-full-trace').click(function(){
-        $(this).closest('table').find('tr.mongo-stack-trace-hide').toggle();
+    $('a.mongo-toggle-raw-response-data').click(function () {
+      $("#" + $(this).attr('data-row')).toggle();
     });
-
-})(fldt.$);
+  })(fldt.$);
 </script>

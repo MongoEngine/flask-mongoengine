@@ -1,7 +1,10 @@
 import flask
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db
+from pymongo import monitoring
 from views import index, pagination
+
+from flask_mongoengine.panels import mongo_command_logger
 
 app = flask.Flask(__name__)
 app.config.from_object(__name__)
@@ -10,19 +13,22 @@ app.config["TESTING"] = True
 app.config["SECRET_KEY"] = "flask+mongoengine=<3"
 app.debug = True
 app.config["DEBUG_TB_PANELS"] = (
-    "flask_debugtoolbar.panels.versions.VersionDebugPanel",
-    "flask_debugtoolbar.panels.timer.TimerDebugPanel",
+    "flask_debugtoolbar.panels.config_vars.ConfigVarsDebugPanel",
+    "flask_debugtoolbar.panels.g.GDebugPanel",
     "flask_debugtoolbar.panels.headers.HeaderDebugPanel",
-    "flask_debugtoolbar.panels.request_vars.RequestVarsDebugPanel",
-    "flask_debugtoolbar.panels.template.TemplateDebugPanel",
     "flask_debugtoolbar.panels.logger.LoggingPanel",
+    "flask_debugtoolbar.panels.profiler.ProfilerDebugPanel",
+    "flask_debugtoolbar.panels.request_vars.RequestVarsDebugPanel",
+    "flask_debugtoolbar.panels.route_list.RouteListDebugPanel",
+    "flask_debugtoolbar.panels.template.TemplateDebugPanel",
+    "flask_debugtoolbar.panels.timer.TimerDebugPanel",
+    "flask_debugtoolbar.panels.versions.VersionDebugPanel",
     "flask_mongoengine.panels.MongoDebugPanel",
 )
 app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
-
-db.init_app(app)
-
 DebugToolbarExtension(app)
+monitoring.register(mongo_command_logger)
+db.init_app(app)
 
 
 app.add_url_rule("/", view_func=index)

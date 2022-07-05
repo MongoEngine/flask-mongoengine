@@ -252,4 +252,11 @@ myst_enable_extensions = [
     "fieldlist",
 ]
 myst_heading_anchors = 3
-suppress_warnings=["autodoc"]
+suppress_warnings = ["autodoc"]
+autodoc_default_options = {
+    "members": True,
+    "undoc-members": True,
+    "show-inheritance": True,
+    "ignore-module-all": True,
+    "private-members": True,
+}
