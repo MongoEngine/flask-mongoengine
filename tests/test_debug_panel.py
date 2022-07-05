@@ -119,6 +119,7 @@ class TestMongoDebugPanel:
             "queries": [],
             "inserts": [],
             "updates": [],
+            "unknown": [],
             "deletes": [],
             "slow_query_limit": 100,
         }

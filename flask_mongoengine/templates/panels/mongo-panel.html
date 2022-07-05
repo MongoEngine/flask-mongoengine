@@ -1,5 +1,5 @@
 <style>
-  #flDebug .mongo-insert-data, #flDebug .mongo-data, .mongo-op-table {
+  #flDebug .mongo-raw-response-data, #flDebug .mongo-raw-command-data, #flDebug .mongo-insert-data, #flDebug .mongo-data, .mongo-op-table {
     display: none;
   }
 
@@ -27,18 +27,25 @@
         <th>Database</th>
         <th>Operation</th>
         <th>Collection</th>
-        <th>Filter</th>
         {% if title == 'Queries' %}
+          <th>Filter</th>
           <th>Sorting</th>
           <th>Skip</th>
           <th>Limit</th>
           <th>Data</th>
+        {% elif title == 'Removes' %}
+          <th>Filter</th>
         {% elif title == 'Inserts' %}
           <th>Data</th>
         {% elif title == 'Updates' %}
+          <th>Filter</th>
           <th>Update</th>
           <th>Multi</th>
           <th>Upsert</th>
+        {% elif title == 'Unknown' %}
+          <th>Operation id</th>
+          <th>Raw server command</th>
+          <th>Raw response data</th>
         {% endif %}
         <th>Request status</th>
       </tr>
@@ -53,13 +60,13 @@
           <td>{{ query.database }}</td>
           <td>{{ query.operation }}</td>
           <td>{{ query.collection }}</td>
-          <td>
-            {% if query.filter %}
-              <pre>{{ query.filter|pprint }}</pre>
-            {% endif %}
-          </td>
           {% if title == "Queries" %}
             {% set colspan = 10 %}
+            <td>
+              {% if query.filter %}
+                <pre>{{ query.filter|pprint }}</pre>
+              {% endif %}
+            </td>
             <td>{% if query.sorting %}
               <pre>{{ query.sorting|pprint }}</pre>{% endif %}
             </td>
@@ -68,6 +75,12 @@
             <td>
               <a href="javascript:void(0);" class="mongo-toggle-data"
                  data-row="mongo-data-{{ loop.index }}">Toggle</a>
+            </td>
+          {% elif title == "Removes" %}
+            <td>
+              {% if query.filter %}
+                <pre>{{ query.filter|pprint }}</pre>
+              {% endif %}
             </td>
           {% elif title == "Inserts" %}
             {% set colspan = 7 %}
@@ -78,13 +91,30 @@
           {% elif title == 'Updates' %}
             {% set colspan = 9 %}
             <td>
+              {% if query.filter %}
+                <pre>{{ query.filter|pprint }}</pre>
+              {% endif %}
+            </td>
+            <td>
               <pre>{{ query.updates|pprint }}</pre>
             </td>
             <td>{{ query.multi }}</td>
             <td>{{ query.upsert }}</td>
+          {% elif title == 'Unknown' %}
+            {% set colspan = 9 %}
+            <td>{{ query.operation_id }}</td>
+            <td>
+              <a href="javascript:void(0);" class="mongo-toggle-raw-command-data"
+                 data-row="mongo-raw-command-data-{{ loop.index }}">Toggle</a>
+            </td>
+            <td>
+              <a href="javascript:void(0);" class="mongo-toggle-raw-response-data"
+                 data-row="mongo-raw-response-data-{{ loop.index }}">Toggle</a>
+            </td>
           {% endif %}
           <td>{{ query.request_status }}</td>
         </tr>
+
         {% if title == "Inserts" %}
           <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }} mongo-insert-data"
               id="mongo-insert-data-{{ loop.index }}">
@@ -101,6 +131,21 @@
             </td>
           </tr>
         {% endif %}
+
+        {% if title == "Unknown" %}
+          <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }} mongo-raw-command-data"
+              id="mongo-raw-command-data-{{ loop.index }}">
+            <td colspan="{{ colspan }}">
+              <pre>{{ query.server_command|pprint }}</pre>
+            </td>
+          </tr>
+          <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }} mongo-raw-response-data"
+              id="mongo-raw-response-data-{{ loop.index }}">
+            <td colspan="{{ colspan }}">
+              <pre>{{ query.raw_response|pprint }}</pre>
+            </td>
+          </tr>
+        {% endif %}
       {% endfor %}
       </tbody>
     </table>
@@ -113,6 +158,7 @@
 {{ render_stats("Removes", deletes, slow_query_limit) }}
 {{ render_stats("Inserts", inserts, slow_query_limit) }}
 {{ render_stats("Updates", updates, slow_query_limit) }}
+{{ render_stats("Unknown", unknown, slow_query_limit) }}
 
 <script>
   (function ($) {
@@ -125,5 +171,12 @@
       $("#" + $(this).attr('data-row')).toggle();
     });
 
+    $('a.mongo-toggle-raw-command-data').click(function () {
+      $("#" + $(this).attr('data-row')).toggle();
+    });
+
+    $('a.mongo-toggle-raw-response-data').click(function () {
+      $("#" + $(this).attr('data-row')).toggle();
+    });
   })(fldt.$);
 </script>

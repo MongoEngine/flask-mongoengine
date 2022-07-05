@@ -35,14 +35,14 @@ class BaseLoggedEvents:
     supported_operations: ClassVar[Sequence[str]]
 
     @property
-    def _succeeded_event(self):
-        """Internal helper to get 'succeeded' event object. Just for code readability."""
-        return self._event if self._is_query_pass else None
+    def _command(self):
+        """Extracted raw MongoDb command, send to server."""
+        return self._start_event.command
 
     @property
-    def _failed_event(self):
-        """Internal helper to get 'failed' event object. Just for code readability."""
-        return None if self._is_query_pass else self._event
+    def _raw_response(self):
+        """Raw MongoDb response received from server."""
+        return self._event.reply if self._is_query_pass else self._event.failure
 
     @property
     def time(self):
@@ -51,8 +51,8 @@ class BaseLoggedEvents:
 
     @property
     def size(self):
-        """Shared web interface data: success query object size or zero for failed."""
-        return sys.getsizeof(self._event.reply, 0) / 1024 if self._is_query_pass else 0
+        """Shared web interface data: query object size."""
+        return sys.getsizeof(self._raw_response, 0) / 1024
 
     @property
     def database(self):
@@ -62,7 +62,7 @@ class BaseLoggedEvents:
     @property
     def collection(self):
         """Shared web interface data: query collection target."""
-        return self._start_event.command.get(self.operation)
+        return self._command.get(self.operation)
 
     @property
     def operation(self):
@@ -90,7 +90,7 @@ class DeleteQueryEvent(BaseLoggedEvents):
         if self.operation != "delete":
             return {}
         try:
-            return self._start_event.command.get("deletes", [])[0]
+            return self._command.get("deletes", [])[0]
         except IndexError:
             return {}
 
@@ -117,7 +117,7 @@ class InsertQueryEvent(BaseLoggedEvents):
     @property
     def document(self):
         """Document inserted to database with operation."""
-        return self._start_event.command.get("documents")
+        return self._command.get("documents")
 
 
 class FindQueryEvent(BaseLoggedEvents):
@@ -132,32 +132,28 @@ class FindQueryEvent(BaseLoggedEvents):
     @property
     def sorting(self):
         """Internal sorting statement extractor."""
-        _sorting = self._start_event.command.get("sort")
+        _sorting = self._command.get("sort")
         return _sorting.to_dict() if _sorting is not None else None
 
     @property
     def filter(self):
         """Filter used before operation."""
-        return self._start_event.command.get("filter")
+        return self._command.get("filter")
 
     @property
     def skip(self):
         """Query 'skip' value."""
-        return self._start_event.command.get("skip")
+        return self._command.get("skip")
 
     @property
     def limit(self):
         """Query 'limit' value."""
-        return self._start_event.command.get("limit")
+        return self._command.get("limit")
 
     @property
     def data(self):
-        """Documents returned by operation."""
-        return (
-            self._event.reply.get("cursor", {}).get("firstBatch")
-            if self._is_query_pass
-            else None
-        )
+        """Documents returned by succeeded operation."""
+        return self._raw_response.get("cursor", {}).get("firstBatch")
 
 
 class UpdateQueryEvent(BaseLoggedEvents):
@@ -175,7 +171,7 @@ class UpdateQueryEvent(BaseLoggedEvents):
         if self.operation != "update":
             return {}
         try:
-            return self._start_event.command.get("updates", [])[0]
+            return self._command.get("updates", [])[0]
         except IndexError:
             return {}
 
@@ -208,6 +204,21 @@ class UnknownQueryEvent(BaseLoggedEvents):
     """
 
     supported_operations = []
+
+    @property
+    def operation_id(self):
+        """MongoDb operation_id used to match 'start' and 'final' monitoring events."""
+        return self._start_event.operation_id
+
+    @property
+    def server_command(self):
+        """Raw MongoDb command send to server."""
+        return self._command
+
+    @property
+    def raw_response(self):
+        """Raw MongoDb response received from server."""
+        return self._raw_response
 
 
 class MongoCommandLogger(monitoring.CommandListener):
@@ -248,6 +259,11 @@ class MongoCommandLogger(monitoring.CommandListener):
         self.updates.append(UpdateQueryEvent(event, start_event, request_status))
         logger.debug(f"Added record to 'Updates' section: {self.updates[-1]}")
 
+    def append_unknown_query(self, event, start_event, request_status):
+        """Pass 'unknown' events to parser and include final result to final list."""
+        self.unknown.append(UnknownQueryEvent(event, start_event, request_status))
+        logger.debug(f"Added record to 'Unknown' section: {self.unknown[-1]}")
+
     def failed(self, event):
         """Receives 'failed' events. Required to track database answer to request."""
         logger.debug(f"Received 'Failed' event from driver: {event}")
@@ -271,6 +287,8 @@ class MongoCommandLogger(monitoring.CommandListener):
             self.append_find_query(event, start_event, request_status)
         elif event.command_name in UpdateQueryEvent.supported_operations:
             self.append_update_query(event, start_event, request_status)
+        else:
+            self.append_unknown_query(event, start_event, request_status)
 
     def started(self, event):
         """Receives 'started' events. Required to track original request context."""
@@ -319,6 +337,7 @@ class MongoDebugPanel(DebugPanel):
             "inserts": mongo_command_logger.inserts,
             "updates": mongo_command_logger.updates,
             "deletes": mongo_command_logger.deletes,
+            "unknown": mongo_command_logger.unknown,
             "slow_query_limit": current_app.config.get(
                 "MONGO_DEBUG_PANEL_SLOW_QUERY_LIMIT", 100
             ),
