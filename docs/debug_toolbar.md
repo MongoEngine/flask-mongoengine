@@ -87,13 +87,11 @@ more information about objects.
 There is some HTML rendering related issues, that I cannot fix, as do not work with
 front end at all. If you have a little HTML/CSS knowledge, please help.
 
-- [#468] Mongo Debug Toolbar Panel: Update HTML view to enable scrolling
 - [#469] Mongo Debug Toolbar Panel: Update HTML view to use wide screens
 - Objects sizes may be incorrect, as calculated in python. This part is copied from
   previous version, and may be removed in the future, if there will be confirmation,
   that this size data completely incorrect.
 
 [Flask Debug Toolbar]: https://github.com/flask-debugtoolbar/flask-debugtoolbar
-[#468]: https://github.com/MongoEngine/flask-mongoengine/issues/468
 [#469]: https://github.com/MongoEngine/flask-mongoengine/issues/469
 [pymongo]: https://pymongo.readthedocs.io/en/stable/
