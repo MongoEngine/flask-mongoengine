@@ -3,15 +3,25 @@ Tests for ``MongoDebugPanel`` and related mongo events listener.
 
 - Independent of global configuration by design.
 """
+
+import contextlib
+
 import jinja2
+import pymongo
 import pytest
 from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_debugtoolbar.panels import DebugPanel
 from jinja2 import ChoiceLoader, DictLoader
+from pymongo import monitoring
+from pymongo.errors import OperationFailure
 from pytest_mock import MockerFixture
 
-from flask_mongoengine.panels import MongoDebugPanel, _maybe_patch_jinja_loader
+from flask_mongoengine.panels import (
+    MongoDebugPanel,
+    _maybe_patch_jinja_loader,
+    mongo_command_logger,
+)
 
 
 @pytest.fixture()
@@ -28,17 +38,16 @@ def app_no_mongo_monitoring():
         yield app
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def registered_monitoring():
     """Register/Unregister mongo_command_logger in required tests"""
-    from pymongo import monitoring
-
-    from flask_mongoengine.panels import mongo_command_logger
-
     monitoring.register(mongo_command_logger)
+    mongo_command_logger.reset_tracker()
     yield mongo_command_logger
     # Unregister listener between independent tests
-    monitoring._LISTENERS.command_listeners.remove(mongo_command_logger)
+    mongo_command_logger.reset_tracker()
+    with contextlib.suppress(ValueError):
+        monitoring._LISTENERS.command_listeners.remove(mongo_command_logger)
 
 
 def test__maybe_patch_jinja_loader__replace_loader_when_initial_loader_is_not_choice_loader():
@@ -83,12 +92,14 @@ class TestMongoDebugPanel:
         self, toolbar_with_no_flask, caplog
     ):
         """Also verify logging done."""
+        # Emulate not working state(against auto used registered_monitoring fixture)
+        mongo_command_logger.reset_tracker()
+        monitoring._LISTENERS.command_listeners.remove(mongo_command_logger)
         assert toolbar_with_no_flask.is_properly_configured is False
         assert caplog.messages[0] == toolbar_with_no_flask.config_error_message
 
     def test__is_properly_configured__return_true__when_mongo_command_logger_registered(
         self,
-        registered_monitoring,
         toolbar_with_no_flask,
     ):
         assert toolbar_with_no_flask.is_properly_configured is True
@@ -97,6 +108,9 @@ class TestMongoDebugPanel:
         self, toolbar_with_no_flask
     ):
         """Also check that content flag changed."""
+        # Emulate not working state(against auto used registered_monitoring fixture)
+        mongo_command_logger.reset_tracker()
+        monitoring._LISTENERS.command_listeners.remove(mongo_command_logger)
         # First line is before nav_subtitle() call
         assert toolbar_with_no_flask.has_content is True
 
@@ -108,7 +122,6 @@ class TestMongoDebugPanel:
 
     def test__nav_subtitle__return_correct_message_when_toolbar_correctly_configured(
         self,
-        registered_monitoring,
         toolbar_with_no_flask,
     ):
         assert toolbar_with_no_flask.nav_subtitle() == "0 operations, in  0.00ms"
@@ -173,7 +186,6 @@ class TestMongoDebugPanel:
     def test__content__calls_parent__render__function(
         self,
         app,
-        registered_monitoring,
         toolbar_with_no_flask,
         mocker: MockerFixture,
     ):
@@ -189,4 +201,47 @@ class TestMongoDebugPanel:
 class TestMongoCommandLogger:
     """By design tested with raw pymongo."""
 
-    pass
+    @pytest.fixture(autouse=True)
+    def py_db(self, registered_monitoring):
+        """Clean up and returns special database for testing on pymongo driver level"""
+        client = pymongo.MongoClient("localhost", 27017)
+        db = client.pymongo_test_database
+        client.drop_database(db)
+        registered_monitoring.reset_tracker()
+        yield db
+        client.drop_database(db)
+
+    def test__insert_one__logged(self, py_db, registered_monitoring):
+        post = {
+            "author": "Mike",
+            "text": "My first blog post!",
+            "tags": ["mongodb", "python", "pymongo"],
+        }
+
+        py_db.posts.insert_one(post)
+        assert registered_monitoring.started_operations_count == 1
+        assert registered_monitoring.succeeded_operations_count == 1
+        assert registered_monitoring.inserts[0].collection == "posts"
+        assert len(registered_monitoring.inserts[0].data) == 1
+        assert registered_monitoring.inserts[0].filter is None
+        assert registered_monitoring.inserts[0].operation == "insert"
+        assert registered_monitoring.inserts[0].request_status == "Succeed"
+
+    def test__collectionCollection__logged(self, py_db, registered_monitoring):
+        pymongo.collection.Collection(py_db, "test", create=True)
+        with contextlib.suppress(OperationFailure):
+            pymongo.collection.Collection(py_db, "test", create=True)
+        assert registered_monitoring.started_operations_count == 2
+        assert registered_monitoring.succeeded_operations_count == 1
+        assert registered_monitoring.failed_operations_count == 1
+        assert registered_monitoring.inserts[0].operation == "create"
+        assert registered_monitoring.inserts[1].operation == "create"
+        assert registered_monitoring.inserts[0].request_status == "Succeed"
+        assert registered_monitoring.inserts[1].request_status == "Failed"
+        assert registered_monitoring.inserts[0].data == {"ok": 1.0}
+        assert registered_monitoring.inserts[1].data == {
+            "code": 48,
+            "codeName": "NamespaceExists",
+            "errmsg": "Collection already exists. NS: pymongo_test_database.test",
+            "ok": 0.0,
+        }
