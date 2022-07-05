@@ -235,11 +235,11 @@ class MongoCommandLogger(monitoring.CommandListener):
         self.started_operations_count: int = 0
         self.succeeded_operations_count: int = 0
         self.failed_operations_count: int = 0
-        self.queries: List = []
-        self.inserts: List = []
-        self.updates: List = []
-        self.deletes: List = []
-        self.unknown: List = []
+        self.queries: List[FindQueryEvent] = []
+        self.inserts: List[InsertQueryEvent] = []
+        self.updates: List[UpdateQueryEvent] = []
+        self.deletes: List[DeleteQueryEvent] = []
+        self.unknown: List[UnknownQueryEvent] = []
         self.started_events: dict = {}
 
     def append_delete_query(self, event, start_event, request_status):
