@@ -239,9 +239,4 @@ class TestMongoCommandLogger:
         assert registered_monitoring.inserts[0].request_status == "Succeed"
         assert registered_monitoring.inserts[1].request_status == "Failed"
         assert registered_monitoring.inserts[0].data == {"ok": 1.0}
-        assert registered_monitoring.inserts[1].data == {
-            "code": 48,
-            "codeName": "NamespaceExists",
-            "errmsg": "Collection already exists. NS: pymongo_test_database.test",
-            "ok": 0.0,
-        }
+        assert "already exists" in registered_monitoring.inserts[1].data["errmsg"]
