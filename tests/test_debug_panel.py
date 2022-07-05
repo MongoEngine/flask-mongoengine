@@ -130,10 +130,6 @@ class TestMongoDebugPanel:
     def test__context__is_empty_by_default(self, app, toolbar_with_no_flask):
         assert toolbar_with_no_flask._context == {
             "queries": [],
-            "inserts": [],
-            "updates": [],
-            "unknown": [],
-            "deletes": [],
             "slow_query_limit": 100,
         }
 
@@ -152,10 +148,6 @@ class TestMongoDebugPanel:
         registered_monitoring.succeeded_operations_count = 1
         registered_monitoring.failed_operations_count = 1
         registered_monitoring.queries = [1, 2]
-        registered_monitoring.inserts = [1, 2]
-        registered_monitoring.updates = [1, 2]
-        registered_monitoring.deletes = [1, 2]
-        registered_monitoring.unknown = [1, 2]
         registered_monitoring.started_events = {1: 1, 2: 2}
 
         # Pre-test validation
@@ -164,10 +156,6 @@ class TestMongoDebugPanel:
         assert registered_monitoring.succeeded_operations_count == 1
         assert registered_monitoring.failed_operations_count == 1
         assert registered_monitoring.queries == [1, 2]
-        assert registered_monitoring.inserts == [1, 2]
-        assert registered_monitoring.updates == [1, 2]
-        assert registered_monitoring.deletes == [1, 2]
-        assert registered_monitoring.unknown == [1, 2]
         assert registered_monitoring.started_events == {1: 1, 2: 2}
         toolbar_with_no_flask.process_request(None)
 
@@ -177,10 +165,6 @@ class TestMongoDebugPanel:
         assert registered_monitoring.succeeded_operations_count == 0
         assert registered_monitoring.failed_operations_count == 0
         assert registered_monitoring.queries == []
-        assert registered_monitoring.inserts == []
-        assert registered_monitoring.updates == []
-        assert registered_monitoring.deletes == []
-        assert registered_monitoring.unknown == []
         assert registered_monitoring.started_events == {}
 
     def test__content__calls_parent__render__function(
@@ -211,7 +195,7 @@ class TestMongoCommandLogger:
         yield db
         client.drop_database(db)
 
-    def test__insert_one__logged(self, py_db, registered_monitoring):
+    def test__normal_command__logged(self, py_db, registered_monitoring):
         post = {
             "author": "Mike",
             "text": "My first blog post!",
@@ -221,22 +205,42 @@ class TestMongoCommandLogger:
         py_db.posts.insert_one(post)
         assert registered_monitoring.started_operations_count == 1
         assert registered_monitoring.succeeded_operations_count == 1
-        assert registered_monitoring.inserts[0].collection == "posts"
-        assert len(registered_monitoring.inserts[0].data) == 1
-        assert registered_monitoring.inserts[0].filter is None
-        assert registered_monitoring.inserts[0].operation == "insert"
-        assert registered_monitoring.inserts[0].request_status == "Succeed"
+        assert registered_monitoring.queries[0].time > 0
+        assert registered_monitoring.queries[0].size > 0
+        assert registered_monitoring.queries[0].database == "pymongo_test_database"
+        assert registered_monitoring.queries[0].collection == "posts"
+        assert registered_monitoring.queries[0].command_name == "insert"
+        assert isinstance(registered_monitoring.queries[0].operation_id, int)
+        assert len(registered_monitoring.queries[0].server_command["documents"]) == 1
+        assert registered_monitoring.queries[0].server_response == {"n": 1, "ok": 1.0}
+        assert registered_monitoring.queries[0].request_status == "Succeed"
 
-    def test__collectionCollection__logged(self, py_db, registered_monitoring):
+    def test__failed_command_logged__logged(self, py_db, registered_monitoring):
+        """Failed command index 1 in provided test."""
         pymongo.collection.Collection(py_db, "test", create=True)
         with contextlib.suppress(OperationFailure):
             pymongo.collection.Collection(py_db, "test", create=True)
         assert registered_monitoring.started_operations_count == 2
         assert registered_monitoring.succeeded_operations_count == 1
         assert registered_monitoring.failed_operations_count == 1
-        assert registered_monitoring.inserts[0].operation == "create"
-        assert registered_monitoring.inserts[1].operation == "create"
-        assert registered_monitoring.inserts[0].request_status == "Succeed"
-        assert registered_monitoring.inserts[1].request_status == "Failed"
-        assert registered_monitoring.inserts[0].data == {"ok": 1.0}
-        assert "already exists" in registered_monitoring.inserts[1].data["errmsg"]
+        assert registered_monitoring.queries[0].time > 0
+        assert registered_monitoring.queries[0].size > 0
+        assert registered_monitoring.queries[0].database == "pymongo_test_database"
+        assert registered_monitoring.queries[0].collection == "test"
+        assert registered_monitoring.queries[0].command_name == "create"
+        assert isinstance(registered_monitoring.queries[0].operation_id, int)
+        assert registered_monitoring.queries[0].server_command["create"] == "test"
+        assert registered_monitoring.queries[0].server_response == {"ok": 1.0}
+        assert registered_monitoring.queries[0].request_status == "Succeed"
+        assert registered_monitoring.queries[1].time > 0
+        assert registered_monitoring.queries[1].size > 0
+        assert registered_monitoring.queries[1].database == "pymongo_test_database"
+        assert registered_monitoring.queries[1].collection == "test"
+        assert registered_monitoring.queries[1].command_name == "create"
+        assert isinstance(registered_monitoring.queries[1].operation_id, int)
+        assert registered_monitoring.queries[1].server_command["create"] == "test"
+        assert (
+            "already exists"
+            in registered_monitoring.queries[1].server_response["errmsg"]
+        )
+        assert registered_monitoring.queries[1].request_status == "Failed"
