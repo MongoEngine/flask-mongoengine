@@ -81,7 +81,10 @@ def latest(session):
     flask = ">=2.1.2"
     mongoengine = ">=0.24.1"
     session = base_install(session, flask, mongoengine)
-    _run_in_docker(session)
+    if session.interactive:
+        _run_in_docker(session)
+    else:
+        session.run("pytest", *session.posargs)
 
 
 @nox.session(python="3.10")
