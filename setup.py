@@ -46,7 +46,7 @@ setup(
     platforms="any",
     python_requires=">=3.7",
     install_requires=[
-        "Flask>=1.1.2",
+        "Flask>=1.1.4",
         "WTForms[email]>=2.3.1",
         "Flask-WTF>=0.14.3",
         "mongoengine>=0.21",
