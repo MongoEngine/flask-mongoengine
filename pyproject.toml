@@ -113,3 +113,7 @@ multi_line_output = 3
 include_trailing_comma = true
 force_grid_wrap = 0
 use_parentheses = true
+
+[tool.pytest.ini_options]
+addopts = "--cov=flask_mongoengine --cov-config=setup.cfg"
+testpaths = ["tests"]
