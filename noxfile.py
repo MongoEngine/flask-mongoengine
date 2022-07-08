@@ -13,21 +13,20 @@ db_version = "5.0"
 
 def base_install(session, flask, mongoengine):
     """Create basic environment setup for tests and linting."""
-    session.install("-r", "requirements-dev.txt")
     if flask == "==1.1.4":
         session.install(
             f"Flask{flask}",
             f"mongoengine{mongoengine}",
             "MarkupSafe==2.0.1",
             "-e",
-            ".",
+            ".[wtf,toolbar,dev]",
         )
     else:
         session.install(
             f"Flask{flask}",
             f"mongoengine{mongoengine}",
             "-e",
-            ".",
+            ".[wtf,toolbar,dev]",
         )
     return session
 
@@ -98,7 +97,7 @@ def docs(session, batch_run: bool = False):
     """Build the documentation or serve documentation interactively."""
     shutil.rmtree(Path("docs").joinpath("_build"), ignore_errors=True)
     session.install("-r", "docs/requirements.txt")
-    session.install("-e", ".")
+    session.install("-e", ".[wtf,toolbar]")
     session.cd("docs")
     sphinx_args = ["-b", "html", "-W", ".", "_build/html"]
 

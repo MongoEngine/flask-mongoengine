@@ -48,7 +48,15 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 wtf = ["WTForms[email]>=2.3.1", "Flask-WTF>=0.14.3"]
-debug_toolbar = ["Flask-DebugToolbar>=0.11.0"]
+toolbar = ["Flask-DebugToolbar>=0.11.0"]
+dev = [
+  "black==22.6.0",
+  "pre-commit",
+  "pytest",
+  "pytest-cov",
+  "pytest-mock",
+  "nox",
+]
 
 [project.urls]
 homepage = "https://github.com/MongoEngine/flask-mongoengine"

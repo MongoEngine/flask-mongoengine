@@ -1,9 +1,0 @@
--r requirements.txt
-
-# Most dev and test dependencies without version limiting, to test with latest.
-black==22.6.0
-pre-commit
-pytest
-pytest-cov
-pytest-mock
-nox
