@@ -10,6 +10,14 @@ from pymongo.read_preferences import ReadPreference
 from flask_mongoengine import MongoEngine, current_mongoengine_instance
 
 
+def is_mongo_mock_installed() -> bool:
+    try:
+        import mongomock.__version__  # noqa
+    except ImportError:
+        return False
+    return True
+
+
 def test_connection__should_use_defaults__if_no_settings_provided(app):
     """Make sure a simple connection to a standalone MongoDB works."""
     db = MongoEngine()
@@ -128,6 +136,9 @@ def test_connection__should_parse_host_uri__if_host_formatted_as_uri(
     assert connection.PORT == 27017
 
 
+@pytest.mark.skipif(
+    is_mongo_mock_installed(), reason="This test require mongomock not exist"
+)
 @pytest.mark.parametrize(
     ("config_extension"),
     [
