@@ -20,3 +20,4 @@ venv/
 .vscode
 htmlcov/
 coverage.xml
+_version.py

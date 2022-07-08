@@ -9,16 +9,6 @@ from flask_mongoengine.pagination import *
 from flask_mongoengine.sessions import *
 from flask_mongoengine.wtf import db_fields
 
-VERSION = (1, 0, 0)
-
-
-def get_version():
-    """Return the VERSION as a string."""
-    return ".".join(map(str, VERSION))
-
-
-__version__ = get_version()
-
 
 def current_mongoengine_instance():
     """Return a MongoEngine instance associated with current Flask app."""

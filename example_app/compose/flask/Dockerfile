@@ -4,6 +4,5 @@ ENV PYTHONUNBUFFERED 1
 RUN groupadd -r flask && useradd -r -g flask flask
 COPY --chown=flask . /flask_mongoengine
 RUN pip install --upgrade pip  \
-    && pip install -r /flask_mongoengine/requirements.txt  \
-    && pip install -e /flask_mongoengine
+    && pip install -e /flask_mongoengine[toolbar,wtf]
 WORKDIR /flask_mongoengine
