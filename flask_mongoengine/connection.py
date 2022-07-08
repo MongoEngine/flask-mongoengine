@@ -60,7 +60,7 @@ def _get_name(setting_name: str) -> str:
 
 
 def _sanitize_settings(settings: dict) -> dict:
-    """Remove MONGODB_ prefix from dict values, to correct bypass to mongoengine."""
+    """Remove ``MONGODB_`` prefix from dict values, to correct bypass to mongoengine."""
     resolved_settings = {}
     for k, v in settings.items():
         # Replace with k.lower().removeprefix("mongodb_") when python 3.8 support ends.
