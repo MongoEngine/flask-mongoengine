@@ -8,18 +8,64 @@ __all__ = (
 )
 
 
+def _get_name(setting_name: str) -> str:
+    """
+    Return known pymongo setting name, or lower case name for unknown.
+
+    This problem discovered in issue #451. As mentioned there pymongo settings are not
+    case-sensitive, but mongoengine use exact name of some settings for matching,
+    overwriting pymongo behaviour.
+
+    This function address this issue, and potentially address cases when pymongo will
+    become case-sensitive in some settings by same reasons as mongoengine done.
+
+    Based on pymongo 4.1.1 settings.
+    """
+    KNOWN_CAMEL_CASE_SETTINGS = {
+        "directconnection": "directConnection",
+        "maxpoolsize": "maxPoolSize",
+        "minpoolsize": "minPoolSize",
+        "maxidletimems": "maxIdleTimeMS",
+        "maxconnecting": "maxConnecting",
+        "sockettimeoutms": "socketTimeoutMS",
+        "connecttimeoutms": "connectTimeoutMS",
+        "serverselectiontimeoutms": "serverSelectionTimeoutMS",
+        "waitqueuetimeoutms": "waitQueueTimeoutMS",
+        "heartbeatfrequencyms": "heartbeatFrequencyMS",
+        "retrywrites": "retryWrites",
+        "retryreads": "retryReads",
+        "zlibcompressionlevel": "zlibCompressionLevel",
+        "uuidrepresentation": "uuidRepresentation",
+        "srvservicename": "srvServiceName",
+        "wtimeoutms": "wTimeoutMS",
+        "replicaset": "replicaSet",
+        "readpreference": "readPreference",
+        "readpreferencetags": "readPreferenceTags",
+        "maxstalenessseconds": "maxStalenessSeconds",
+        "authsource": "authSource",
+        "authmechanism": "authMechanism",
+        "authmechanismproperties": "authMechanismProperties",
+        "tlsinsecure": "tlsInsecure",
+        "tlsallowinvalidcertificates": "tlsAllowInvalidCertificates",
+        "tlsallowinvalidhostnames": "tlsAllowInvalidHostnames",
+        "tlscafile": "tlsCAFile",
+        "tlscertificatekeyfile": "tlsCertificateKeyFile",
+        "tlscrlfile": "tlsCRLFile",
+        "tlscertificatekeyfilepassword": "tlsCertificateKeyFilePassword",
+        "tlsdisableocspendpointcheck": "tlsDisableOCSPEndpointCheck",
+        "readconcernlevel": "readConcernLevel",
+    }
+    _setting_name = KNOWN_CAMEL_CASE_SETTINGS.get(setting_name.lower())
+    return setting_name.lower() if _setting_name is None else _setting_name
+
+
 def _sanitize_settings(settings: dict) -> dict:
     """Remove MONGODB_ prefix from dict values, to correct bypass to mongoengine."""
     resolved_settings = {}
     for k, v in settings.items():
         # Replace with k.lower().removeprefix("mongodb_") when python 3.8 support ends.
-        key = k.lower()[8:] if k.lower().startswith("mongodb_") else k.lower()
+        key = _get_name(k[8:]) if k.lower().startswith("mongodb_") else _get_name(k)
         resolved_settings[key] = v
-
-    # Clean up empty values
-    for k, v in list(resolved_settings.items()):
-        if v is None:
-            del resolved_settings[k]
 
     return resolved_settings
 
