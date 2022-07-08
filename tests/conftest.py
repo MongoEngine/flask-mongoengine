@@ -39,7 +39,9 @@ def app():
 def db(app):
     app.config["MONGODB_HOST"] = "mongodb://localhost:27017/flask_mongoengine_test_db"
     test_db = MongoEngine(app)
-    db_name = test_db.connection.get_database("flask_mongoengine_test_db").name
+    db_name = (
+        test_db.connection["default"].get_database("flask_mongoengine_test_db").name
+    )
 
     if not db_name.endswith("_test_db"):
         raise RuntimeError(
@@ -47,12 +49,12 @@ def db(app):
         )
 
     # Clear database before tests, for cases when some test failed before.
-    test_db.connection.drop_database(db_name)
+    test_db.connection["default"].drop_database(db_name)
 
     yield test_db
 
     # Clear database after tests, for graceful exit.
-    test_db.connection.drop_database(db_name)
+    test_db.connection["default"].drop_database(db_name)
 
 
 @pytest.fixture()
