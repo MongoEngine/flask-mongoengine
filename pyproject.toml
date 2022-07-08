@@ -57,6 +57,11 @@ dev = [
   "pytest-mock",
   "nox",
 ]
+legacy = [
+  "pytest",
+  "pytest-cov",
+  "pytest-mock",
+]
 
 [project.urls]
 homepage = "https://github.com/MongoEngine/flask-mongoengine"
