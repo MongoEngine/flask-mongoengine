@@ -64,10 +64,10 @@ legacy = [
 ]
 
 [project.urls]
-homepage = "https://github.com/MongoEngine/flask-mongoengine"
-documentation = "http://docs.mongoengine.org/projects/flask-mongoengine/en/latest/"
-repository = "https://github.com/MongoEngine/flask-mongoengine"
-changelog = "https://github.com/MongoEngine/flask-mongoengine/releases"
+Homepage = "https://github.com/MongoEngine/flask-mongoengine"
+Documentation = "http://docs.mongoengine.org/projects/flask-mongoengine/en/latest/"
+Repository = "https://github.com/MongoEngine/flask-mongoengine"
+Changelog = "https://github.com/MongoEngine/flask-mongoengine/releases"
 
 [build-system]
 requires = [
