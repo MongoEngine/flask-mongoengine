@@ -1,3 +1,4 @@
+import warnings
 from typing import List
 
 import mongoengine
@@ -60,7 +61,7 @@ def _get_name(setting_name: str) -> str:
 
 
 def _sanitize_settings(settings: dict) -> dict:
-    """Remove MONGODB_ prefix from dict values, to correct bypass to mongoengine."""
+    """Remove ``MONGODB_`` prefix from dict values, to correct bypass to mongoengine."""
     resolved_settings = {}
     for k, v in settings.items():
         # Replace with k.lower().removeprefix("mongodb_") when python 3.8 support ends.
@@ -81,6 +82,15 @@ def get_connection_settings(config: dict) -> List[dict]:
 
     # If no "MONGODB_SETTINGS", sanitize the "MONGODB_" keys as single connection.
     if "MONGODB_SETTINGS" not in config:
+        warnings.warn(
+            (
+                "Passing flat configuration is deprecated. Please check "
+                "http://docs.mongoengine.org/projects/flask-mongoengine/flask_config.html "
+                "for more info."
+            ),
+            DeprecationWarning,
+            stacklevel=2,
+        )
         config = {k: v for k, v in config.items() if k.lower().startswith("mongodb_")}
         return [_sanitize_settings(config)]
 

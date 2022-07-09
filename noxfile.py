@@ -17,9 +17,8 @@ def base_install(session, flask, mongoengine):
         session.install(
             f"Flask{flask}",
             f"mongoengine{mongoengine}",
-            "MarkupSafe==2.0.1",
             "-e",
-            ".[wtf,toolbar,legacy]",
+            ".[wtf,toolbar,legacy,legacy-dev]",
         )
     else:
         session.install(
