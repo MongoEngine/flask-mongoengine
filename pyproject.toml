@@ -1,7 +1,7 @@
 [project]
 name = "flask-mongoengine"
 description = "Flask extension that provides integration with MongoEngine and WTF model forms."
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.7"
 license = {text = "BSD 3-Clause License"}
 classifiers = [
