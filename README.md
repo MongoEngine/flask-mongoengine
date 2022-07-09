@@ -21,12 +21,10 @@ By default, Flask-MongoEngine will install integration only between [Flask] and
 should be selected as extra option, if required. This is done by users request, to
 limit amount of external dependencies in different production setup environments.
 
-Project packaging is done with setuptools, installation is expected by ``pip`` usage.
-
 All methods end extras described below are compatible between each other and can be
 used together.
 
-### Installation with [MongoEngine] only support
+### Installation with MongoEngine only support
 
 ```bash
 # For Flask >= 2.0.0
@@ -42,7 +40,7 @@ extra option.
 pip install flask-mongoengine[legacy]
 ```
 
-### Installation with WTF Forms support
+### Installation with WTFForms and Flask-WTF support
 
 Flask-mongoengine can be installed with [Flask-WTF] and [WTFForms] support. This
 will extend project dependencies with [Flask-WTF], [WTFForms] and related packages.
@@ -61,6 +59,13 @@ you need to install flask-mongoengine with related support, use:
 ```bash
 # With FlaskDebugToolbar dependencies
 pip install flask-mongoengine[toolbar]
+```
+
+### Installation with all features together
+
+```bash
+# With Flask-WTF, WTFForms and FlaskDebugToolbar dependencies
+pip install flask-mongoengine[wtf,toolbar]
 ```
 
 ## Contributing and testing
