@@ -6,9 +6,16 @@ from views import index, pagination
 
 from flask_mongoengine.panels import mongo_command_logger
 
-app = flask.Flask(__name__)
-app.config.from_object(__name__)
-app.config["MONGODB_SETTINGS"] = {"DB": "testing", "host": "mongo"}
+app = flask.Flask("example_app")
+# Working multidatabase settings example
+app.config["MONGODB_SETTINGS"] = [
+    {"db": "example_app", "host": "mongo", "alias": "default"},
+    {
+        "MONGODB_DB": "example_app_2",
+        "MONGODB_HOST": "mongo",
+        "MONGODB_ALIAS": "secondary",
+    },
+]
 app.config["TESTING"] = True
 app.config["SECRET_KEY"] = "flask+mongoengine=<3"
 app.debug = True
