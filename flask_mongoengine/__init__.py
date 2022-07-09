@@ -1,3 +1,5 @@
+import warnings
+
 import mongoengine
 from flask import Flask, abort, current_app
 from mongoengine.errors import DoesNotExist
@@ -22,6 +24,16 @@ class MongoEngine:
     """Main class used for initialization of Flask-MongoEngine."""
 
     def __init__(self, app=None, config=None):
+        if config is not None:
+            warnings.warn(
+                (
+                    "Passing flat configuration is deprecated. Please check "
+                    "http://docs.mongoengine.org/projects/flask-mongoengine/flask_config.html "
+                    "for more info."
+                ),
+                DeprecationWarning,
+                stacklevel=2,
+            )
         # Extended database fields
         self.BinaryField = db_fields.BinaryField
         self.BooleanField = db_fields.BooleanField
@@ -78,6 +90,16 @@ class MongoEngine:
         if not app or not isinstance(app, Flask):
             raise TypeError("Invalid Flask application instance")
 
+        if config is not None:
+            warnings.warn(
+                (
+                    "Passing flat configuration is deprecated. Please check "
+                    "http://docs.mongoengine.org/projects/flask-mongoengine/flask_config.html "
+                    "for more info."
+                ),
+                DeprecationWarning,
+                stacklevel=2,
+            )
         self.app = app
 
         app.extensions = getattr(app, "extensions", {})

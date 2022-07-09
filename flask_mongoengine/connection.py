@@ -1,3 +1,4 @@
+import warnings
 from typing import List
 
 import mongoengine
@@ -81,6 +82,15 @@ def get_connection_settings(config: dict) -> List[dict]:
 
     # If no "MONGODB_SETTINGS", sanitize the "MONGODB_" keys as single connection.
     if "MONGODB_SETTINGS" not in config:
+        warnings.warn(
+            (
+                "Passing flat configuration is deprecated. Please check "
+                "http://docs.mongoengine.org/projects/flask-mongoengine/flask_config.html "
+                "for more info."
+            ),
+            DeprecationWarning,
+            stacklevel=2,
+        )
         config = {k: v for k, v in config.items() if k.lower().startswith("mongodb_")}
         return [_sanitize_settings(config)]
 
