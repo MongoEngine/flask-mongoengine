@@ -17,6 +17,7 @@ You can also use `WTForms <http://wtforms.simplecodes.com/>`_ as model forms for
    debug_toolbar
    example_app
    api/index
+   CONTRIBUTING
    AUTHORS
    changelog
    LICENSE
