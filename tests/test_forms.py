@@ -8,7 +8,7 @@ import wtforms
 from mongoengine import NotUniqueError, queryset_manager
 from werkzeug.datastructures import MultiDict
 
-from flask_mongoengine.wtf import model_form
+from flask_mongoengine.wtf.orm import model_form
 
 
 def test_binaryfield(app, db):
