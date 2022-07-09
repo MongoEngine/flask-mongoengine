@@ -14,6 +14,11 @@ but you can configure it to open connection only on first database access by set
 the ``'connect'`` dictionary parameter or its ``MONGODB_CONNECT`` flat equivalent to
 ``False``.
 
+```{note}
+Due lack of developers we are unable to answer/solve not recommended connection methods
+errors. Please switch to recommended method before posting any issue. Thank you.
+```
+
 ## Recommended: List of dictionaries settings
 
 Recommended way for setting up connections is to set ``MONGODB_SETTINGS`` in you
