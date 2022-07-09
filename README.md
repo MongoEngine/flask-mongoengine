@@ -10,10 +10,6 @@
 Flask-MongoEngine is a Flask extension that provides integration with [MongoEngine],
 [WtfForms] and [FlaskDebugToolbar].
 
-## Documentation
-
-Full project documentation available on [read the docs].
-
 ## Installation
 
 By default, Flask-MongoEngine will install integration only between [Flask] and
@@ -68,6 +64,23 @@ pip install flask-mongoengine[toolbar]
 pip install flask-mongoengine[wtf,toolbar]
 ```
 
+## Flask configuration
+
+Flask-mongoengine does not provide any configuration defaults. User is responsible
+for setting up correct database settings, to exclude any possible misconfiguration
+and data corruption.
+
+There are several options to set connection. Please note, that all except
+recommended are deprecated and may be removed in future versions, to lower code base
+complexity and bugs. If you use any deprecated connection settings approach, you should
+update your application configuration.
+
+Please refer to [complete connection settings description] for more info.
+
+## Usage and API documentation
+
+Full project documentation available on [read the docs].
+
 ## Contributing and testing
 
 We are welcome for contributors and testers! Check [Contribution guidelines].
@@ -93,3 +106,5 @@ Flask-MongoEngine is distributed under [BSD 3-Clause License].
 [Contribution guidelines]: CONTRIBUTING.md
 
 [nox]: https://nox.thea.codes/en/stable/usage.html
+
+[complete connection settings description]: http://docs.mongoengine.org/projects/flask-mongoengine/flask_config.html
