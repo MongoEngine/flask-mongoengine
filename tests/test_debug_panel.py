@@ -3,7 +3,6 @@ Tests for ``MongoDebugPanel`` and related mongo events listener.
 
 - Independent of global configuration by design.
 """
-
 import contextlib
 
 import jinja2
@@ -18,6 +17,7 @@ from pymongo.errors import OperationFailure
 from pytest_mock import MockerFixture
 
 from flask_mongoengine.panels import (
+    MongoCommandLogger,
     MongoDebugPanel,
     _maybe_patch_jinja_loader,
     mongo_command_logger,
@@ -25,7 +25,7 @@ from flask_mongoengine.panels import (
 
 
 @pytest.fixture()
-def app_no_mongo_monitoring():
+def app_no_mongo_monitoring() -> Flask:
     app = Flask(__name__)
     app.config["TESTING"] = True
     app.config["WTF_CSRF_ENABLED"] = False
@@ -39,7 +39,7 @@ def app_no_mongo_monitoring():
 
 
 @pytest.fixture(autouse=True)
-def registered_monitoring():
+def registered_monitoring() -> MongoCommandLogger:
     """Register/Unregister mongo_command_logger in required tests"""
     monitoring.register(mongo_command_logger)
     mongo_command_logger.reset_tracker()
@@ -69,7 +69,7 @@ class TestMongoDebugPanel:
     """Trivial tests to highlight any unexpected changes in namings or code."""
 
     @pytest.fixture
-    def toolbar_with_no_flask(self):
+    def toolbar_with_no_flask(self) -> MongoDebugPanel:
         """Simple instance of MongoDebugPanel without flask application"""
         jinja2_env = jinja2.Environment()
         return MongoDebugPanel(jinja2_env)
@@ -186,7 +186,7 @@ class TestMongoCommandLogger:
     """By design tested with raw pymongo."""
 
     @pytest.fixture(autouse=True)
-    def py_db(self, registered_monitoring):
+    def py_db(self, registered_monitoring) -> pymongo.MongoClient:
         """Clean up and returns special database for testing on pymongo driver level"""
         client = pymongo.MongoClient("localhost", 27017)
         db = client.pymongo_test_database
