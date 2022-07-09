@@ -130,6 +130,19 @@ nox -- -k test__normal_command__logged
 
 9. Submit a pull request through the GitHub website.
 
+## Interactive documentation development
+
+Our nox configuration include special session for simplifying documentation
+development. When launched, documentation will be re-rendered after any saved
+code/documentation files changes. To use this session, after local environment setup,
+just run:
+
+```bash
+nox -s docs
+```
+
+Rendered documentation will be available under: <http://localhost:9812/>
+
 ## Style guide
 
 ### General guidelines
