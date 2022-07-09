@@ -63,56 +63,9 @@ you need to install flask-mongoengine with related support, use:
 pip install flask-mongoengine[toolbar]
 ```
 
-## Development and tests
+## Contributing and testing
 
-All development requirements, except [docker] are included in package extra options
-``dev``. So, to install full development environment you need just run package with
-all related options installation:
-
-```bash
-# With all development and package requirements, except docker
-pip install flask-mongoengine[wtf,toolbar,dev]
-```
-
-Our test environment related on [docker] and [nox] to test project on real database
-engine and not use any database mocking, as such mocking can raise unexpected
-behaviour, that is not seen in real database engines.
-
-Before running tests, please ensure that real database not launched on port
-``27017``, otherwise tests will fail. If you want to run tests with local launched
-database engine, run tests in non-interactive mode (see below), in this case [docker]
-will not be used at all.
-
-To run minimum amount of required tests with [docker], use:
-
-```bash
-nox
-```
-
-To run minimum amount of required tests with local database, use:
-
-```bash
-nox --non-interactive
-```
-
-To run one or mode nox sessions only, use `-s` option. For example to run only
-documentation and linting tests, run:
-
-```bash
-nox -s documentation_tests lint
-```
-
-In some cases you will want to bypass arguments to pytest itself, to run single test
-or single test file. It is easy to do, everything after double dash will be bypassed
-to pytest directly. For example, to run ``test__normal_command__logged`` test only, use:
-
-```bash
-nox -- -k test__normal_command__logged
-```
-
-## Contributing
-
-We are welcome for contributions! See the [Contribution guidelines].
+We are welcome for contributors and testers! Check [Contribution guidelines].
 
 ## License
 
@@ -132,8 +85,6 @@ Flask-MongoEngine is distributed under [BSD 3-Clause License].
 
 [BSD 3-Clause License]: LICENSE.md
 
-[Contribution guidelines]: CONTRIBUTING.rst
-
-[docker]: https://www.docker.com/
+[Contribution guidelines]: CONTRIBUTING.md
 
 [nox]: https://nox.thea.codes/en/stable/usage.html
