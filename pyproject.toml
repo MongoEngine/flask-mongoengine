@@ -57,7 +57,8 @@ dev = [
   "pytest-mock",
   "nox",
 ]
-legacy = [
+legacy = ["MarkupSafe==2.0.1"]
+legacy-dev = [
   "pytest",
   "pytest-cov",
   "pytest-mock",
