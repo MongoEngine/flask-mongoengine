@@ -1,4 +1,4 @@
-from bson import json_util, DBRef, ObjectId
+from bson import DBRef, ObjectId, json_util
 from flask.json import JSONEncoder
 from mongoengine.base import BaseDocument
 from mongoengine.queryset import QuerySet

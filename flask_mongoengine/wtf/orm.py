@@ -6,7 +6,8 @@ from collections import OrderedDict
 
 from bson import ObjectId
 from mongoengine import ReferenceField
-from wtforms import fields as f, validators
+from wtforms import fields as f
+from wtforms import validators
 
 from flask_mongoengine.wtf.fields import (
     BinaryField,
@@ -84,9 +85,9 @@ class ModelConverter(object):
         if hasattr(field, "to_form_field"):
             return field.to_form_field(model, kwargs)
 
-        if hasattr(field, "field") and type(field.field) == ReferenceField:
+        if hasattr(field, "field") and isinstance(field.field, ReferenceField):
             kwargs["label_modifier"] = getattr(
-                model, field.name + "_label_modifier", None
+                model, f"{field.name}_label_modifier", None
             )
 
         if ftype in self.converters:
@@ -221,6 +222,10 @@ class ModelConverter(object):
     def conv_GenericReference(self, model, field, kwargs):
         return
 
+    @converts("FileField")
+    def conv_File(self, model, field, kwargs):
+        return f.FileField(**kwargs)
+
     def coerce(self, field_type):
         coercions = {
             "IntField": int,
@@ -298,4 +303,4 @@ def model_form(
     """
     field_dict = model_fields(model, only, exclude, field_args, converter)
     field_dict["model_class"] = model
-    return type(model.__name__ + "Form", (base_class,), field_dict)
+    return type(f"{model.__name__}Form", (base_class,), field_dict)

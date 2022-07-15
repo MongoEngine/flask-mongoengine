@@ -1,81 +1,19 @@
-import inspect
+import warnings
 
 import mongoengine
 from flask import Flask, abort, current_app
-from mongoengine.base.fields import BaseField
 from mongoengine.errors import DoesNotExist
 from mongoengine.queryset import QuerySet
 
-from .connection import *
-from .json import override_json_encoder
-from .pagination import *
-from .sessions import *
-from .wtf import WtfBaseField
+from flask_mongoengine.connection import *
+from flask_mongoengine.json import override_json_encoder
+from flask_mongoengine.pagination import *
+from flask_mongoengine.sessions import *
 
-VERSION = (1, 0, 0)
-
-
-def get_version():
-    """Return the VERSION as a string."""
-    return ".".join(map(str, VERSION))
-
-
-__version__ = get_version()
-
-
-def _patch_base_field(obj, name):
-    """
-    If the object submitted has a class whose base class is
-    mongoengine.base.fields.BaseField, then monkey patch to
-    replace it with flask_mongoengine.wtf.WtfBaseField.
-
-    @note:  WtfBaseField is an instance of BaseField - but
-            gives us the flexibility to extend field parameters
-            and settings required of WTForm via model form generator.
-
-    @see: flask_mongoengine.wtf.base.WtfBaseField.
-    @see: model_form in flask_mongoengine.wtf.orm
-
-    @param obj: MongoEngine instance in which we should locate the class.
-    @param name: Name of an attribute which may or may not be a BaseField.
-    """
-    # TODO is there a less hacky way to accomplish the same level of
-    # extensibility/control?
-
-    # get an attribute of the MongoEngine class and return if it's not
-    # a class
-    cls = getattr(obj, name)
-    if not inspect.isclass(cls):
-        return
-
-    # if it is a class, inspect all of its parent classes
-    cls_bases = list(cls.__bases__)
-
-    # if any of them is a BaseField, replace it with WtfBaseField
-    for index, base in enumerate(cls_bases):
-        if base == BaseField:
-            cls_bases[index] = WtfBaseField
-            cls.__bases__ = tuple(cls_bases)
-            break
-
-    # re-assign the class back to the MongoEngine instance
-    delattr(obj, name)
-    setattr(obj, name, cls)
-
-
-def _include_mongoengine(obj):
-    """
-    Copy all of the attributes from mongoengine and mongoengine.fields
-    onto obj (which should be an instance of the MongoEngine class).
-    """
-    # TODO why do we need this? What's wrong with importing from the
-    # original modules?
-    for attr_name in mongoengine.__all__:
-        if not hasattr(obj, attr_name):
-            setattr(obj, attr_name, getattr(mongoengine, attr_name))
-
-            # patch BaseField if available
-            _patch_base_field(obj, attr_name)
+try:
+    from flask_mongoengine.wtf import db_fields
+except ImportError:
+    from mongoengine import fields as db_fields
 
 
 def current_mongoengine_instance():
@@ -86,14 +24,66 @@ def current_mongoengine_instance():
             return k
 
 
-class MongoEngine(object):
+class MongoEngine:
     """Main class used for initialization of Flask-MongoEngine."""
 
     def __init__(self, app=None, config=None):
-        _include_mongoengine(self)
+        if config is not None:
+            warnings.warn(
+                (
+                    "Passing flat configuration is deprecated. Please check "
+                    "http://docs.mongoengine.org/projects/flask-mongoengine/flask_config.html "
+                    "for more info."
+                ),
+                DeprecationWarning,
+                stacklevel=2,
+            )
+        # Extended database fields
+        self.BinaryField = db_fields.BinaryField
+        self.BooleanField = db_fields.BooleanField
+        self.CachedReferenceField = db_fields.CachedReferenceField
+        self.ComplexDateTimeField = db_fields.ComplexDateTimeField
+        self.DateField = db_fields.DateField
+        self.DateTimeField = db_fields.DateTimeField
+        self.DecimalField = db_fields.DecimalField
+        self.DictField = db_fields.DictField
+        self.DynamicField = db_fields.DynamicField
+        self.EmailField = db_fields.EmailField
+        self.EmbeddedDocumentField = db_fields.EmbeddedDocumentField
+        self.EmbeddedDocumentListField = db_fields.EmbeddedDocumentListField
+        self.EnumField = db_fields.EnumField
+        self.FileField = db_fields.FileField
+        self.FloatField = db_fields.FloatField
+        self.GenericEmbeddedDocumentField = db_fields.GenericEmbeddedDocumentField
+        self.GenericLazyReferenceField = db_fields.GenericLazyReferenceField
+        self.GenericReferenceField = db_fields.GenericReferenceField
+        self.GeoJsonBaseField = db_fields.GeoJsonBaseField
+        self.GeoPointField = db_fields.GeoPointField
+        self.ImageField = db_fields.ImageField
+        self.IntField = db_fields.IntField
+        self.LazyReferenceField = db_fields.LazyReferenceField
+        self.LineStringField = db_fields.LineStringField
+        self.ListField = db_fields.ListField
+        self.LongField = db_fields.LongField
+        self.MapField = db_fields.MapField
+        self.MultiLineStringField = db_fields.MultiLineStringField
+        self.MultiPointField = db_fields.MultiPointField
+        self.MultiPolygonField = db_fields.MultiPolygonField
+        self.ObjectIdField = db_fields.ObjectIdField
+        self.PointField = db_fields.PointField
+        self.PolygonField = db_fields.PolygonField
+        self.ReferenceField = db_fields.ReferenceField
+        self.SequenceField = db_fields.SequenceField
+        self.SortedListField = db_fields.SortedListField
+        self.StringField = db_fields.StringField
+        self.URLField = db_fields.URLField
+        self.UUIDField = db_fields.UUIDField
 
+        # Flask related data
         self.app = None
         self.config = config
+
+        # Extended documents classes
         self.Document = Document
         self.DynamicDocument = DynamicDocument
 
@@ -104,6 +94,16 @@ class MongoEngine(object):
         if not app or not isinstance(app, Flask):
             raise TypeError("Invalid Flask application instance")
 
+        if config is not None:
+            warnings.warn(
+                (
+                    "Passing flat configuration is deprecated. Please check "
+                    "http://docs.mongoengine.org/projects/flask-mongoengine/flask_config.html "
+                    "for more info."
+                ),
+                DeprecationWarning,
+                stacklevel=2,
+            )
         self.app = app
 
         app.extensions = getattr(app, "extensions", {})
@@ -125,10 +125,10 @@ class MongoEngine(object):
 
         if not self.config:
             # If no configs passed, use app.config.
-            config = app.config
+            self.config = app.config
 
         # Obtain db connection(s)
-        connections = create_connections(config)
+        connections = create_connections(self.config)
 
         # Store objects in application instance so that multiple apps do not
         # end up accessing the same objects.
@@ -136,32 +136,58 @@ class MongoEngine(object):
         app.extensions["mongoengine"][self] = s
 
     @property
-    def connection(self):
+    def connection(self) -> dict:
         """
         Return MongoDB connection(s) associated with this MongoEngine
         instance.
         """
         return current_app.extensions["mongoengine"][self]["conn"]
 
+    def __getattr__(self, attr_name):
+        """
+        Mongoengine backward compatibility handler.
+
+        Provide original :module:``mongoengine`` module methods/classes if they are not
+        modified by us, and not mapped directly.
+        """
+        return getattr(mongoengine, attr_name)
+
 
 class BaseQuerySet(QuerySet):
-    """Mongoengine's queryset extended with handy extras."""
+    """Extends :class:`~mongoengine.queryset.QuerySet` class with handly methods."""
 
-    def get_or_404(self, *args, **kwargs):
+    def _abort_404(self, _message_404):
+        """Returns 404 error with message, if message provided.
+
+        :param _message_404: Message for 404 comment
         """
-        Get a document and raise a 404 Not Found error if it doesn't
-        exist.
+        abort(404, _message_404) if _message_404 else abort(404)
+
+    def get_or_404(self, *args, _message_404=None, **kwargs):
+        """Get a document and raise a 404 Not Found error if it doesn't exist.
+
+        :param _message_404: Message for 404 comment, not forwarded to
+            :func:`~mongoengine.queryset.QuerySet.get`
+        :param args: args list, silently forwarded to
+            :func:`~mongoengine.queryset.QuerySet.get`
+        :param kwargs: keywords arguments, silently forwarded to
+            :func:`~mongoengine.queryset.QuerySet.get`
         """
         try:
             return self.get(*args, **kwargs)
         except DoesNotExist:
-            message = kwargs.get("message", None)
-            abort(404, message) if message else abort(404)
+            self._abort_404(_message_404)
 
-    def first_or_404(self, message=None):
-        """Same as get_or_404, but uses .first, not .get."""
-        obj = self.first()
-        return obj if obj else abort(404, message) if message else abort(404)
+    def first_or_404(self, _message_404=None):
+        """
+        Same as :func:`~BaseQuerySet.get_or_404`, but uses
+        :func:`~mongoengine.queryset.QuerySet.first`, not
+        :func:`~mongoengine.queryset.QuerySet.get`.
+
+        :param _message_404: Message for 404 comment, not forwarded to
+            :func:`~mongoengine.queryset.QuerySet.get`
+        """
+        return self.first() or self._abort_404(_message_404)
 
     def paginate(self, page, per_page, **kwargs):
         """
@@ -177,7 +203,7 @@ class BaseQuerySet(QuerySet):
         """
         # TODO this doesn't sound useful at all - remove in next release?
         item = self.get(id=doc_id)
-        count = getattr(item, field_name + "_count", "")
+        count = getattr(item, f"{field_name}_count", "")
         total = total or count or len(getattr(item, field_name))
         return ListFieldPagination(
             self, doc_id, field_name, page, per_page, total=total
@@ -192,7 +218,7 @@ class Document(mongoengine.Document):
     def paginate_field(self, field_name, page, per_page, total=None):
         """Paginate items within a list field."""
         # TODO this doesn't sound useful at all - remove in next release?
-        count = getattr(self, field_name + "_count", "")
+        count = getattr(self, f"{field_name}_count", "")
         total = total or count or len(getattr(self, field_name))
         return ListFieldPagination(
             self.__class__.objects, self.pk, field_name, page, per_page, total=total

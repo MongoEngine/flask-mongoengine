@@ -8,7 +8,7 @@ import wtforms
 from mongoengine import NotUniqueError, queryset_manager
 from werkzeug.datastructures import MultiDict
 
-from flask_mongoengine.wtf import model_form
+from flask_mongoengine.wtf.orm import model_form
 
 
 def test_binaryfield(app, db):
@@ -65,21 +65,19 @@ def test_emailfield(app, db):
 
         EmailForm = model_form(Email)
         form = EmailForm(instance=Email())
-        assert "None" not in "%s" % form.email
+        assert "None" not in f"{form.email}"
         assert form.validate()
 
         form = EmailForm(MultiDict({"email": ""}))
-        assert "None" not in "%s" % form.email
+        assert "None" not in f"{form.email}"
         assert form.validate()
-
-        # Ensure required works
 
         class Email(db.Document):
             email = db.EmailField(required=True)
 
         EmailForm = model_form(Email)
         form = EmailForm(MultiDict({"email": ""}))
-        assert "None" not in "%s" % form.email
+        assert "None" not in f"{form.email}"
         assert not form.validate()
 
 
@@ -357,6 +355,19 @@ def test_modelradiofield(app, db):
         assert form.answer.choices == choices
 
 
+def test_filefield(app, db):
+    with app.test_request_context("/"):
+
+        class FileUpload(db.Document):
+            file = db.FileField()
+
+        FileUploadForm = model_form(FileUpload)
+
+        form = FileUploadForm(file=None)
+
+        assert isinstance(form.file.widget, wtforms.widgets.FileInput)
+
+
 def test_passwordfield(app, db):
     with app.test_request_context("/"):
 
@@ -528,3 +539,23 @@ def test_form_label_modifier(app, db):
         form = FoodStoreForm()
 
         assert [obj.label.text for obj in form.food_items] == fruit_names
+
+
+def test_csrf_token(app, db):
+    # fixes MongoEngine/flask-mongoengine#436
+    app.config["WTF_CSRF_ENABLED"] = True
+    with app.test_request_context("/"):
+
+        class DummyCSRF(wtforms.csrf.core.CSRF):
+            def generate_csrf_token(self, csrf_token_field):
+                return "dummytoken"
+
+        class MyModel(db.Document):
+            pass
+
+        form = model_form(MyModel)(
+            MultiDict({"csrf_token": "dummytoken"}), meta={"csrf_class": DummyCSRF}
+        )
+        assert "csrf_token" in form
+        assert form.validate()
+        form.save()

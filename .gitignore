@@ -14,8 +14,10 @@ venv/
 .project
 .pydevproject
 .tox
+.nox
 .eggs
 .idea
 .vscode
 htmlcov/
 coverage.xml
+_version.py

@@ -1,9 +1,9 @@
 """
 Useful form fields for use with the mongoengine.
 """
-import json
 from gettext import gettext as _
 
+from flask import json
 from mongoengine.queryset import DoesNotExist
 from wtforms import widgets
 from wtforms.fields import SelectFieldBase, StringField, TextAreaField
@@ -99,7 +99,6 @@ class QuerySetSelectField(SelectFieldBase):
 
 
 class QuerySetSelectMultipleField(QuerySetSelectField):
-
     widget = widgets.Select(multiple=True)
 
     def __init__(

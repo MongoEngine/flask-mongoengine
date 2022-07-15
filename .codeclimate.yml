@@ -1,0 +1,17 @@
+version: "2"
+checks:
+  file-lines:
+    enabled: false
+  method-count:
+    enabled: false
+  method-lines:
+    enabled: false
+  complex-logic:
+    config:
+      threshold: 10
+  method-complexity:
+    config:
+      threshold: 10
+exclude_patterns:
+  - "tests/"
+  - "example_app/"

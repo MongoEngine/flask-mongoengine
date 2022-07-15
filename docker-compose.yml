@@ -1,0 +1,25 @@
+version: "3.3"
+volumes:
+  db_data: {}
+
+services:
+  mongo:
+    image: mongo:4.4
+    volumes:
+      - db_data:/data/db/
+    ports:
+      - 27017:27017
+    restart: always
+
+  flask:
+    build:
+      context: .
+      dockerfile: ./example_app/compose/flask/Dockerfile
+    depends_on:
+      - mongo
+    command: python ./example_app/app.py
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/flask_mongoengine
+    restart: always
