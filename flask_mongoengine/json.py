@@ -2,6 +2,7 @@ from bson import DBRef, ObjectId, json_util
 from flask.json import JSONEncoder
 from mongoengine.base import BaseDocument
 from mongoengine.queryset import QuerySet
+from pymongo.command_cursor import CommandCursor
 
 
 def _make_encoder(superclass):
@@ -16,6 +17,8 @@ def _make_encoder(superclass):
                 return json_util._json_convert(obj.to_mongo())
             elif isinstance(obj, QuerySet):
                 return json_util._json_convert(obj.as_pymongo())
+            elif isinstance(obj, CommandCursor):
+                return json_util._json_convert(obj)
             elif isinstance(obj, DBRef):
                 return obj.id
             elif isinstance(obj, ObjectId):
