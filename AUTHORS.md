@@ -34,7 +34,7 @@ This project is made by incredible authors:
 - fieliapm
 - Garito
 - Gregg Lind
-- Ido Shraga (https://github.com/idoshr)
+- Ido Shraga
 - icoz
 - Jack Stouffer
 - Jamar Parris
