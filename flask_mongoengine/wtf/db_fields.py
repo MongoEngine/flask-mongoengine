@@ -84,7 +84,7 @@ class WtfFieldMixin:
 
 class BinaryField(WtfFieldMixin, fields.BinaryField):
     """
-    Extends :class:`mongoengine.fields.BinaryField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.BinaryField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -94,7 +94,7 @@ class BinaryField(WtfFieldMixin, fields.BinaryField):
 
 class BooleanField(WtfFieldMixin, fields.BooleanField):
     """
-    Extends :class:`mongoengine.fields.BooleanField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.BooleanField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -104,7 +104,7 @@ class BooleanField(WtfFieldMixin, fields.BooleanField):
 
 class CachedReferenceField(WtfFieldMixin, fields.CachedReferenceField):
     """
-    Extends :class:`mongoengine.fields.CachedReferenceField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.CachedReferenceField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -114,7 +114,7 @@ class CachedReferenceField(WtfFieldMixin, fields.CachedReferenceField):
 
 class ComplexDateTimeField(WtfFieldMixin, fields.ComplexDateTimeField):
     """
-    Extends :class:`mongoengine.fields.ComplexDateTimeField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.ComplexDateTimeField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -124,7 +124,7 @@ class ComplexDateTimeField(WtfFieldMixin, fields.ComplexDateTimeField):
 
 class DateField(WtfFieldMixin, fields.DateField):
     """
-    Extends :class:`mongoengine.fields.DateField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.DateField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -134,7 +134,7 @@ class DateField(WtfFieldMixin, fields.DateField):
 
 class DateTimeField(WtfFieldMixin, fields.DateTimeField):
     """
-    Extends :class:`mongoengine.fields.DateTimeField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.DateTimeField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -144,7 +144,7 @@ class DateTimeField(WtfFieldMixin, fields.DateTimeField):
 
 class DecimalField(WtfFieldMixin, fields.DecimalField):
     """
-    Extends :class:`mongoengine.fields.DecimalField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.DecimalField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -154,7 +154,7 @@ class DecimalField(WtfFieldMixin, fields.DecimalField):
 
 class DictField(WtfFieldMixin, fields.DictField):
     """
-    Extends :class:`mongoengine.fields.DictField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.DictField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -164,7 +164,7 @@ class DictField(WtfFieldMixin, fields.DictField):
 
 class DynamicField(WtfFieldMixin, fields.DynamicField):
     """
-    Extends :class:`mongoengine.fields.DynamicField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.DynamicField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -174,7 +174,7 @@ class DynamicField(WtfFieldMixin, fields.DynamicField):
 
 class EmailField(WtfFieldMixin, fields.EmailField):
     """
-    Extends :class:`mongoengine.fields.EmailField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.EmailField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -184,7 +184,7 @@ class EmailField(WtfFieldMixin, fields.EmailField):
 
 class EmbeddedDocumentField(WtfFieldMixin, fields.EmbeddedDocumentField):
     """
-    Extends :class:`mongoengine.fields.EmbeddedDocumentField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.EmbeddedDocumentField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -194,7 +194,7 @@ class EmbeddedDocumentField(WtfFieldMixin, fields.EmbeddedDocumentField):
 
 class EmbeddedDocumentListField(WtfFieldMixin, fields.EmbeddedDocumentListField):
     """
-    Extends :class:`mongoengine.fields.EmbeddedDocumentListField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.EmbeddedDocumentListField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -204,7 +204,7 @@ class EmbeddedDocumentListField(WtfFieldMixin, fields.EmbeddedDocumentListField)
 
 class EnumField(WtfFieldMixin, fields.EnumField):
     """
-    Extends :class:`mongoengine.fields.EnumField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.EnumField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -214,7 +214,7 @@ class EnumField(WtfFieldMixin, fields.EnumField):
 
 class FileField(WtfFieldMixin, fields.FileField):
     """
-    Extends :class:`mongoengine.fields.FileField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.FileField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -224,7 +224,7 @@ class FileField(WtfFieldMixin, fields.FileField):
 
 class FloatField(WtfFieldMixin, fields.FloatField):
     """
-    Extends :class:`mongoengine.fields.FloatField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.FloatField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -234,7 +234,7 @@ class FloatField(WtfFieldMixin, fields.FloatField):
 
 class GenericEmbeddedDocumentField(WtfFieldMixin, fields.GenericEmbeddedDocumentField):
     """
-    Extends :class:`mongoengine.fields.GenericEmbeddedDocumentField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.GenericEmbeddedDocumentField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -244,7 +244,7 @@ class GenericEmbeddedDocumentField(WtfFieldMixin, fields.GenericEmbeddedDocument
 
 class GenericLazyReferenceField(WtfFieldMixin, fields.GenericLazyReferenceField):
     """
-    Extends :class:`mongoengine.fields.GenericLazyReferenceField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.GenericLazyReferenceField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -254,7 +254,7 @@ class GenericLazyReferenceField(WtfFieldMixin, fields.GenericLazyReferenceField)
 
 class GenericReferenceField(WtfFieldMixin, fields.GenericReferenceField):
     """
-    Extends :class:`mongoengine.fields.GenericReferenceField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.GenericReferenceField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -264,7 +264,7 @@ class GenericReferenceField(WtfFieldMixin, fields.GenericReferenceField):
 
 class GeoJsonBaseField(WtfFieldMixin, fields.GeoJsonBaseField):
     """
-    Extends :class:`mongoengine.fields.GeoJsonBaseField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.GeoJsonBaseField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -274,7 +274,7 @@ class GeoJsonBaseField(WtfFieldMixin, fields.GeoJsonBaseField):
 
 class GeoPointField(WtfFieldMixin, fields.GeoPointField):
     """
-    Extends :class:`mongoengine.fields.GeoPointField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.GeoPointField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -284,7 +284,7 @@ class GeoPointField(WtfFieldMixin, fields.GeoPointField):
 
 class ImageField(WtfFieldMixin, fields.ImageField):
     """
-    Extends :class:`mongoengine.fields.ImageField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.ImageField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -294,7 +294,7 @@ class ImageField(WtfFieldMixin, fields.ImageField):
 
 class IntField(WtfFieldMixin, fields.IntField):
     """
-    Extends :class:`mongoengine.fields.IntField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.IntField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -304,7 +304,7 @@ class IntField(WtfFieldMixin, fields.IntField):
 
 class LazyReferenceField(WtfFieldMixin, fields.LazyReferenceField):
     """
-    Extends :class:`mongoengine.fields.LazyReferenceField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.LazyReferenceField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -314,7 +314,7 @@ class LazyReferenceField(WtfFieldMixin, fields.LazyReferenceField):
 
 class LineStringField(WtfFieldMixin, fields.LineStringField):
     """
-    Extends :class:`mongoengine.fields.LineStringField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.LineStringField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -324,7 +324,7 @@ class LineStringField(WtfFieldMixin, fields.LineStringField):
 
 class ListField(WtfFieldMixin, fields.ListField):
     """
-    Extends :class:`mongoengine.fields.ListField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.ListField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -334,7 +334,7 @@ class ListField(WtfFieldMixin, fields.ListField):
 
 class LongField(WtfFieldMixin, fields.LongField):
     """
-    Extends :class:`mongoengine.fields.LongField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.LongField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -344,7 +344,7 @@ class LongField(WtfFieldMixin, fields.LongField):
 
 class MapField(WtfFieldMixin, fields.MapField):
     """
-    Extends :class:`mongoengine.fields.MapField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.MapField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -354,7 +354,7 @@ class MapField(WtfFieldMixin, fields.MapField):
 
 class MultiLineStringField(WtfFieldMixin, fields.MultiLineStringField):
     """
-    Extends :class:`mongoengine.fields.MultiLineStringField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.MultiLineStringField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -364,7 +364,7 @@ class MultiLineStringField(WtfFieldMixin, fields.MultiLineStringField):
 
 class MultiPointField(WtfFieldMixin, fields.MultiPointField):
     """
-    Extends :class:`mongoengine.fields.MultiPointField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.MultiPointField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -374,7 +374,7 @@ class MultiPointField(WtfFieldMixin, fields.MultiPointField):
 
 class MultiPolygonField(WtfFieldMixin, fields.MultiPolygonField):
     """
-    Extends :class:`mongoengine.fields.MultiPolygonField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.MultiPolygonField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -384,7 +384,7 @@ class MultiPolygonField(WtfFieldMixin, fields.MultiPolygonField):
 
 class ObjectIdField(WtfFieldMixin, fields.ObjectIdField):
     """
-    Extends :class:`mongoengine.fields.ObjectIdField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.ObjectIdField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -394,7 +394,7 @@ class ObjectIdField(WtfFieldMixin, fields.ObjectIdField):
 
 class PointField(WtfFieldMixin, fields.PointField):
     """
-    Extends :class:`mongoengine.fields.PointField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.PointField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -404,7 +404,7 @@ class PointField(WtfFieldMixin, fields.PointField):
 
 class PolygonField(WtfFieldMixin, fields.PolygonField):
     """
-    Extends :class:`mongoengine.fields.PolygonField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.PolygonField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -414,7 +414,7 @@ class PolygonField(WtfFieldMixin, fields.PolygonField):
 
 class ReferenceField(WtfFieldMixin, fields.ReferenceField):
     """
-    Extends :class:`mongoengine.fields.ReferenceField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.ReferenceField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -424,7 +424,7 @@ class ReferenceField(WtfFieldMixin, fields.ReferenceField):
 
 class SequenceField(WtfFieldMixin, fields.SequenceField):
     """
-    Extends :class:`mongoengine.fields.SequenceField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.SequenceField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -434,7 +434,7 @@ class SequenceField(WtfFieldMixin, fields.SequenceField):
 
 class SortedListField(WtfFieldMixin, fields.SortedListField):
     """
-    Extends :class:`mongoengine.fields.SortedListField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.SortedListField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -444,7 +444,7 @@ class SortedListField(WtfFieldMixin, fields.SortedListField):
 
 class StringField(WtfFieldMixin, fields.StringField):
     """
-    Extends :class:`mongoengine.fields.StringField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.StringField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -454,7 +454,7 @@ class StringField(WtfFieldMixin, fields.StringField):
 
 class URLField(WtfFieldMixin, fields.URLField):
     """
-    Extends :class:`mongoengine.fields.URLField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.URLField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
@@ -464,7 +464,7 @@ class URLField(WtfFieldMixin, fields.URLField):
 
 class UUIDField(WtfFieldMixin, fields.UUIDField):
     """
-    Extends :class:`mongoengine.fields.UUIDField`` with wtf required parameters.
+    Extends :class:`mongoengine.fields.UUIDField` with wtf required parameters.
 
     For full list of arguments and keyword arguments, look parent field docs.
     """
