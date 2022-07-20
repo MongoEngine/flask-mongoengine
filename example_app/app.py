@@ -1,9 +1,9 @@
 import flask
 from flask_debugtoolbar import DebugToolbarExtension
-from models import db
 from pymongo import monitoring
-from views import index, pagination
 
+from example_app.models import db
+from example_app.views import index, pagination
 from flask_mongoengine.panels import mongo_command_logger
 
 app = flask.Flask("example_app")

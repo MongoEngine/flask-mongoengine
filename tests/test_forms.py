@@ -47,7 +47,7 @@ def test_list_choices_coerce(app, db):
         CHOICES = ((1, "blue"), (2, "red"))
 
         class MyChoices(db.Document):
-            pill = db.ListField(db.IntField(choices=CHOICES))
+            pill = db.ListField(field=db.IntField(choices=CHOICES))
 
         MyChoicesForm = model_form(MyChoices)
         form = MyChoicesForm(MultiDict({"pill": "1"}))
@@ -88,7 +88,7 @@ def test_model_form(app, db):
             meta = {"allow_inheritance": True}
             title = db.StringField(required=True, max_length=200)
             posted = db.DateTimeField(default=datetime.datetime.now)
-            tags = db.ListField(db.StringField())
+            tags = db.ListField(field=db.StringField())
 
         class TextPost(BlogPost):
             email = db.EmailField(required=False)
@@ -189,7 +189,7 @@ def test_model_form_only(app, db):
         class BlogPost(db.Document):
             title = db.StringField(required=True, max_length=200)
             posted = db.DateTimeField(default=datetime.datetime.now)
-            tags = db.ListField(db.StringField())
+            tags = db.ListField(field=db.StringField())
 
         BlogPost.drop_collection()
 
@@ -215,7 +215,7 @@ def test_model_form_with_custom_query_set(app, db):
                 return queryset(breed__in=["german sheppard", "wolfhound"])
 
         class DogOwner(db.Document):
-            dog = db.ReferenceField(Dog)
+            dog = db.ReferenceField(document_type=Dog)
 
         big_dogs = [Dog(breed="german sheppard"), Dog(breed="wolfhound")]
         dogs = [Dog(breed="poodle")] + big_dogs
@@ -238,7 +238,7 @@ def test_modelselectfield(app, db):
             name = db.StringField()
 
         class DogOwner(db.Document):
-            dog = db.ReferenceField(Dog)
+            dog = db.ReferenceField(document_type=Dog)
 
         DogOwnerForm = model_form(DogOwner, field_args={"dog": {"allow_blank": True}})
 
@@ -276,7 +276,7 @@ def test_modelselectfield_multiple(app, db):
             name = db.StringField()
 
         class DogOwner(db.Document):
-            dogs = db.ListField(db.ReferenceField(Dog))
+            dogs = db.ListField(field=db.ReferenceField(document_type=Dog))
 
         DogOwnerForm = model_form(DogOwner, field_args={"dogs": {"allow_blank": True}})
 
@@ -317,7 +317,7 @@ def test_modelselectfield_multiple_initalvalue_None(app, db):
             name = db.StringField()
 
         class DogOwner(db.Document):
-            dogs = db.ListField(db.ReferenceField(Dog))
+            dogs = db.ListField(field=db.ReferenceField(document_type=Dog))
 
         DogOwnerForm = model_form(DogOwner)
 
@@ -402,7 +402,7 @@ def test_sub_field_args(app, db):
     with app.test_request_context("/"):
 
         class TestModel(db.Document):
-            lst = db.ListField(db.StringField())
+            lst = db.ListField(field=db.StringField())
 
         field_args = {
             "lst": {
@@ -438,7 +438,7 @@ def test_modelselectfield_multiple_selected_elements_must_be_retained(app, db):
                 return self.name
 
         class DogOwner(db.Document):
-            dogs = db.ListField(db.ReferenceField(Dog))
+            dogs = db.ListField(field=db.ReferenceField(document_type=Dog))
 
         DogOwnerForm = model_form(DogOwner)
 
@@ -508,8 +508,8 @@ def test_embedded_model_form(app, db):
 
         class Post(db.Document):
             title = db.StringField(max_length=120, required=True)
-            tags = db.ListField(db.StringField(max_length=30))
-            content = db.EmbeddedDocumentField("Content")
+            tags = db.ListField(field=db.StringField(max_length=30))
+            content = db.EmbeddedDocumentField(document_type="Content")
 
         PostForm = model_form(Post)
         form = PostForm()
@@ -524,7 +524,7 @@ def test_form_label_modifier(app, db):
 
         class FoodStore(db.Document):
             title = db.StringField(max_length=120, required=True)
-            food_items = db.ListField(db.ReferenceField(FoodItem))
+            food_items = db.ListField(field=db.ReferenceField(document_type=FoodItem))
 
             def food_items_label_modifier(obj):
                 return obj.title
