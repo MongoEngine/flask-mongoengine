@@ -11,6 +11,16 @@ def setup_endpoints(app, todo):
     def index():
         return flask.jsonify(result=Todo.objects())
 
+    @app.route("/as_pymongo")
+    def as_pymongo():
+        return flask.jsonify(result=Todo.objects().as_pymongo())
+
+    @app.route("/aggregate")
+    def aggregate():
+        return flask.jsonify(
+            result=Todo.objects().aggregate({"$match": {"title": {"$ne": "lksdjh"}}})
+        )
+
     @app.route("/add", methods=["POST"])
     def add():
         form = flask.request.form
@@ -57,7 +67,24 @@ def test_basic_insert(app):
     client = app.test_client()
     client.post("/add", data={"title": "First Item", "text": "The text"})
     client.post("/add", data={"title": "2nd Item", "text": "The text"})
+
     rv = client.get("/")
     result = flask.json.loads(rv.data).get("result")
+    assert len(result) == 2
+    for i in result:
+        assert "title" in i
+        assert "text" in i
 
+    rv = client.get("/as_pymongo")
+    result = flask.json.loads(rv.data).get("result")
+    assert len(result) == 2
+    for i in result:
+        assert "title" in i
+        assert "text" in i
+
+    rv = client.get("/aggregate")
+    result = flask.json.loads(rv.data).get("result")
+    for i in result:
+        assert "title" in i
+        assert "text" in i
     assert len(result) == 2
