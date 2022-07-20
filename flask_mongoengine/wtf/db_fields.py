@@ -53,17 +53,16 @@ class WtfFieldMixin:
     number of field parameters, and settings on behalf
     of document model form generator for WTForm.
 
-    :param args: arguments silently bypassed to normal mongoengine fields
     :param validators:  wtf model form field validators.
     :param filters:     wtf model form field filters.
     :param kwargs: keyword arguments silently bypassed to normal mongoengine fields
     """
 
-    def __init__(self, *args, validators=None, filters=None, **kwargs):
+    def __init__(self, *, validators=None, filters=None, **kwargs):
         self.validators = self._ensure_callable_or_list(validators, "validators")
         self.filters = self._ensure_callable_or_list(filters, "filters")
 
-        super().__init__(*args, **kwargs)
+        super().__init__(**kwargs)
 
     def _ensure_callable_or_list(self, field, msg_flag):
         """
