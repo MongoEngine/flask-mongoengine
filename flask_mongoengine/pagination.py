@@ -1,3 +1,4 @@
+"""Module responsible for custom pagination."""
 import math
 
 from flask import abort
