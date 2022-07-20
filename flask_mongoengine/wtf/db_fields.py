@@ -1,3 +1,4 @@
+"""Responsible for mongoengine fields extension, if WTFForms integration used."""
 from mongoengine import fields
 
 __all__ = [
