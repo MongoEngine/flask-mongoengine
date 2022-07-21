@@ -1,14 +1,19 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-<title>Flask MongoEngine</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+  <title>Flask MongoEngine</title>
+  <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
 </head>
 <body>
-<div class=page>
-  <h1>Toolbar example</h1>
+<nav>
+  <ul>
+    <li><a href="{{ url_for("index") }}">Home</a></li>
+    <li><a href="{{ url_for("pagination") }}">Pagination</a></li>
+  </ul>
+</nav>
+<div>
   <div>
-  {% block body %}{% endblock %}
+    {% block body %}{% endblock %}
   </div>
 </div>
 </body>

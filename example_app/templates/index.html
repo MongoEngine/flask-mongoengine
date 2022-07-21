@@ -1,13 +1,18 @@
 {% extends "layout.html" %}
 {% block body %}
-  {% for todo in todos %}
-    <div>
-      <h2>{{ todo.title }}</h2>
-      {{ todo.text|safe }}
-    </div>
-  {% else %}
-    <em>Unbelievable.  No todos here so far <a href="/add">Add one</a></em>
-  {% endfor %}
-  <br/>
-  <a href="{{ url_for('pagination') }}">See pagination</a>
+  <p>This is demo application that shows Flask-Mongoengine features and integrations.</p>
+  <p>Feel free to open Flask debug toolbar after any action to check executed database requests.</p>
+  <p>If you use this application for first time, it is good idea to generate some fake data.</p>
+  <p>
+    Data will be generated inside docker container database.
+    Two databases will be used to show Flask Debug Panel integration capabilities.
+  </p>
+  <p>You can also delete all data, to test forms only.</p>
+  {% if message %}
+  <p><mark>{{ message }}</mark></p>
+  {% endif %}
+  <form action="{{ url_for("index") }}" method="post">
+    <input type="submit" name="button" value="Generate data"/>
+    <input type="submit" name="button" value="Delete data"/>
+  </form>
 {% endblock %}

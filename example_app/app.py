@@ -38,7 +38,7 @@ monitoring.register(mongo_command_logger)
 db.init_app(app)
 
 
-app.add_url_rule("/", view_func=views.index)
+app.add_url_rule("/", view_func=views.index, methods=["GET", "POST"])
 app.add_url_rule("/pagination", view_func=views.pagination, methods=["GET", "POST"])
 
 if __name__ == "__main__":
