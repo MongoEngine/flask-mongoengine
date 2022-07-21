@@ -66,8 +66,13 @@ def index():
 
 def pagination():
     """Return pagination demonstration page and data generation entrypoint."""
+    form = models.TodoForm()
+
     with switch_db(models.Todo, "secondary"):
+        if request.method == "POST":
+            form.validate_on_submit()
+            form.save()
         page_num = int(request.args.get("page") or 1)
         todos_page = models.Todo.objects.paginate(page=page_num, per_page=3)
 
-    return render_template("pagination.html", todos_page=todos_page)
+    return render_template("pagination.html", todos_page=todos_page, form=form)

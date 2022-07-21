@@ -17,6 +17,19 @@
   </div>
 {% endmacro %}
 
+{% macro with_errors(field) %}
+  <div class="form_field">
+    {% if field.errors %}
+      {% set css_class = 'has_error ' + kwargs.pop('class', '') %}
+      {{ field.label }}{{ field(class=css_class, **kwargs) }}{% if field.flags.required %}*{% endif %}
+      <ul class="errors">{% for error in field.errors %}
+        <li>{{ error|e }}</li>{% endfor %}</ul>
+    {% else %}
+      {{ field.label }}{{ field(**kwargs) }}{% if field.flags.required %}*{% endif %}
+    {% endif %}
+  </div>
+{% endmacro %}
+
 {% block body %}
 
   <div>
@@ -44,6 +57,13 @@
   <div>
     {{ render_navigation(todos_page, "pagination") }}
   </div>
-
+  <div>
+    <form method="POST" action="{{ url_for("pagination") }}">
+      {% for field in form %}
+        {{ with_errors(field, style='font-weight: bold') }}
+      {% endfor %}
+      <input type="submit" value="Create">
+    </form>
+  </div>
 
 {% endblock %}
