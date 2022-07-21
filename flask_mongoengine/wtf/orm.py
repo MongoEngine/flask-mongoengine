@@ -252,10 +252,10 @@ def _get_fields_names(
     :param exclude: If provided, field names will be excluded from fields definition.
       All other field names will have fields.
     """
-    field_names = set(model._fields_ordered)
+    field_names = model._fields_ordered
 
     if only:
-        field_names = [field for field in only if field in set(field_names)]
+        field_names = [field for field in only if field in field_names]
     elif exclude:
         field_names = [field for field in field_names if field not in set(exclude)]
 
