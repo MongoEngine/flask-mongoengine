@@ -299,7 +299,7 @@ def model_form(
     exclude: Optional[List[str]] = None,
     field_args=None,
     converter=None,
-) -> Type:
+) -> Type[ModelForm]:
     """
     Create a wtforms Form for a given mongoengine Document schema::
 
@@ -326,4 +326,5 @@ def model_form(
     """
     field_dict = model_fields(model, only, exclude, field_args, converter)
     field_dict["model_class"] = model
+    # noinspection PyTypeChecker
     return type(f"{model.__name__}Form", (base_class,), field_dict)
