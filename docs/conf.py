@@ -244,6 +244,8 @@ intersphinx_mapping = {
     "werkzeug": ("https://werkzeug.palletsprojects.com/en/2.1.x/", None),
     "pymongo": ("https://pymongo.readthedocs.io/en/stable/", None),
     "mongoengine": ("https://docs.mongoengine.org/", None),
+    "wtforms": ("https://wtforms.readthedocs.io/en/3.0.x/", None),
+    "flask-wtf": ("https://flask-wtf.readthedocs.io/en/1.0.x/", None),
 }
 myst_enable_extensions = [
     "tasklist",
