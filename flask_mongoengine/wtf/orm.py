@@ -6,6 +6,7 @@ from collections import OrderedDict
 
 from bson import ObjectId
 from mongoengine import ReferenceField
+from mongoengine.base import BaseDocument, DocumentMetaclass
 from wtforms import fields as f
 from wtforms import validators
 
@@ -243,8 +244,6 @@ def model_fields(model, only=None, exclude=None, field_args=None, converter=None
 
     See `model_form` docstring for description of parameters.
     """
-    from mongoengine.base import BaseDocument, DocumentMetaclass
-
     if not isinstance(model, (BaseDocument, DocumentMetaclass)):
         raise TypeError("model must be a mongoengine Document schema")
 
