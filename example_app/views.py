@@ -65,7 +65,7 @@ def index():
 
 
 def pagination():
-    """Return pagination demonstration page and data generation entrypoint."""
+    """Return pagination and easy form demonstration."""
     form = models.TodoForm()
 
     with switch_db(models.Todo, "secondary"):
