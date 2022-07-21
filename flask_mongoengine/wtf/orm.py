@@ -3,6 +3,7 @@ Tools for generating forms based on mongoengine Document schemas.
 """
 import decimal
 from collections import OrderedDict
+from typing import List, Optional, Type
 
 from bson import ObjectId
 from mongoengine import ReferenceField
@@ -238,44 +239,67 @@ class ModelConverter(object):
         return coercions.get(field_type, str)
 
 
-def model_fields(model, only=None, exclude=None, field_args=None, converter=None):
+def _get_fields_names(
+    model,
+    only: Optional[List[str]],
+    exclude: Optional[List[str]],
+) -> List[str]:
+    """
+    Filter fields names for further form generation.
+
+    :param model: Source model class for fields list retrieval
+    :param only: If provided, only these field names will have fields definition.
+    :param exclude: If provided, field names will be excluded from fields definition.
+      All other field names will have fields.
+    """
+    field_names = set(model._fields_ordered)
+
+    if only:
+        field_names = [field for field in only if field in set(field_names)]
+    elif exclude:
+        field_names = [field for field in field_names if field not in set(exclude)]
+
+    return field_names
+
+
+def model_fields(
+    model: Type[BaseDocument],
+    only: Optional[List[str]] = None,
+    exclude: Optional[List[str]] = None,
+    field_args=None,
+    converter=None,
+) -> OrderedDict:
     """
     Generate a dictionary of fields for a given database model.
 
-    See `model_form` docstring for description of parameters.
+    See :func:`model_form` docstring for description of parameters.
     """
-    if not isinstance(model, (BaseDocument, DocumentMetaclass)):
+    if not issubclass(model, (BaseDocument, DocumentMetaclass)):
         raise TypeError("model must be a mongoengine Document schema")
 
     converter = converter or ModelConverter()
     field_args = field_args or {}
+    form_fields_dict = OrderedDict()
+    # noinspection PyTypeChecker
+    fields_names = _get_fields_names(model, only, exclude)
 
-    names = ((k, v.creation_counter) for k, v in model._fields.items())
-    field_names = [n[0] for n in sorted(names, key=lambda n: n[1])]
+    for field_name in fields_names:
+        model_field = model._fields[field_name]
+        form_field = converter.convert(model, model_field, field_args.get(field_name))
+        if form_field is not None:
+            form_fields_dict[field_name] = form_field
 
-    if only:
-        field_names = [x for x in only if x in set(field_names)]
-    elif exclude:
-        field_names = [x for x in field_names if x not in set(exclude)]
-
-    field_dict = OrderedDict()
-    for name in field_names:
-        model_field = model._fields[name]
-        field = converter.convert(model, model_field, field_args.get(name))
-        if field is not None:
-            field_dict[name] = field
-
-    return field_dict
+    return form_fields_dict
 
 
 def model_form(
-    model,
-    base_class=ModelForm,
-    only=None,
-    exclude=None,
+    model: Type[BaseDocument],
+    base_class: Type[ModelForm] = ModelForm,
+    only: Optional[List[str]] = None,
+    exclude: Optional[List[str]] = None,
     field_args=None,
     converter=None,
-):
+) -> Type:
     """
     Create a wtforms Form for a given mongoengine Document schema::
 
@@ -286,7 +310,7 @@ def model_form(
     :param model:
         A mongoengine Document schema class
     :param base_class:
-        Base form class to extend from. Must be a ``wtforms.Form`` subclass.
+        Base form class to extend from. Must be a :class:`.ModelForm` subclass.
     :param only:
         An optional iterable with the property names that should be included in
         the form. Only these properties will have fields.
@@ -298,7 +322,7 @@ def model_form(
         to construct each field object.
     :param converter:
         A converter to generate the fields based on the model properties. If
-        not set, ``ModelConverter`` is used.
+        not set, :class:`.ModelConverter` is used.
     """
     field_dict = model_fields(model, only, exclude, field_args, converter)
     field_dict["model_class"] = model
