@@ -70,6 +70,15 @@ class ModelConverter(object):
 
         return kwargs
 
+    def _process_convert_for_choice_fields(self, field, field_class, kwargs):
+        kwargs["choices"] = field.choices
+        kwargs["coerce"] = self.coerce(field_class)
+        if kwargs.pop("multiple", False):
+            return f.SelectMultipleField(**kwargs)
+        if kwargs.pop("radio", False):
+            return f.RadioField(**kwargs)
+        return f.SelectField(**kwargs)
+
     def convert(self, model, field, field_args):
         if hasattr(field, "to_form_field"):
             return field.to_form_field(model, field_args)
@@ -84,13 +93,7 @@ class ModelConverter(object):
         kwargs = self._generate_convert_base_kwargs(field, field_args)
 
         if field.choices:
-            kwargs["choices"] = field.choices
-            kwargs["coerce"] = self.coerce(field_class)
-            if kwargs.pop("multiple", False):
-                return f.SelectMultipleField(**kwargs)
-            if kwargs.pop("radio", False):
-                return f.RadioField(**kwargs)
-            return f.SelectField(**kwargs)
+            return self._process_convert_for_choice_fields(field, field_class, kwargs)
 
         if hasattr(field, "field") and isinstance(field.field, ReferenceField):
             kwargs["label_modifier"] = getattr(
