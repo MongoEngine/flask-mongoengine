@@ -47,7 +47,7 @@ class ModelConverter(object):
 
         self.converters = converters
 
-    def convert(self, model, field, field_args):
+    def _generate_convert_base_kwargs(self, field, field_args) -> dict:
         kwargs = {
             "label": getattr(field, "verbose_name", field.name),
             "description": getattr(field, "help_text", None) or "",
@@ -58,42 +58,46 @@ class ModelConverter(object):
         if field_args:
             kwargs.update(field_args)
 
-        if kwargs["validators"]:
-            # Create a copy of the list since we will be modifying it, and if
-            # validators set as shared list between fields - duplicates/conflicts may
-            # be created.
-            kwargs["validators"] = list(kwargs["validators"])
-
+        # Create a copy of the lists since we will be modifying it, and if
+        # validators set as shared list between fields - duplicates/conflicts may
+        # be created.
+        kwargs["validators"] = list(kwargs["validators"])
+        kwargs["filters"] = list(kwargs["filters"])
         if field.required:
             kwargs["validators"].append(validators.InputRequired())
         else:
             kwargs["validators"].append(validators.Optional())
 
-        ftype = type(field).__name__
+        return kwargs
+
+    def convert(self, model, field, field_args):
+        if hasattr(field, "to_form_field"):
+            return field.to_form_field(model, field_args)
+
+        field_class = type(field).__name__
+
+        if field_class not in self.converters:
+            raise NotImplementedError(
+                f"No converter for: {field_class}, exclude it from form generation."
+            )
+
+        kwargs = self._generate_convert_base_kwargs(field, field_args)
 
         if field.choices:
             kwargs["choices"] = field.choices
-
-            if ftype in self.converters:
-                kwargs["coerce"] = self.coerce(ftype)
-            multiple_field = kwargs.pop("multiple", False)
-            radio_field = kwargs.pop("radio", False)
-            if multiple_field:
+            kwargs["coerce"] = self.coerce(field_class)
+            if kwargs.pop("multiple", False):
                 return f.SelectMultipleField(**kwargs)
-            if radio_field:
+            if kwargs.pop("radio", False):
                 return f.RadioField(**kwargs)
             return f.SelectField(**kwargs)
-
-        if hasattr(field, "to_form_field"):
-            return field.to_form_field(model, kwargs)
 
         if hasattr(field, "field") and isinstance(field.field, ReferenceField):
             kwargs["label_modifier"] = getattr(
                 model, f"{field.name}_label_modifier", None
             )
 
-        if ftype in self.converters:
-            return self.converters[ftype](model, field, kwargs)
+        return self.converters[field_class](model, field, kwargs)
 
     @classmethod
     def _string_common(cls, model, field, kwargs):
