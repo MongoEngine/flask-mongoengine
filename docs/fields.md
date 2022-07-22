@@ -95,6 +95,15 @@ For all fields, processed by Flask-Mongoengine integration:
   special {class}`~.NoneStringField` with `None` value support used.
 - Field's {attr}`choices`, if exist, used as form {attr}`choices`.
 
+```{warning}
+As at version **2.0.0** there is no {attr}`validators` duplicates/conflicts check. User
+should be careful with manual {attr}`validators` setup. And in case of forms
+problems this is first place to look on.
+
+{attr}`validators` and {attr}`filters` duplication check expected in future versions;
+PRs are welcome.
+```
+
 Some additional transformations are made by specific field, check exact field
 documentation below for more info.
 
