@@ -1,6 +1,14 @@
 """Responsible for mongoengine fields extension, if WTFForms integration used."""
 from typing import Callable, List, Optional, Union
 
+try:
+    from wtforms import fields as wtf_fields
+    from wtforms import validators as wtf_validators
+except ImportError:
+    wtf_fields = None
+    wtf_validators = None
+
+
 from mongoengine import fields
 
 __all__ = [

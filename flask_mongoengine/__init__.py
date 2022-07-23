@@ -5,15 +5,11 @@ from flask import Flask, abort, current_app
 from mongoengine.errors import DoesNotExist
 from mongoengine.queryset import QuerySet
 
+from flask_mongoengine import db_fields
 from flask_mongoengine.connection import *
 from flask_mongoengine.json import override_json_encoder
 from flask_mongoengine.pagination import *
 from flask_mongoengine.sessions import *
-
-try:
-    from flask_mongoengine.wtf import db_fields
-except ImportError:
-    from mongoengine import fields as db_fields
 
 
 def current_mongoengine_instance():
