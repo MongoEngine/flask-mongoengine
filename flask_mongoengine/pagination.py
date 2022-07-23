@@ -15,14 +15,20 @@ class Pagination(object):
         self.iterable = iterable
         self.page = page
         self.per_page = per_page
-        self.total = len(iterable)
 
-        start_index = (page - 1) * per_page
-        end_index = page * per_page
+        if isinstance(self.iterable, QuerySet):
+            self.total = iterable.count()
+            self.items = (
+                self.iterable.skip(self.per_page * (self.page - 1))
+                .limit(self.per_page)
+                .select_related()
+            )
+        else:
+            start_index = (page - 1) * per_page
+            end_index = page * per_page
 
-        self.items = iterable[start_index:end_index]
-        if isinstance(self.items, QuerySet):
-            self.items = self.items.select_related()
+            self.total = len(iterable)
+            self.items = iterable[start_index:end_index]
         if not self.items and page != 1:
             abort(404)
 
