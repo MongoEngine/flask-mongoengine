@@ -1,9 +1,14 @@
+from typing import Type, Union
+
+import mongoengine
 from flask_wtf import FlaskForm
 from flask_wtf.form import _Auto
 
 
 class ModelForm(FlaskForm):
     """A WTForms mongoengine model form"""
+
+    model_class: Type[Union[mongoengine.Document, mongoengine.DynamicDocument]]
 
     def __init__(self, formdata=_Auto, **kwargs):
         self.instance = kwargs.pop("instance", None) or kwargs.get("obj")

@@ -48,7 +48,7 @@ class ModelConverter(object):
         self.converters = converters
 
     def _generate_convert_base_kwargs(self, field, field_args) -> dict:
-        kwargs = {
+        kwargs: dict = {
             "label": getattr(field, "verbose_name", field.name),
             "description": getattr(field, "help_text", None) or "",
             "validators": getattr(field, "validators", None) or [],
@@ -291,6 +291,7 @@ def model_fields(
     fields_names = _get_fields_names(model, only, exclude)
 
     for field_name in fields_names:
+        # noinspection PyUnresolvedReferences
         model_field = model._fields[field_name]
         form_field = converter.convert(model, model_field, field_args.get(field_name))
         if form_field is not None:
