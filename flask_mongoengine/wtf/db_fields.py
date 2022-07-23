@@ -1,4 +1,6 @@
 """Responsible for mongoengine fields extension, if WTFForms integration used."""
+from typing import Callable, List, Optional, Union
+
 from mongoengine import fields
 
 __all__ = [
@@ -58,28 +60,34 @@ class WtfFieldMixin:
     :param kwargs: keyword arguments silently bypassed to normal mongoengine fields
     """
 
-    def __init__(self, *, validators=None, filters=None, **kwargs):
+    def __init__(
+        self,
+        *,
+        validators: Optional[Union[List, Callable]] = None,
+        filters: Optional[Union[List, Callable]] = None,
+        **kwargs,
+    ):
         self.validators = self._ensure_callable_or_list(validators, "validators")
         self.filters = self._ensure_callable_or_list(filters, "filters")
 
         super().__init__(**kwargs)
 
-    def _ensure_callable_or_list(self, field, msg_flag):
+    def _ensure_callable_or_list(self, argument, msg_flag: str) -> Optional[List]:
         """
-        Ensure the value submitted via field is either
-        a callable object to convert to list or it is
-        in fact a valid list value.
+        Ensure submitted argument value is a callable object or valid list value.
 
+        :param argument: Argument input to make verification on.
+        :param msg_flag: Argument string name for error message.
         """
-        if field is not None:
-            if callable(field):
-                field = [field]
-            else:
-                msg = "Argument '%s' must be a list value" % msg_flag
-                if not isinstance(field, list):
-                    raise TypeError(msg)
+        if argument is None:
+            return None
 
-        return field
+        if callable(argument):
+            return [argument]
+        elif not isinstance(argument, list):
+            raise TypeError(f"Argument '{msg_flag}' must be a list value")
+
+        return argument
 
 
 class BinaryField(WtfFieldMixin, fields.BinaryField):
