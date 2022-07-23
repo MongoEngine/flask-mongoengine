@@ -50,7 +50,7 @@ from mongoengine import fields
 try:
     from wtforms import fields as wtf_fields
     from wtforms import validators as wtf_validators
-except ImportError:
+except ImportError:  # pragma: no cover
     wtf_fields = None
     wtf_validators = None
 
