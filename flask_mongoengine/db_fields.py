@@ -41,6 +41,8 @@ __all__ = [
     "URLField",
     "UUIDField",
 ]
+import functools
+import logging
 from typing import Callable, List, Optional, Union
 
 from mongoengine import fields
@@ -51,6 +53,22 @@ try:
 except ImportError:
     wtf_fields = None
     wtf_validators = None
+
+logger = logging.getLogger("flask_mongoengine")
+
+
+def wtf_required(func):
+    """Special decorator to warn user on incorrect installation."""
+
+    @functools.wraps(func)
+    def wrapped(*args, **kwargs):
+        if wtf_validators is None or wtf_fields is None:
+            logger.error(f"WTForms not installed. Function '{func.__name__}' aborted.")
+            return None
+
+        return func(*args, **kwargs)
+
+    return wrapped
 
 
 class WtfFieldMixin:
