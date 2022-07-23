@@ -18,6 +18,12 @@ def test_queryset_paginator(app, todo):
     paginator = Pagination(Todo.objects, 1, 10)
     _test_paginator(paginator)
 
+    for page in range(1, 10):
+        for index, todo in enumerate(
+            Todo.objects.paginate(page=page, per_page=5).items
+        ):
+            assert todo.title == f"post: {(page-1) * 5 + index}"
+
 
 def test_paginate_plain_list():
     with pytest.raises(NotFound):
