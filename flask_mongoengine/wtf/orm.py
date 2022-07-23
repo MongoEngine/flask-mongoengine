@@ -86,15 +86,10 @@ class ModelConverter(object):
 
     @orm_deprecated
     def convert(self, model, field, field_args):
-        if hasattr(field, "to_form_field"):
-            return field.to_form_field(model, field_args)
-
         field_class = type(field).__name__
 
         if field_class not in self.converters:
-            raise NotImplementedError(
-                f"No converter for: {field_class}, exclude it from form generation."
-            )
+            return None
 
         kwargs = self._generate_convert_base_kwargs(field, field_args)
 
