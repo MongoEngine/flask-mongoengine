@@ -2,8 +2,8 @@ import flask
 from flask_debugtoolbar import DebugToolbarExtension
 from pymongo import monitoring
 
+from example_app import views
 from example_app.models import db
-from example_app.views import index, pagination
 from flask_mongoengine.panels import mongo_command_logger
 
 app = flask.Flask("example_app")
@@ -38,8 +38,8 @@ monitoring.register(mongo_command_logger)
 db.init_app(app)
 
 
-app.add_url_rule("/", view_func=index)
-app.add_url_rule("/pagination", view_func=pagination)
+app.add_url_rule("/", view_func=views.index, methods=["GET", "POST"])
+app.add_url_rule("/pagination", view_func=views.pagination, methods=["GET", "POST"])
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)

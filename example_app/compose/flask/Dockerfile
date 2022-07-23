@@ -7,5 +7,6 @@ RUN apt-get update && \
 RUN groupadd -r flask && useradd -r -g flask flask
 COPY --chown=flask . /flask_mongoengine
 RUN pip install --upgrade pip  \
-    && pip install -e /flask_mongoengine[toolbar,wtf]
+    && pip install -e /flask_mongoengine[toolbar,wtf] \
+    && pip install Faker
 WORKDIR /flask_mongoengine
