@@ -72,7 +72,8 @@ class WtfFieldMixin:
 
         super().__init__(**kwargs)
 
-    def _ensure_callable_or_list(self, argument, msg_flag: str) -> Optional[List]:
+    @staticmethod
+    def _ensure_callable_or_list(argument, msg_flag: str) -> Optional[List]:
         """
         Ensure submitted argument value is a callable object or valid list value.
 
