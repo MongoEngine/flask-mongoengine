@@ -11,6 +11,7 @@ from mongoengine.base import BaseDocument, DocumentMetaclass
 from wtforms import fields as f
 from wtforms import validators
 
+from flask_mongoengine.decorators import orm_deprecated
 from flask_mongoengine.wtf.fields import (
     BinaryField,
     DictField,
@@ -26,6 +27,7 @@ __all__ = (
 )
 
 
+@orm_deprecated
 def converts(*args):
     def _inner(func):
         func._converter_for = frozenset(args)
@@ -35,6 +37,7 @@ def converts(*args):
 
 
 class ModelConverter(object):
+    @orm_deprecated
     def __init__(self, converters=None):
         if not converters:
             converters = {}
@@ -47,6 +50,7 @@ class ModelConverter(object):
 
         self.converters = converters
 
+    @orm_deprecated
     def _generate_convert_base_kwargs(self, field, field_args) -> dict:
         kwargs: dict = {
             "label": getattr(field, "verbose_name", field.name),
@@ -70,6 +74,7 @@ class ModelConverter(object):
 
         return kwargs
 
+    @orm_deprecated
     def _process_convert_for_choice_fields(self, field, field_class, kwargs):
         kwargs["choices"] = field.choices
         kwargs["coerce"] = self.coerce(field_class)
@@ -79,6 +84,7 @@ class ModelConverter(object):
             return f.RadioField(**kwargs)
         return f.SelectField(**kwargs)
 
+    @orm_deprecated
     def convert(self, model, field, field_args):
         if hasattr(field, "to_form_field"):
             return field.to_form_field(model, field_args)
@@ -235,6 +241,7 @@ class ModelConverter(object):
     def conv_File(self, model, field, kwargs):
         return f.FileField(**kwargs)
 
+    @orm_deprecated
     def coerce(self, field_type):
         coercions = {
             "IntField": int,
@@ -246,6 +253,7 @@ class ModelConverter(object):
         return coercions.get(field_type, str)
 
 
+@orm_deprecated
 def _get_fields_names(
     model,
     only: Optional[List[str]],
@@ -269,6 +277,7 @@ def _get_fields_names(
     return field_names
 
 
+@orm_deprecated
 def model_fields(
     model: Type[BaseDocument],
     only: Optional[List[str]] = None,
@@ -300,6 +309,7 @@ def model_fields(
     return form_fields_dict
 
 
+@orm_deprecated
 def model_form(
     model: Type[BaseDocument],
     base_class: Type[ModelForm] = ModelForm,
