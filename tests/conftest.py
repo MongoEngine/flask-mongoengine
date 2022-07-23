@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import NoReturn
 
 import mongoengine
 import pytest
@@ -9,7 +10,7 @@ from flask_mongoengine import MongoEngine
 
 
 @pytest.fixture(autouse=True, scope="session")
-def session_clean_up():
+def session_clean_up() -> NoReturn:
     """Mandatory tests environment clean up before/after test session."""
     client = MongoClient("localhost", 27017)
     client.drop_database("flask_mongoengine_test_db")
@@ -24,7 +25,7 @@ def session_clean_up():
 
 
 @pytest.fixture()
-def app():
+def app() -> Flask:
     app = Flask(__name__)
     app.config["TESTING"] = True
     app.config["WTF_CSRF_ENABLED"] = False
@@ -36,7 +37,7 @@ def app():
 
 
 @pytest.fixture()
-def db(app):
+def db(app) -> MongoEngine:
     app.config["MONGODB_HOST"] = "mongodb://localhost:27017/flask_mongoengine_test_db"
     test_db = MongoEngine(app)
     db_name = (
