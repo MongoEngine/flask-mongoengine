@@ -56,12 +56,14 @@ dev = [
   "pytest-cov",
   "pytest-mock",
   "nox",
+  "Pillow>=7.0.0",
 ]
 legacy = ["MarkupSafe==2.0.1"]
 legacy-dev = [
   "pytest",
   "pytest-cov",
   "pytest-mock",
+  "Pillow>=7.0.0",
 ]
 
 [project.urls]
