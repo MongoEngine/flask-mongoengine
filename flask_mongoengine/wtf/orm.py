@@ -327,9 +327,13 @@ def model_form(
     :param only:
         An optional iterable with the property names that should be included in
         the form. Only these properties will have fields.
+        Fields are always appear in provided order, this allows user to change form
+        fields ordering, without changing database model.
     :param exclude:
         An optional iterable with the property names that should be excluded
         from the form. All other properties will have fields.
+        Fields are appears in order, defined in model, excluding provided fields
+        names. For adjusting fields ordering, use :attr:`only`.
     :param field_args:
         An optional dictionary of field names mapping to keyword arguments used
         to construct each field object.
