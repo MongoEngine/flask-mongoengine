@@ -135,6 +135,7 @@ class WtfFormMixin:
             to construct each field object.
         """
         form_fields_dict = {}
+        field_args = field_args or {}
         fields_names = cls._get_fields_names(only, exclude)
 
         for field_name in fields_names:
@@ -142,7 +143,8 @@ class WtfFormMixin:
             field_class = cls._fields[field_name]
             try:
                 form_fields_dict[field_name] = field_class.to_wtf_field(
-                    field_args.get(field_name)
+                    cls,
+                    field_args.get(field_name),
                 )
             except AttributeError:
                 logger.warning(
