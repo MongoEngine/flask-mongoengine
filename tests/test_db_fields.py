@@ -5,7 +5,7 @@ import pytest
 from mongoengine import fields as base_fields
 from pytest_mock import MockerFixture
 
-from flask_mongoengine import db_fields
+from flask_mongoengine import db_fields, documents
 
 
 @pytest.fixture
@@ -13,6 +13,77 @@ def local_app(app):
     """Helper fixture to minimize code indentation."""
     with app.test_request_context("/"):
         yield app
+
+
+class TestWtfFormMixin:
+    @pytest.fixture(
+        params=[
+            documents.Document,
+            documents.DynamicDocument,
+            documents.DynamicEmbeddedDocument,
+            documents.EmbeddedDocument,
+        ]
+    )
+    def TempDocument(self, request):
+        """Cool fixture"""
+
+        class Model(request.param):
+            """
+            Temp document model for most of the tests.
+
+            field_one by design cannot be converted to FormField.
+            """
+
+            field_one = base_fields.StringField()
+            field_two = db_fields.StringField()
+            field_three = db_fields.StringField()
+            field_four = db_fields.StringField()
+            field_five = db_fields.StringField()
+
+        return Model
+
+    def test__get_fields_names__is_called_by_to_wtf_form_call(
+        self, TempDocument, mocker: MockerFixture
+    ):
+        get_fields_names_spy = mocker.patch.object(
+            documents.WtfFormMixin, "_get_fields_names", autospec=True
+        )
+        TempDocument.to_wtf_form()
+        get_fields_names_spy.assert_called_once()
+
+    def test__get_fields_names__hold_correct_fields_ordering_for_only(
+        self, TempDocument
+    ):
+
+        field_names = TempDocument._get_fields_names(
+            only=["field_five", "field_one"], exclude=None
+        )
+        assert field_names == ["field_five", "field_one"]
+
+    def test__get_fields_names__hold_correct_fields_ordering_for_exclude(
+        self, TempDocument
+    ):
+        field_names = TempDocument._get_fields_names(
+            only=None, exclude=["id", "field_five", "field_one"]
+        )
+        assert field_names == ["field_two", "field_three", "field_four"]
+
+    def test__to_wtf_form__is_called_by_mixin_child_model(
+        self, TempDocument, caplog, mocker: MockerFixture
+    ):
+        to_wtf_spy = mocker.patch.object(
+            documents.WtfFormMixin, "to_wtf_form", autospec=True
+        )
+        TempDocument.to_wtf_form()
+        to_wtf_spy.assert_called_once()
+
+    def test__to_wtf_form__logs_error(self, caplog, TempDocument):
+        TempDocument.to_wtf_form()
+
+        # Check error logging
+        assert (
+            "Field field_one ignored, field type does not have .to_wtf_field() method."
+        ) in caplog.messages
 
 
 class TestWtfFieldMixin:
