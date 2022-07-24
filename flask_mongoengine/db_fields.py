@@ -101,6 +101,14 @@ class WtfFieldMixin:
 
         return argument
 
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
+
 
 class BinaryField(WtfFieldMixin, fields.BinaryField):
     """
@@ -109,7 +117,13 @@ class BinaryField(WtfFieldMixin, fields.BinaryField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class BooleanField(WtfFieldMixin, fields.BooleanField):
@@ -119,7 +133,13 @@ class BooleanField(WtfFieldMixin, fields.BooleanField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class CachedReferenceField(WtfFieldMixin, fields.CachedReferenceField):
@@ -129,7 +149,13 @@ class CachedReferenceField(WtfFieldMixin, fields.CachedReferenceField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class ComplexDateTimeField(WtfFieldMixin, fields.ComplexDateTimeField):
@@ -139,7 +165,13 @@ class ComplexDateTimeField(WtfFieldMixin, fields.ComplexDateTimeField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class DateField(WtfFieldMixin, fields.DateField):
@@ -149,7 +181,13 @@ class DateField(WtfFieldMixin, fields.DateField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class DateTimeField(WtfFieldMixin, fields.DateTimeField):
@@ -159,7 +197,13 @@ class DateTimeField(WtfFieldMixin, fields.DateTimeField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class DecimalField(WtfFieldMixin, fields.DecimalField):
@@ -169,7 +213,13 @@ class DecimalField(WtfFieldMixin, fields.DecimalField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class DictField(WtfFieldMixin, fields.DictField):
@@ -179,7 +229,13 @@ class DictField(WtfFieldMixin, fields.DictField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class DynamicField(WtfFieldMixin, fields.DynamicField):
@@ -189,7 +245,13 @@ class DynamicField(WtfFieldMixin, fields.DynamicField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class EmailField(WtfFieldMixin, fields.EmailField):
@@ -199,7 +261,13 @@ class EmailField(WtfFieldMixin, fields.EmailField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class EmbeddedDocumentField(WtfFieldMixin, fields.EmbeddedDocumentField):
@@ -209,7 +277,13 @@ class EmbeddedDocumentField(WtfFieldMixin, fields.EmbeddedDocumentField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class EmbeddedDocumentListField(WtfFieldMixin, fields.EmbeddedDocumentListField):
@@ -219,7 +293,13 @@ class EmbeddedDocumentListField(WtfFieldMixin, fields.EmbeddedDocumentListField)
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class EnumField(WtfFieldMixin, fields.EnumField):
@@ -229,7 +309,13 @@ class EnumField(WtfFieldMixin, fields.EnumField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class FileField(WtfFieldMixin, fields.FileField):
@@ -239,7 +325,13 @@ class FileField(WtfFieldMixin, fields.FileField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class FloatField(WtfFieldMixin, fields.FloatField):
@@ -249,7 +341,13 @@ class FloatField(WtfFieldMixin, fields.FloatField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class GenericEmbeddedDocumentField(WtfFieldMixin, fields.GenericEmbeddedDocumentField):
@@ -259,7 +357,13 @@ class GenericEmbeddedDocumentField(WtfFieldMixin, fields.GenericEmbeddedDocument
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class GenericLazyReferenceField(WtfFieldMixin, fields.GenericLazyReferenceField):
@@ -269,7 +373,13 @@ class GenericLazyReferenceField(WtfFieldMixin, fields.GenericLazyReferenceField)
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class GenericReferenceField(WtfFieldMixin, fields.GenericReferenceField):
@@ -279,7 +389,13 @@ class GenericReferenceField(WtfFieldMixin, fields.GenericReferenceField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class GeoJsonBaseField(WtfFieldMixin, fields.GeoJsonBaseField):
@@ -289,7 +405,13 @@ class GeoJsonBaseField(WtfFieldMixin, fields.GeoJsonBaseField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class GeoPointField(WtfFieldMixin, fields.GeoPointField):
@@ -299,7 +421,13 @@ class GeoPointField(WtfFieldMixin, fields.GeoPointField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class ImageField(WtfFieldMixin, fields.ImageField):
@@ -309,7 +437,13 @@ class ImageField(WtfFieldMixin, fields.ImageField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class IntField(WtfFieldMixin, fields.IntField):
@@ -319,7 +453,13 @@ class IntField(WtfFieldMixin, fields.IntField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class LazyReferenceField(WtfFieldMixin, fields.LazyReferenceField):
@@ -329,7 +469,13 @@ class LazyReferenceField(WtfFieldMixin, fields.LazyReferenceField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class LineStringField(WtfFieldMixin, fields.LineStringField):
@@ -339,7 +485,13 @@ class LineStringField(WtfFieldMixin, fields.LineStringField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class ListField(WtfFieldMixin, fields.ListField):
@@ -349,7 +501,13 @@ class ListField(WtfFieldMixin, fields.ListField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class LongField(WtfFieldMixin, fields.LongField):
@@ -359,7 +517,13 @@ class LongField(WtfFieldMixin, fields.LongField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class MapField(WtfFieldMixin, fields.MapField):
@@ -369,7 +533,13 @@ class MapField(WtfFieldMixin, fields.MapField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class MultiLineStringField(WtfFieldMixin, fields.MultiLineStringField):
@@ -379,7 +549,13 @@ class MultiLineStringField(WtfFieldMixin, fields.MultiLineStringField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class MultiPointField(WtfFieldMixin, fields.MultiPointField):
@@ -389,7 +565,13 @@ class MultiPointField(WtfFieldMixin, fields.MultiPointField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class MultiPolygonField(WtfFieldMixin, fields.MultiPolygonField):
@@ -399,7 +581,13 @@ class MultiPolygonField(WtfFieldMixin, fields.MultiPolygonField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class ObjectIdField(WtfFieldMixin, fields.ObjectIdField):
@@ -409,7 +597,13 @@ class ObjectIdField(WtfFieldMixin, fields.ObjectIdField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class PointField(WtfFieldMixin, fields.PointField):
@@ -419,7 +613,13 @@ class PointField(WtfFieldMixin, fields.PointField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class PolygonField(WtfFieldMixin, fields.PolygonField):
@@ -429,7 +629,13 @@ class PolygonField(WtfFieldMixin, fields.PolygonField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class ReferenceField(WtfFieldMixin, fields.ReferenceField):
@@ -439,7 +645,13 @@ class ReferenceField(WtfFieldMixin, fields.ReferenceField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class SequenceField(WtfFieldMixin, fields.SequenceField):
@@ -449,7 +661,13 @@ class SequenceField(WtfFieldMixin, fields.SequenceField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class SortedListField(WtfFieldMixin, fields.SortedListField):
@@ -459,7 +677,13 @@ class SortedListField(WtfFieldMixin, fields.SortedListField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class StringField(WtfFieldMixin, fields.StringField):
@@ -469,7 +693,13 @@ class StringField(WtfFieldMixin, fields.StringField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class URLField(WtfFieldMixin, fields.URLField):
@@ -479,7 +709,13 @@ class URLField(WtfFieldMixin, fields.URLField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")
 
 
 class UUIDField(WtfFieldMixin, fields.UUIDField):
@@ -489,4 +725,10 @@ class UUIDField(WtfFieldMixin, fields.UUIDField):
     For full list of arguments and keyword arguments, look parent field docs.
     """
 
-    pass
+    def to_wtf_field(self, model, field_kwargs):
+        """
+        Protection from execution of :func:`to_wtf_field` in form generation.
+
+        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        """
+        raise NotImplementedError("Field converter to WTForm Field not implemented.")

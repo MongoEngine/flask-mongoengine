@@ -146,10 +146,10 @@ class WtfFormMixin:
                     cls,
                     field_args.get(field_name),
                 )
-            except AttributeError:
+            except (AttributeError, NotImplementedError):
                 logger.warning(
                     f"Field {field_name} ignored, field type does not have "
-                    f".to_wtf_field() method."
+                    f".to_wtf_field() method or method raised NotImplementedError."
                 )
 
         form_fields_dict["model_class"] = cls

@@ -82,7 +82,8 @@ class TestWtfFormMixin:
 
         # Check error logging
         assert (
-            "Field field_one ignored, field type does not have .to_wtf_field() method."
+            "Field field_one ignored, field type does not have .to_wtf_field() method or "
+            "method raised NotImplementedError."
         ) in caplog.messages
 
 
