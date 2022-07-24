@@ -76,6 +76,11 @@ class WtfFieldMixin:
         self.validators = self._ensure_callable_or_list(validators, "validators")
         self.filters = self._ensure_callable_or_list(filters, "filters")
 
+        # Some attributes that will be updated by parent methods
+        self.required = False
+        self.default = None
+        self.name = ""
+
         super().__init__(**kwargs)
 
     @staticmethod
