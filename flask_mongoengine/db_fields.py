@@ -137,7 +137,7 @@ class WtfFieldMixin:
         )
         self.wtf_options = wtf_options
         self.wtf_choices_coerce = wtf_choices_coerce or self.DEFAULT_WTF_CHOICES_COERCE
-        # Some attributes that will be updated by parent methods
+        # Some attributes that will be updated by super()
         self.required = False
         self.default = None
         self.name = ""

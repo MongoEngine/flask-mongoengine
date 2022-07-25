@@ -4,6 +4,7 @@ from enum import Enum
 import pytest
 from mongoengine import fields as base_fields
 from pytest_mock import MockerFixture
+from wtforms import validators as wtf_validators_
 
 from flask_mongoengine import db_fields, documents
 
@@ -88,6 +89,12 @@ class TestWtfFormMixin:
 
 
 class TestWtfFieldMixin:
+    # noinspection PyAbstractClass
+    class WTFieldBaseMRO(db_fields.WtfFieldMixin, base_fields.BaseField):
+        """Just an MRO setter for testing any BaseField child."""
+
+        pass
+
     def test__init__set_additional_instance_arguments(self, db, mocker: MockerFixture):
         checker_spy = mocker.spy(db_fields.WtfFieldMixin, "_ensure_callable_or_list")
 
@@ -121,6 +128,195 @@ class TestWtfFieldMixin:
                 argument=1, msg_flag="field"
             )
         assert str(error.value) == "Argument 'field' must be a list value"
+
+    @pytest.mark.parametrize(
+        "FieldClass",
+        [
+            db_fields.WtfFieldMixin,
+            db_fields.BinaryField,
+            db_fields.BooleanField,
+            db_fields.CachedReferenceField,
+            db_fields.ComplexDateTimeField,
+            db_fields.DateField,
+            db_fields.DateTimeField,
+            db_fields.DecimalField,
+            db_fields.DictField,
+            db_fields.DynamicField,
+            db_fields.EmailField,
+            db_fields.EmbeddedDocumentField,
+            db_fields.EmbeddedDocumentListField,
+            db_fields.EnumField,
+            db_fields.FileField,
+            db_fields.FloatField,
+            db_fields.GenericEmbeddedDocumentField,
+            db_fields.GenericLazyReferenceField,
+            db_fields.GenericReferenceField,
+            db_fields.GeoJsonBaseField,
+            db_fields.GeoPointField,
+            db_fields.ImageField,
+            db_fields.IntField,
+            db_fields.LazyReferenceField,
+            db_fields.LineStringField,
+            db_fields.ListField,
+            db_fields.LongField,
+            db_fields.MapField,
+            db_fields.MultiLineStringField,
+            db_fields.MultiPointField,
+            db_fields.MultiPolygonField,
+            db_fields.ObjectIdField,
+            db_fields.PointField,
+            db_fields.PolygonField,
+            db_fields.ReferenceField,
+            db_fields.SequenceField,
+            db_fields.SortedListField,
+            db_fields.StringField,
+            db_fields.URLField,
+            db_fields.UUIDField,
+        ],
+    )
+    def test__ensure_nested_field_class__to_wtf_field__method_disabled(
+        self, FieldClass, mocker: MockerFixture
+    ):
+        """
+        It is expected, that amount of such classes will be decreased in the future.
+
+        __init__ method mocked to limit test scope.
+        """
+        mocker.patch.object(db_fields.WtfFieldMixin, "__init__", return_value=None)
+        field = FieldClass()
+        with pytest.raises(NotImplementedError):
+            field.to_wtf_field(model=None, field_kwargs=None)
+
+    def test__init__method__warning__if_deprecated__validators__set(self, recwarn):
+        db_fields.WtfFieldMixin(validators=[])
+        assert str(recwarn.list[0].message) == (
+            "Passing 'validators' keyword argument to field definition is "
+            "deprecated and will be removed in version 3.0.0. "
+            "Please rename 'validators' to 'wtf_validators'. "
+            "If both values set, 'wtf_validators' is used."
+        )
+
+    def test__init__method__warning__if_deprecated__filters__set(self, recwarn):
+        db_fields.WtfFieldMixin(filters=[])
+        assert str(recwarn.list[0].message) == (
+            "Passing 'filters' keyword argument to field definition is "
+            "deprecated and will be removed in version 3.0.0. "
+            "Please rename 'filters' to 'wtf_filters'. "
+            "If both values set, 'wtf_filters' is used."
+        )
+
+    def test__wtf_field_class__return__DEFAULT_WTF_FIELD__value_if_no_init_options_set(
+        self,
+    ):
+        field = db_fields.WtfFieldMixin()
+        field.DEFAULT_WTF_FIELD = "fake"
+        assert field.wtf_field_class == "fake"
+
+    def test__wtf_field_class__return__DEFAULT_WTF_CHOICES_FIELD_value_if_choices_options_set(
+        self,
+    ):
+        field = db_fields.StringField(choices=(1, 2, 3))
+        field.DEFAULT_WTF_CHOICES_FIELD = "fake"
+        assert issubclass(field.__class__, db_fields.WtfFieldMixin)
+        assert field.wtf_field_class == "fake"
+
+    def test__wtf_field_class__return__user_provided_value__if_set(self):
+        field = db_fields.WtfFieldMixin(wtf_field_class=str)
+
+        assert issubclass(field.wtf_field_class, str)
+
+    @pytest.mark.parametrize(
+        ["user_dict", "expected_result"],
+        [
+            ({"fake": "replaced"}, {"fake": "replaced"}),
+            ({"added_arg": "added"}, {"fake": "dict", "added_arg": "added"}),
+            (None, {"fake": "dict"}),
+        ],
+    )
+    def test__wtf_field_options__overwrite_generated_options_with_user_provided(
+        self, mocker: MockerFixture, user_dict, expected_result
+    ):
+        mocker.patch.object(
+            db_fields.WtfFieldMixin,
+            "wtf_generated_options",
+            new_callable=lambda: {"fake": "dict"},
+        )
+
+        field = db_fields.WtfFieldMixin(wtf_options=user_dict)
+        assert field.wtf_field_options == expected_result
+
+    def test__wtf_generated_options__correctly_retrieve_label_from_parent_class(self):
+        """Test based on base class for all fields."""
+        default_call = self.WTFieldBaseMRO()
+        default_call.name = "set not by init"  # set by metaclass for documents
+        with_option_call = self.WTFieldBaseMRO(verbose_name="fake")
+
+        assert default_call.wtf_generated_options["label"] == "set not by init"
+        assert with_option_call.wtf_generated_options["label"] == "fake"
+
+    def test__wtf_generated_options__correctly_retrieve_description_from_parent_class(
+        self,
+    ):
+        default_call = self.WTFieldBaseMRO()
+        with_option_call = self.WTFieldBaseMRO(help_text="fake")
+
+        assert default_call.wtf_generated_options["description"] == ""
+        assert with_option_call.wtf_generated_options["description"] == "fake"
+
+    def test__wtf_generated_options__correctly_retrieve_default_from_parent_class(self):
+        default_call = self.WTFieldBaseMRO()
+        with_option_call = self.WTFieldBaseMRO(default="fake")
+
+        assert default_call.wtf_generated_options["default"] is None
+        assert with_option_call.wtf_generated_options["default"] == "fake"
+
+    def test__wtf_generated_options__correctly_retrieve_validators_from_parent_class__and__add_optional_validator__if_field_not_required(
+        self,
+    ):
+        default_call = self.WTFieldBaseMRO()
+        with_option_call = self.WTFieldBaseMRO(wtf_validators=[str, int])
+
+        assert isinstance(
+            default_call.wtf_generated_options["validators"][0],
+            wtf_validators_.Optional,
+        )
+        assert len(with_option_call.wtf_generated_options["validators"]) == 3
+        assert isinstance(
+            with_option_call.wtf_generated_options["validators"][-1],
+            wtf_validators_.Optional,
+        )
+
+    def test__wtf_generated_options__correctly_retrieve_validators_from_parent_class__and__add_required__if_field_required(
+        self,
+    ):
+        default_call = self.WTFieldBaseMRO(required=True)
+        with_option_call = self.WTFieldBaseMRO(required=True, wtf_validators=[str, int])
+
+        assert isinstance(
+            default_call.wtf_generated_options["validators"][0],
+            wtf_validators_.InputRequired,
+        )
+        assert len(with_option_call.wtf_generated_options["validators"]) == 3
+        assert isinstance(
+            with_option_call.wtf_generated_options["validators"][-1],
+            wtf_validators_.InputRequired,
+        )
+
+    def test__wtf_generated_options__correctly_retrieve_filters_from_parent_class(self):
+        default_call = self.WTFieldBaseMRO()
+        with_option_call = self.WTFieldBaseMRO(wtf_filters=[str, list])
+
+        assert default_call.wtf_generated_options["filters"] == []
+        assert with_option_call.wtf_generated_options["filters"] == [str, list]
+
+    def test__wtf_generated_options__correctly_handle_choices_settings(self):
+        default_call = self.WTFieldBaseMRO(choices=[1, 2])
+        with_option_call = self.WTFieldBaseMRO(choices=[1, 2], wtf_choices_coerce=list)
+
+        assert default_call.wtf_generated_options["choices"] == [1, 2]
+        assert default_call.wtf_generated_options["coerce"] is str
+        assert with_option_call.wtf_generated_options["choices"] == [1, 2]
+        assert with_option_call.wtf_generated_options["coerce"] is list
 
 
 class TestBinaryField:
