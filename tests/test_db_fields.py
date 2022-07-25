@@ -100,7 +100,7 @@ class TestWtfFieldMixin:
     def test__ensure_callable_or_list__return_none_if_argument_is_none(self):
         assert (
             db_fields.WtfFieldMixin._ensure_callable_or_list(argument=None, msg_flag="")
-            is None
+            == []
         )
 
     def test__ensure_callable_or_list__return_callable_argument_as_list(self):
