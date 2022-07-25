@@ -162,8 +162,8 @@ class WtfFormMixin:
             field_class = cls._fields[field_name]
             try:
                 form_fields_dict[field_name] = field_class.to_wtf_field(
-                    cls,
-                    fields_kwargs.get(field_name),
+                    model=cls,
+                    field_kwargs=fields_kwargs.get(field_name, {}),
                 )
             except (AttributeError, NotImplementedError):
                 logger.warning(

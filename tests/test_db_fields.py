@@ -1,5 +1,6 @@
 """Tests for db_fields overwrite and WTForms integration."""
 from enum import Enum
+from unittest.mock import Mock
 
 import pytest
 from mongoengine import fields as base_fields
@@ -132,7 +133,6 @@ class TestWtfFieldMixin:
     @pytest.mark.parametrize(
         "FieldClass",
         [
-            db_fields.WtfFieldMixin,
             db_fields.BinaryField,
             db_fields.BooleanField,
             db_fields.CachedReferenceField,
@@ -317,6 +317,40 @@ class TestWtfFieldMixin:
         assert default_call.wtf_generated_options["coerce"] is str
         assert with_option_call.wtf_generated_options["choices"] == [1, 2]
         assert with_option_call.wtf_generated_options["coerce"] is list
+
+    def test__to_wtf_field__does_not_modify_anything_if_options_not_provided(self):
+        # Setting base validators to exclude patching of .wtf_generated_options()
+        field = self.WTFieldBaseMRO(wtf_options={"validators": ["ignore"]})
+        field.DEFAULT_WTF_FIELD = Mock()
+        field_options = field.wtf_field_options
+
+        field.to_wtf_field()
+
+        field.DEFAULT_WTF_FIELD.assert_called_with(**field_options)
+
+    def test__to_wtf_field__update_field_class_if_related_option_provided(self):
+        # Setting base validators to exclude patching of .wtf_generated_options()
+        will_be_called = Mock()
+        will_not_be_called = Mock()
+        field = self.WTFieldBaseMRO(wtf_options={"validators": ["ignore"]})
+        field.DEFAULT_WTF_FIELD = will_not_be_called
+        field_options = field.wtf_field_options
+        field.to_wtf_field(field_kwargs={"wtf_field_class": will_be_called})
+
+        will_not_be_called.assert_not_called()
+        will_be_called.assert_called_with(**field_options)
+
+    def test__to_wtf_field__update_field_kwargs_if_related_option_provided(self):
+        # Setting base validators to exclude patching of .wtf_generated_options()
+        will_be_called = Mock()
+        field = self.WTFieldBaseMRO(wtf_options={"validators": ["ignore"]})
+        field_options = field.wtf_field_options
+        field_options.update({"update": "this"})
+        field.to_wtf_field(
+            field_kwargs={"wtf_field_class": will_be_called, "update": "this"}
+        )
+
+        will_be_called.assert_called_with(**field_options)
 
 
 class TestBinaryField:
