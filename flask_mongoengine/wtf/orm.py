@@ -55,8 +55,12 @@ class ModelConverter(object):
         kwargs: dict = {
             "label": getattr(field, "verbose_name", field.name),
             "description": getattr(field, "help_text", None) or "",
-            "validators": getattr(field, "validators", None) or [],
-            "filters": getattr(field, "filters", None) or [],
+            "validators": getattr(field, "wtf_validators", None)
+            or getattr(field, "validators", None)
+            or [],
+            "filters": getattr(field, "wtf_filters", None)
+            or getattr(field, "filters", None)
+            or [],
             "default": field.default,
         }
         if field_args:

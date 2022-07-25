@@ -92,8 +92,8 @@ class TestWtfFieldMixin:
         checker_spy = mocker.spy(db_fields.WtfFieldMixin, "_ensure_callable_or_list")
 
         string = db.StringField(validators=[1, 2], filters=[1, 2])
-        assert string.validators == [1, 2]
-        assert string.filters == [1, 2]
+        assert string.wtf_validators == [1, 2]
+        assert string.wtf_filters == [1, 2]
         checker_spy.assert_called()
         assert checker_spy.call_count == 2
 

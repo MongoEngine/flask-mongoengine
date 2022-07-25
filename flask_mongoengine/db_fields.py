@@ -42,6 +42,7 @@ __all__ = [
     "UUIDField",
 ]
 import decimal
+import warnings
 from typing import Callable, List, Optional, Union
 
 from bson import ObjectId
@@ -81,17 +82,47 @@ class WtfFieldMixin:
         *,
         validators: Optional[Union[List, Callable]] = None,
         filters: Optional[Union[List, Callable]] = None,
+        wtf_filters: Optional[Union[List, Callable]] = None,
+        wtf_validators: Optional[Union[List, Callable]] = None,
         **kwargs,
     ):
         """
         Extended :func:`__init__` method for mongoengine db field with WTForms options.
 
-        :param validators:  wtf model form field validators.
-        :param filters:     wtf model form field filters.
+        :param filters:     DEPRECATED: wtf form field filters.
+        :param validators:  DEPRECATED: wtf form field validators.
+        :param wtf_filters:     wtf form field filters.
+        :param wtf_validators:  wtf form field validators.
         :param kwargs: keyword arguments silently bypassed to normal mongoengine fields
         """
-        self.validators = self._ensure_callable_or_list(validators, "validators")
-        self.filters = self._ensure_callable_or_list(filters, "filters")
+        if validators is not None:
+            warnings.warn(
+                (
+                    "Passing 'validators' keyword argument to field definition is "
+                    "deprecated and will be removed in version 3.0.0. "
+                    "Please rename 'validators' to 'wtf_validators'. "
+                    "If both values set, 'wtf_validators' is used."
+                ),
+                DeprecationWarning,
+                stacklevel=2,
+            )
+        if filters is not None:
+            warnings.warn(
+                (
+                    "Passing 'filters' keyword argument to field definition is "
+                    "deprecated and will be removed in version 3.0.0. "
+                    "Please rename 'filters' to 'wtf_filters'. "
+                    "If both values set, 'wtf_filters' is used."
+                ),
+                DeprecationWarning,
+                stacklevel=2,
+            )
+        self.wtf_validators = self._ensure_callable_or_list(
+            wtf_validators or validators, "wtf_validators"
+        )
+        self.wtf_filters = self._ensure_callable_or_list(
+            wtf_filters or filters, "wtf_filters"
+        )
 
         # Some attributes that will be updated by parent methods
         self.required = False
