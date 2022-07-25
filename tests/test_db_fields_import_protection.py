@@ -6,7 +6,7 @@ class TestImportProtection:
         from flask_mongoengine import db_fields
 
         assert db_fields.wtf_fields is not None
-        assert db_fields.wtf_validators is not None
+        assert db_fields.wtf_validators_ is not None
 
     def test__core_class_imported_without_error(self, monkeypatch):
         monkeypatch.setattr("flask_mongoengine.decorators.wtf_installed", False)

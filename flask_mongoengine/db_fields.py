@@ -50,13 +50,13 @@ from mongoengine import fields
 
 try:
     from wtforms import fields as wtf_fields
-    from wtforms import validators as wtf_validators
+    from wtforms import validators as wtf_validators_
 
     from flask_mongoengine.wtf import fields as custom_fields
 except ImportError:  # pragma: no cover
     custom_fields = None
     wtf_fields = None
-    wtf_validators = None
+    wtf_validators_ = None
 
 
 class WtfFieldMixin:
