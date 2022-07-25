@@ -12,6 +12,7 @@ flask_mongoengine.db_fields module
 ----------------------------------
 
 .. automodule:: flask_mongoengine.db_fields
+   :special-members: __init__
 
 flask_mongoengine.decorators module
 -----------------------------------
