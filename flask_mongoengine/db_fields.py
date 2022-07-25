@@ -41,14 +41,19 @@ __all__ = [
     "URLField",
     "UUIDField",
 ]
+import decimal
 from typing import Callable, List, Optional, Union
 
+from bson import ObjectId
 from mongoengine import fields
 
 try:
     from wtforms import fields as wtf_fields
     from wtforms import validators as wtf_validators
+
+    from flask_mongoengine.wtf import fields as custom_fields
 except ImportError:  # pragma: no cover
+    custom_fields = None
     wtf_fields = None
     wtf_validators = None
 
@@ -57,14 +62,19 @@ class WtfFieldMixin:
     """
     Extension wrapper class for mongoengine BaseField.
 
-    This enables flask-mongoengine  wtf to extend the
-    number of field parameters, and settings on behalf
-    of document model form generator for WTForm.
+    This enables flask-mongoengine wtf to extend the number of field parameters, and
+    settings on behalf of document model form generator for WTForm.
 
-    :param validators:  wtf model form field validators.
-    :param filters:     wtf model form field filters.
-    :param kwargs: keyword arguments silently bypassed to normal mongoengine fields
+    **Class variables:**
+
+    :cvar DEFAULT_WTF_CHOICES_FIELD: Default WTForms Field used for db fields when
+        **choices** option specified.
+    :cvar DEFAULT_WTF_FIELD: Default WTForms Field used for db field.
     """
+
+    DEFAULT_WTF_FIELD = None
+    DEFAULT_WTF_CHOICES_FIELD = wtf_fields.SelectField if wtf_fields else None
+    DEFAULT_WTF_CHOICES_FIELD_COERCE = str
 
     def __init__(
         self,
@@ -73,6 +83,13 @@ class WtfFieldMixin:
         filters: Optional[Union[List, Callable]] = None,
         **kwargs,
     ):
+        """
+        Extended :func:`__init__` method for mongoengine db field with WTForms options.
+
+        :param validators:  wtf model form field validators.
+        :param filters:     wtf model form field filters.
+        :param kwargs: keyword arguments silently bypassed to normal mongoengine fields
+        """
         self.validators = self._ensure_callable_or_list(validators, "validators")
         self.filters = self._ensure_callable_or_list(filters, "filters")
 
@@ -118,6 +135,8 @@ class BinaryField(WtfFieldMixin, fields.BinaryField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
+    DEFAULT_WTF_FIELD = custom_fields.BinaryField if custom_fields else None
+
     def to_wtf_field(self, model, field_kwargs):
         """
         Protection from execution of :func:`to_wtf_field` in form generation.
@@ -134,6 +153,9 @@ class BooleanField(WtfFieldMixin, fields.BooleanField):
     For full list of arguments and keyword arguments, look parent field docs.
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
+
+    DEFAULT_WTF_FIELD = wtf_fields.BooleanField if wtf_fields else None
+    DEFAULT_WTF_CHOICES_FIELD_COERCE = bool
 
     def to_wtf_field(self, model, field_kwargs):
         """
@@ -186,6 +208,8 @@ class DateField(WtfFieldMixin, fields.DateField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
+    DEFAULT_WTF_FIELD = wtf_fields.DateField if wtf_fields else None
+
     def to_wtf_field(self, model, field_kwargs):
         """
         Protection from execution of :func:`to_wtf_field` in form generation.
@@ -202,6 +226,8 @@ class DateTimeField(WtfFieldMixin, fields.DateTimeField):
     For full list of arguments and keyword arguments, look parent field docs.
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
+
+    DEFAULT_WTF_FIELD = wtf_fields.DateTimeField if wtf_fields else None
 
     def to_wtf_field(self, model, field_kwargs):
         """
@@ -220,6 +246,9 @@ class DecimalField(WtfFieldMixin, fields.DecimalField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
+    DEFAULT_WTF_FIELD = wtf_fields.DecimalField if wtf_fields else None
+    DEFAULT_WTF_CHOICES_FIELD_COERCE = decimal.Decimal
+
     def to_wtf_field(self, model, field_kwargs):
         """
         Protection from execution of :func:`to_wtf_field` in form generation.
@@ -236,6 +265,8 @@ class DictField(WtfFieldMixin, fields.DictField):
     For full list of arguments and keyword arguments, look parent field docs.
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
+
+    DEFAULT_WTF_FIELD = custom_fields.DictField if custom_fields else None
 
     def to_wtf_field(self, model, field_kwargs):
         """
@@ -269,7 +300,13 @@ class EmailField(WtfFieldMixin, fields.EmailField):
 
     For full list of arguments and keyword arguments, look parent field docs.
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
+
+    .. versionchanged:: 2.0.0
+        Default field output changed from :class:`.NoneStringField` to
+        :class:`wtforms.fields.EmailField`
     """
+
+    DEFAULT_WTF_FIELD = wtf_fields.EmailField if wtf_fields else None
 
     def to_wtf_field(self, model, field_kwargs):
         """
@@ -287,6 +324,8 @@ class EmbeddedDocumentField(WtfFieldMixin, fields.EmbeddedDocumentField):
     For full list of arguments and keyword arguments, look parent field docs.
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
+
+    DEFAULT_WTF_FIELD = wtf_fields.FormField if wtf_fields else None
 
     def to_wtf_field(self, model, field_kwargs):
         """
@@ -339,6 +378,8 @@ class FileField(WtfFieldMixin, fields.FileField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
+    DEFAULT_WTF_FIELD = wtf_fields.FileField if wtf_fields else None
+
     def to_wtf_field(self, model, field_kwargs):
         """
         Protection from execution of :func:`to_wtf_field` in form generation.
@@ -355,6 +396,9 @@ class FloatField(WtfFieldMixin, fields.FloatField):
     For full list of arguments and keyword arguments, look parent field docs.
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
+
+    DEFAULT_WTF_FIELD = wtf_fields.FloatField if wtf_fields else None
+    DEFAULT_WTF_CHOICES_FIELD_COERCE = float
 
     def to_wtf_field(self, model, field_kwargs):
         """
@@ -475,6 +519,9 @@ class IntField(WtfFieldMixin, fields.IntField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
+    DEFAULT_WTF_FIELD = wtf_fields.IntegerField if wtf_fields else None
+    DEFAULT_WTF_CHOICES_FIELD_COERCE = int
+
     def to_wtf_field(self, model, field_kwargs):
         """
         Protection from execution of :func:`to_wtf_field` in form generation.
@@ -525,6 +572,8 @@ class ListField(WtfFieldMixin, fields.ListField):
     For full list of arguments and keyword arguments, look parent field docs.
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
+
+    DEFAULT_WTF_FIELD = wtf_fields.FieldList if wtf_fields else None
 
     def to_wtf_field(self, model, field_kwargs):
         """
@@ -628,6 +677,8 @@ class ObjectIdField(WtfFieldMixin, fields.ObjectIdField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
+    DEFAULT_WTF_CHOICES_FIELD_COERCE = ObjectId
+
     def to_wtf_field(self, model, field_kwargs):
         """
         Protection from execution of :func:`to_wtf_field` in form generation.
@@ -679,6 +730,8 @@ class ReferenceField(WtfFieldMixin, fields.ReferenceField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
+    DEFAULT_WTF_FIELD = custom_fields.ModelSelectField if custom_fields else None
+
     def to_wtf_field(self, model, field_kwargs):
         """
         Protection from execution of :func:`to_wtf_field` in form generation.
@@ -713,6 +766,8 @@ class SortedListField(WtfFieldMixin, fields.SortedListField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
+    DEFAULT_WTF_FIELD = wtf_fields.FieldList if wtf_fields else None
+
     def to_wtf_field(self, model, field_kwargs):
         """
         Protection from execution of :func:`to_wtf_field` in form generation.
@@ -730,6 +785,8 @@ class StringField(WtfFieldMixin, fields.StringField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
+    DEFAULT_WTF_FIELD = wtf_fields.TextAreaField if wtf_fields else None
+
     def to_wtf_field(self, model, field_kwargs):
         """
         Protection from execution of :func:`to_wtf_field` in form generation.
@@ -746,6 +803,8 @@ class URLField(WtfFieldMixin, fields.URLField):
     For full list of arguments and keyword arguments, look parent field docs.
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
+
+    DEFAULT_WTF_FIELD = custom_fields.NoneStringField if custom_fields else None
 
     def to_wtf_field(self, model, field_kwargs):
         """
