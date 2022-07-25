@@ -43,7 +43,7 @@ __all__ = [
 ]
 import decimal
 import warnings
-from typing import Callable, List, Optional, Union
+from typing import Callable, Dict, List, Optional, Type, Union
 
 from bson import ObjectId
 from mongoengine import fields
@@ -82,8 +82,10 @@ class WtfFieldMixin:
         *,
         validators: Optional[Union[List, Callable]] = None,
         filters: Optional[Union[List, Callable]] = None,
+        wtf_field_class: Optional[Type] = None,
         wtf_filters: Optional[Union[List, Callable]] = None,
         wtf_validators: Optional[Union[List, Callable]] = None,
+        wtf_options: Optional[Dict] = None,
         **kwargs,
     ):
         """
@@ -91,8 +93,13 @@ class WtfFieldMixin:
 
         :param filters:     DEPRECATED: wtf form field filters.
         :param validators:  DEPRECATED: wtf form field validators.
+        :param wtf_field_class: Any subclass of :class:`wtforms.forms.core.Field` that
+            can be used for form field generation. Takes precedence over
+            :attr:`DEFAULT_WTF_FIELD`  and :attr:`DEFAULT_WTF_CHOICES_FIELD`
         :param wtf_filters:     wtf form field filters.
         :param wtf_validators:  wtf form field validators.
+        :param wtf_options: Dictionary with WTForm Field settings.
+            Applied last, takes precedence over any generated field options.
         :param kwargs: keyword arguments silently bypassed to normal mongoengine fields
         """
         if validators is not None:
@@ -123,13 +130,28 @@ class WtfFieldMixin:
         self.wtf_filters = self._ensure_callable_or_list(
             wtf_filters or filters, "wtf_filters"
         )
+        self.wtf_options = wtf_options
 
         # Some attributes that will be updated by parent methods
         self.required = False
         self.default = None
         self.name = ""
+        self.choices = None
+
+        # Internals
+        self._wtf_field_class = wtf_field_class
+        self._wtf_options = {}
 
         super().__init__(**kwargs)
+
+    @property
+    def wtf_field_class(self):
+        """Final WTForm Field class, that will be used for field generation."""
+        if self._wtf_field_class:
+            return self._wtf_field_class
+        if self.choices and self.DEFAULT_WTF_CHOICES_FIELD:
+            return self.DEFAULT_WTF_CHOICES_FIELD
+        return self.DEFAULT_WTF_FIELD
 
     @staticmethod
     def _ensure_callable_or_list(argument, msg_flag: str) -> Optional[List]:
