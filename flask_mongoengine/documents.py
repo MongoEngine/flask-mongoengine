@@ -1,6 +1,6 @@
 """Extended version of :mod:`mongoengine.document`."""
 import logging
-from typing import List, Optional, Type, Union
+from typing import Dict, List, Optional, Type, Union
 
 import mongoengine
 from flask import abort
@@ -113,7 +113,7 @@ class WtfFormMixin:
         base_class: Type[ModelForm] = ModelForm,
         only: Optional[List[str]] = None,
         exclude: Optional[List[str]] = None,
-        field_args=None,
+        fields_kwargs: Optional[Dict[str, Dict]] = None,
     ) -> Type[ModelForm]:
         """
         Generate WTForm from Document model.
@@ -130,12 +130,31 @@ class WtfFormMixin:
             from the form. All other properties will have fields.
             Fields are appears in order, defined in model, excluding provided fields
             names. For adjusting fields ordering, use :attr:`only`.
-        :param field_args:
-            An optional dictionary of field names mapping to keyword arguments used
-            to construct each field object.
+        :param fields_kwargs:
+            An optional dictionary of dictionaries, where field names mapping to keyword
+            arguments used to construct each field object. Has the highest priority over
+            all fields settings (made in Document field definition). Field options are
+            directly passed to field generation, so must match WTForm Field keyword
+            arguments. Support special field keyword option ``wtf_field_class``, that
+            can be used for complete field class replacement.
+
+            Dictionary format example::
+
+                dictionary = {
+                    "field_name":{
+                        "label":"new",
+                        "default": "new",
+                        "wtf_field_class": wtforms.fields.StringField
+                    }
+                }
+
+            With such dictionary for field with name ``field_name``
+            :class:`wtforms.fields.StringField` will be called like::
+
+                field_name = wtforms.fields.StringField(label="new", default="new")
         """
         form_fields_dict = {}
-        field_args = field_args or {}
+        fields_kwargs = fields_kwargs or {}
         fields_names = cls._get_fields_names(only, exclude)
 
         for field_name in fields_names:
@@ -144,7 +163,7 @@ class WtfFormMixin:
             try:
                 form_fields_dict[field_name] = field_class.to_wtf_field(
                     cls,
-                    field_args.get(field_name),
+                    fields_kwargs.get(field_name),
                 )
             except (AttributeError, NotImplementedError):
                 logger.warning(
