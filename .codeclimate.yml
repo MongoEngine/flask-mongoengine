@@ -12,6 +12,9 @@ checks:
   method-complexity:
     config:
       threshold: 10
+  argument-count:
+    config:
+      threshold: 20
 exclude_patterns:
   - "tests/"
   - "example_app/"
