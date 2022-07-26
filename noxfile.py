@@ -11,25 +11,33 @@ nox.options.sessions = "latest", "lint", "documentation_tests"
 db_version = "5.0"
 
 
-def base_install(session, flask, mongoengine):
+def base_install(session, flask, mongoengine, toolbar, wtf):
     """Create basic environment setup for tests and linting."""
+    session.run("python", "-m", "pip", "install", "--upgrade", "pip")
+    session.run("python", "-m", "pip", "install", "setuptools_scm[toml]>=6.3.1")
+
+    if toolbar and wtf:
+        extra = "wtf,toolbar,"
+    elif toolbar:
+        extra = "toolbar,"
+    elif wtf:
+        extra = "wtf,"
+    else:
+        extra = ""
+
     if flask == "==1.1.4":
-        session.run("python", "-m", "pip", "install", "--upgrade", "pip")
-        session.run("python", "-m", "pip", "install", "setuptools_scm[toml]>=6.3.1")
         session.install(
             f"Flask{flask}",
             f"mongoengine{mongoengine}",
             "-e",
-            ".[wtf,toolbar,legacy,legacy-dev]",
+            f".[{extra}legacy,legacy-dev]",
         )
     else:
-        session.run("python", "-m", "pip", "install", "--upgrade", "pip")
-        session.run("python", "-m", "pip", "install", "setuptools_scm[toml]>=6.3.1")
         session.install(
             f"Flask{flask}",
             f"mongoengine{mongoengine}",
             "-e",
-            ".[wtf,toolbar,dev]",
+            f".[{extra}dev]",
         )
     return session
 
@@ -44,9 +52,11 @@ def lint(session):
 @nox.session(python=["3.7", "3.8", "3.9", "3.10", "pypy3.7"])
 @nox.parametrize("flask", ["==1.1.4", "==2.0.3", ">=2.1.2"])
 @nox.parametrize("mongoengine", ["==0.21.0", "==0.22.1", "==0.23.1", ">=0.24.1"])
-def ci_cd_tests(session, flask, mongoengine):
+@nox.parametrize("toolbar", [True, False])
+@nox.parametrize("wtf", [True, False])
+def ci_cd_tests(session, flask, mongoengine, toolbar, wtf):
     """Run test suite with pytest into ci_cd (no docker)."""
-    session = base_install(session, flask, mongoengine)
+    session = base_install(session, flask, mongoengine, toolbar, wtf)
     session.run("pytest", *session.posargs)
 
 
@@ -71,18 +81,22 @@ def _run_in_docker(session):
 @nox.session(python=["3.7", "3.8", "3.9", "3.10", "pypy3.7"])
 @nox.parametrize("flask", ["==1.1.4", "==2.0.3", ">=2.1.2"])
 @nox.parametrize("mongoengine", ["==0.21.0", "==0.22.1", "==0.23.1", ">=0.24.1"])
-def full_tests(session, flask, mongoengine):
+@nox.parametrize("toolbar", [True, False])
+@nox.parametrize("wtf", [True, False])
+def full_tests(session, flask, mongoengine, toolbar, wtf):
     """Run tests locally with docker and complete support matrix."""
-    session = base_install(session, flask, mongoengine)
+    session = base_install(session, flask, mongoengine, toolbar, wtf)
     _run_in_docker(session)
 
 
 @nox.session(python=["3.7", "3.8", "3.9", "3.10", "pypy3.7"])
-def latest(session):
+@nox.parametrize("toolbar", [True, False])
+@nox.parametrize("wtf", [True, False])
+def latest(session, toolbar, wtf):
     """Run minimum tests for checking minimum code quality."""
     flask = ">=2.1.2"
     mongoengine = ">=0.24.1"
-    session = base_install(session, flask, mongoengine)
+    session = base_install(session, flask, mongoengine, toolbar, wtf)
     if session.interactive:
         _run_in_docker(session)
     else:
