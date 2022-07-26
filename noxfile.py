@@ -15,6 +15,7 @@ def base_install(session, flask, mongoengine):
     """Create basic environment setup for tests and linting."""
     if flask == "==1.1.4":
         session.run("python", "-m", "pip", "install", "--upgrade", "pip")
+        session.run("python", "-m", "pip", "install", "setuptools_scm[toml]>=6.3.1")
         session.install(
             f"Flask{flask}",
             f"mongoengine{mongoengine}",
@@ -23,6 +24,7 @@ def base_install(session, flask, mongoengine):
         )
     else:
         session.run("python", "-m", "pip", "install", "--upgrade", "pip")
+        session.run("python", "-m", "pip", "install", "setuptools_scm[toml]>=6.3.1")
         session.install(
             f"Flask{flask}",
             f"mongoengine{mongoengine}",
