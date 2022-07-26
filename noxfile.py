@@ -17,7 +17,11 @@ def base_install(session, flask, mongoengine):
         session.run("python", "-m", "pip", "install", "--upgrade", "pip")
         session.install(
             f"Flask{flask}",
+        )
+        session.install(
             f"mongoengine{mongoengine}",
+        )
+        session.install(
             "-e",
             ".[wtf,toolbar,legacy,legacy-dev]",
         )
@@ -25,7 +29,11 @@ def base_install(session, flask, mongoengine):
         session.run("python", "-m", "pip", "install", "--upgrade", "pip")
         session.install(
             f"Flask{flask}",
+        )
+        session.install(
             f"mongoengine{mongoengine}",
+        )
+        session.install(
             "-e",
             ".[wtf,toolbar,dev]",
         )
