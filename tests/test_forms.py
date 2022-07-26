@@ -4,11 +4,14 @@ import re
 import bson
 import flask
 import pytest
-import wtforms
 from mongoengine import NotUniqueError, queryset_manager
 from werkzeug.datastructures import MultiDict
 
-from flask_mongoengine.wtf.orm import model_form
+try:
+    from flask_mongoengine.wtf.orm import model_form
+except ImportError:
+    model_form = None
+wtforms = pytest.importorskip("wtforms")
 
 
 def test_binaryfield(app, db):

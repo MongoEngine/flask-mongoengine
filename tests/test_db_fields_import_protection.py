@@ -1,20 +1,28 @@
 """Testing independency from WTForms."""
+import pytest
+
+try:
+    import wtforms
+
+    wtforms_not_installed = False
+except ImportError:
+    wtforms = None
+    wtforms_not_installed = True
 
 
 class TestImportProtection:
     def test__when_wtforms_available__import_use_its_data(self):
         from flask_mongoengine import db_fields
 
-        assert db_fields.wtf_fields is not None
-        assert db_fields.wtf_validators_ is not None
+        assert db_fields is not None
 
-    def test__core_class_imported_without_error(self, monkeypatch):
-        monkeypatch.setattr("flask_mongoengine.decorators.wtf_installed", False)
+    def test__core_class_imported_without_error(self):
         from flask_mongoengine import MongoEngine
 
         db = MongoEngine()
         assert db is not None
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     def test__wtf_required_decorator__when_wtf_installed(self):
         from flask_mongoengine.decorators import wtf_required
 

@@ -5,9 +5,16 @@ from unittest.mock import Mock
 import pytest
 from mongoengine import fields as base_fields
 from pytest_mock import MockerFixture
-from wtforms import validators as wtf_validators_
 
 from flask_mongoengine import db_fields, documents
+
+try:
+    from wtforms import validators as wtf_validators_
+
+    wtforms_not_installed = False
+except ImportError:
+    wtf_validators_ = None
+    wtforms_not_installed = True
 
 
 @pytest.fixture
@@ -44,6 +51,7 @@ class TestWtfFormMixin:
 
         return Model
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     def test__get_fields_names__is_called_by_to_wtf_form_call(
         self, TempDocument, mocker: MockerFixture
     ):
@@ -79,6 +87,7 @@ class TestWtfFormMixin:
         TempDocument.to_wtf_form()
         to_wtf_spy.assert_called_once()
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     def test__to_wtf_form__logs_error(self, caplog, TempDocument):
         TempDocument.to_wtf_form()
 
@@ -225,6 +234,7 @@ class TestWtfFieldMixin:
 
         assert issubclass(field.wtf_field_class, str)
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     @pytest.mark.parametrize(
         ["user_dict", "expected_result"],
         [
@@ -245,6 +255,7 @@ class TestWtfFieldMixin:
         field = db_fields.WtfFieldMixin(wtf_options=user_dict)
         assert field.wtf_field_options == expected_result
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     def test__wtf_generated_options__correctly_retrieve_label_from_parent_class(self):
         """Test based on base class for all fields."""
         default_call = self.WTFieldBaseMRO()
@@ -254,6 +265,7 @@ class TestWtfFieldMixin:
         assert default_call.wtf_generated_options["label"] == "set not by init"
         assert with_option_call.wtf_generated_options["label"] == "fake"
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     def test__wtf_generated_options__correctly_retrieve_description_from_parent_class(
         self,
     ):
@@ -263,6 +275,7 @@ class TestWtfFieldMixin:
         assert default_call.wtf_generated_options["description"] == ""
         assert with_option_call.wtf_generated_options["description"] == "fake"
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     def test__wtf_generated_options__correctly_retrieve_default_from_parent_class(self):
         default_call = self.WTFieldBaseMRO()
         with_option_call = self.WTFieldBaseMRO(default="fake")
@@ -270,6 +283,7 @@ class TestWtfFieldMixin:
         assert default_call.wtf_generated_options["default"] is None
         assert with_option_call.wtf_generated_options["default"] == "fake"
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     def test__wtf_generated_options__correctly_retrieve_validators_from_parent_class__and__add_optional_validator__if_field_not_required(
         self,
     ):
@@ -286,6 +300,7 @@ class TestWtfFieldMixin:
             wtf_validators_.Optional,
         )
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     def test__wtf_generated_options__correctly_retrieve_validators_from_parent_class__and__add_required__if_field_required(
         self,
     ):
@@ -302,6 +317,7 @@ class TestWtfFieldMixin:
             wtf_validators_.InputRequired,
         )
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     def test__wtf_generated_options__correctly_retrieve_filters_from_parent_class(self):
         default_call = self.WTFieldBaseMRO()
         with_option_call = self.WTFieldBaseMRO(wtf_filters=[str, list])
@@ -309,6 +325,7 @@ class TestWtfFieldMixin:
         assert default_call.wtf_generated_options["filters"] == []
         assert with_option_call.wtf_generated_options["filters"] == [str, list]
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     def test__wtf_generated_options__correctly_handle_choices_settings(self):
         default_call = self.WTFieldBaseMRO(choices=[1, 2])
         with_option_call = self.WTFieldBaseMRO(choices=[1, 2], wtf_choices_coerce=list)
@@ -318,6 +335,7 @@ class TestWtfFieldMixin:
         assert with_option_call.wtf_generated_options["choices"] == [1, 2]
         assert with_option_call.wtf_generated_options["coerce"] is list
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     def test__to_wtf_field__does_not_modify_anything_if_options_not_provided(self):
         # Setting base validators to exclude patching of .wtf_generated_options()
         field = self.WTFieldBaseMRO(wtf_options={"validators": ["ignore"]})
@@ -328,6 +346,7 @@ class TestWtfFieldMixin:
 
         field.DEFAULT_WTF_FIELD.assert_called_with(**field_options)
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     def test__to_wtf_field__update_field_class_if_related_option_provided(self):
         # Setting base validators to exclude patching of .wtf_generated_options()
         will_be_called = Mock()
@@ -340,6 +359,7 @@ class TestWtfFieldMixin:
         will_not_be_called.assert_not_called()
         will_be_called.assert_called_with(**field_options)
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     def test__to_wtf_field__update_field_kwargs_if_related_option_provided(self):
         # Setting base validators to exclude patching of .wtf_generated_options()
         will_be_called = Mock()
