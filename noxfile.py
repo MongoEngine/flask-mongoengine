@@ -14,6 +14,7 @@ db_version = "5.0"
 def base_install(session, flask, mongoengine):
     """Create basic environment setup for tests and linting."""
     if flask == "==1.1.4":
+        session.run("python", "-m", "pip", "install", "--upgrade", "pip")
         session.install(
             f"Flask{flask}",
             f"mongoengine{mongoengine}",
@@ -21,6 +22,7 @@ def base_install(session, flask, mongoengine):
             ".[wtf,toolbar,legacy,legacy-dev]",
         )
     else:
+        session.run("python", "-m", "pip", "install", "--upgrade", "pip")
         session.install(
             f"Flask{flask}",
             f"mongoengine{mongoengine}",
