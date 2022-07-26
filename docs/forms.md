@@ -28,34 +28,6 @@ In the same time, user is able to adjust database fields definition with
 specific settings as on stage of Document model definition, as on form generation stage.
 This allows to create several forms for same model, for different circumstances.
 
-[//]: # (TODO: Read below)
-For complex or custom cases user can bypass additional Flask-WTF/WTForms fields
-arguments , on form generation with {func}`~WtfFormMixin.to_wtf_form` as
-{attr}`fields_kwargs` parameter.
-
-For extremely complex cases, or cases when some field not yet supported by
-Flask-Mongoengine user is able to implement special database model field with
-completely independent field converter for forms, that will be used, ignoring
-Flask-Mongoengine internals. To do this:
-
-1. Inherit from database model field type.
-2. Implement {func}`to_wtf_field` method with additional {attr}`model`,
-   {attr}`field_args` arguments, that will return form field. Check
-   {attr}`.ModelConverter.convert` first lines for details.
-
-```{note}
-{func}`to_form_field` was undocumented feature, even before **2.0.0**, but was not
-in priority of {attr}`.ModelConverter.convert` execution order. I.e. some
-transformations was made before this function existance check, even full form field
-could be generated in some cases.
-```
-
-```{warning}
-Usage of {func}`to_form_field` approach assume that there will not be any
-tranformation from Flask-Mongongine side. So user is fully responsible for all
-validators, labels, etc.
-```
-
 ## Requirements
 
 For correct integration behavior several requirements should be met:
