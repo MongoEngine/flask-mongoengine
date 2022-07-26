@@ -9,14 +9,17 @@ import jinja2
 import pymongo
 import pytest
 from flask import Flask
-from flask_debugtoolbar import DebugToolbarExtension
-from flask_debugtoolbar.panels import DebugPanel
-from jinja2 import ChoiceLoader, DictLoader
-from pymongo import monitoring
-from pymongo.errors import OperationFailure
-from pytest_mock import MockerFixture
 
-from flask_mongoengine.panels import (
+flask_debugtoolbar = pytest.importorskip("flask_debugtoolbar")
+
+from flask_debugtoolbar import DebugToolbarExtension  # noqa
+from flask_debugtoolbar.panels import DebugPanel  # noqa
+from jinja2 import ChoiceLoader, DictLoader  # noqa
+from pymongo import monitoring  # noqa
+from pymongo.errors import OperationFailure  # noqa
+from pytest_mock import MockerFixture  # noqa
+
+from flask_mongoengine.panels import (  # noqa
     MongoCommandLogger,
     MongoDebugPanel,
     _maybe_patch_jinja_loader,
