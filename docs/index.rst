@@ -11,6 +11,9 @@ You can also use `WTForms <http://wtforms.simplecodes.com/>`_ as model forms for
    :maxdepth: 2
 
    flask_config
+   db_model
+   forms
+   migration_to_v2
    custom_queryset
    wtf_forms
    session_interface

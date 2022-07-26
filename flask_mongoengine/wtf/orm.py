@@ -55,8 +55,12 @@ class ModelConverter(object):
         kwargs: dict = {
             "label": getattr(field, "verbose_name", field.name),
             "description": getattr(field, "help_text", None) or "",
-            "validators": getattr(field, "validators", None) or [],
-            "filters": getattr(field, "filters", None) or [],
+            "validators": getattr(field, "wtf_validators", None)
+            or getattr(field, "validators", None)
+            or [],
+            "filters": getattr(field, "wtf_filters", None)
+            or getattr(field, "filters", None)
+            or [],
             "default": field.default,
         }
         if field_args:
@@ -86,15 +90,10 @@ class ModelConverter(object):
 
     @orm_deprecated
     def convert(self, model, field, field_args):
-        if hasattr(field, "to_form_field"):
-            return field.to_form_field(model, field_args)
-
         field_class = type(field).__name__
 
         if field_class not in self.converters:
-            raise NotImplementedError(
-                f"No converter for: {field_class}, exclude it from form generation."
-            )
+            return None
 
         kwargs = self._generate_convert_base_kwargs(field, field_args)
 
@@ -332,9 +331,13 @@ def model_form(
     :param only:
         An optional iterable with the property names that should be included in
         the form. Only these properties will have fields.
+        Fields are always appear in provided order, this allows user to change form
+        fields ordering, without changing database model.
     :param exclude:
         An optional iterable with the property names that should be excluded
         from the form. All other properties will have fields.
+        Fields are appears in order, defined in model, excluding provided fields
+        names. For adjusting fields ordering, use :attr:`only`.
     :param field_args:
         An optional dictionary of field names mapping to keyword arguments used
         to construct each field object.

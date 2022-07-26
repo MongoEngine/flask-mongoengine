@@ -8,6 +8,22 @@ flask_mongoengine.connection module
 
 .. automodule:: flask_mongoengine.connection
 
+flask_mongoengine.db_fields module
+----------------------------------
+
+.. automodule:: flask_mongoengine.db_fields
+   :special-members: __init__
+
+flask_mongoengine.decorators module
+-----------------------------------
+
+.. automodule:: flask_mongoengine.decorators
+
+flask_mongoengine.documents module
+----------------------------------
+
+.. automodule:: flask_mongoengine.documents
+
 flask_mongoengine.json module
 -----------------------------
 

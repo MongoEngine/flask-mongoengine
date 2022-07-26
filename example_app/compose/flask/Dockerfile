@@ -8,5 +8,5 @@ RUN groupadd -r flask && useradd -r -g flask flask
 COPY --chown=flask . /flask_mongoengine
 RUN pip install --upgrade pip  \
     && pip install -e /flask_mongoengine[toolbar,wtf] \
-    && pip install Faker
+    && pip install Faker Pillow
 WORKDIR /flask_mongoengine
