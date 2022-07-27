@@ -5,9 +5,9 @@ from gettext import gettext as _
 
 from flask import json
 from mongoengine.queryset import DoesNotExist
-from wtforms import widgets
-from wtforms.fields import SelectFieldBase, StringField, TextAreaField
-from wtforms.validators import ValidationError
+from wtforms import fields as wtf_fields
+from wtforms import validators as wtf_validators
+from wtforms import widgets as wtf_widgets
 
 __all__ = (
     "ModelSelectField",
@@ -15,7 +15,7 @@ __all__ = (
 )
 
 
-class QuerySetSelectField(SelectFieldBase):
+class QuerySetSelectField(wtf_fields.SelectFieldBase):
     """
     Given a QuerySet either at initialization or inside a view, will display a
     select drop-down field of choices. The `data` property actually will
@@ -32,7 +32,7 @@ class QuerySetSelectField(SelectFieldBase):
     `blank_text` parameter.
     """
 
-    widget = widgets.Select()
+    widget = wtf_widgets.Select()
 
     def __init__(
         self,
@@ -92,14 +92,14 @@ class QuerySetSelectField(SelectFieldBase):
     def pre_validate(self, form):
         if not self.allow_blank or self.data is not None:
             if not self.data:
-                raise ValidationError(_("Not a valid choice"))
+                raise wtf_validators.ValidationError(_("Not a valid choice"))
 
     def _is_selected(self, item):
         return item == self.data
 
 
 class QuerySetSelectMultipleField(QuerySetSelectField):
-    widget = widgets.Select(multiple=True)
+    widget = wtf_widgets.Select(multiple=True)
 
     def __init__(
         self,
@@ -164,7 +164,7 @@ class ModelSelectMultipleField(QuerySetSelectMultipleField):
         )
 
 
-class JSONField(TextAreaField):
+class JSONField(wtf_fields.TextAreaField):
     def _value(self):
         # TODO: Investigate why raw mentioned.
         if self.raw_data:
@@ -187,7 +187,7 @@ class DictField(JSONField):
             raise ValueError(self.gettext("Not a valid dictionary."))
 
 
-class NoneStringField(StringField):
+class NoneStringField(wtf_fields.StringField):
     """
     Custom StringField that counts "" as None
     """
@@ -199,7 +199,7 @@ class NoneStringField(StringField):
             self.data = None
 
 
-class BinaryField(TextAreaField):
+class BinaryField(wtf_fields.TextAreaField):
     """
     Custom TextAreaField that converts its value with binary_type.
     """
