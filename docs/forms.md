@@ -1,4 +1,4 @@
-# Flask-WTF(WTForms) integration
+# WTForms integration
 
 ```{important}
 Documentation below is related to project version 2.0.0 or higher, old versions has
@@ -55,8 +55,12 @@ For all fields, processed by Flask-Mongoengine integration:
   {attr}`label`, otherwise pure field name used.
 - If model field definition have {attr}`help_text` it will be used as form field
   {attr}`description`, otherwise empty string used.
-- Field's {attr}`default` used as form {attr}`default`, that's why for string fields
-  special {class}`~.NoneStringField` with `None` value support used.
+- Field's {attr}`default` used as form {attr}`default`, that's why special WTForms
+  fields implementations was created. Details can be found in
+  {mod}`flask_mongoengine.wtf.fields` module. In new form generator only 'Mongo'
+  prefixed classes are used for fields, other classes are deprecated and will be
+  removed in version **3.0.0**. If you have own nesting classes, you should check
+  inheritance and make an update.
 - Field's {attr}`choices`, if exist, used as form {attr}`choices`.
 
 ```{warning}
@@ -131,7 +135,51 @@ Not yet documented. Please help us with new pull request.
 
 ### StringField
 
-Not yet documented. Please help us with new pull request.
+- API: {class}`.db_fields.StringField`
+- Default form field class: Selected by field settings combination
+
+#### Form generation behaviour
+
+By default, during WTForm generation for fields without specified size (
+{attr}`min_length` or {attr}`max_length`) class {class}`.MongoTextAreaField` is used,
+in case when {attr}`min_length` or {attr}`max_length` set, then
+{class}`.MongoStringField` used and {class}`~wtforms.validators.Length` will be added
+to form field validators. This allows to keep documents of any size in mongodb.
+
+In some cases class {class}`~.MongoStringField` is not the best choice for field, even
+with limited size. In this case user can easily overwrite generated field class by
+providing {attr}`wtf_field_class` on {class}`.db_fields.StringField` field declaration,
+as on document, as well as on form generation steps.
+
+If database field definition has {attr}`regex` parameter set, then
+{class}`~wtforms.validators.Regexp` validator will be added to the form field.
+
+#### Features deprecated
+
+Field declaration step keyword arguments {attr}`password` and {attr}`textarea` are
+deprecated in Flask-Mongoengine version **2.0.0** and exist only to make migration
+steps easy.
+
+To implement same behaviour, user should use {attr}`wtf_field_class` setting on
+{class}`.db_fields.StringField` init.
+
+#### Related WTForm custom fields
+
+Several special WTForms field implementation was created to support mongodb database
+behaviour and do not create any values in database, in case of empty fields. They
+can be used as {attr}`wtf_field_class` setting or independently. Some of them used
+in another database fields too, but all of them based on
+{class}`wtforms.fields.StringField` and {class}`~.EmptyStringIsNoneMixin`. You can use
+{class}`~.EmptyStringIsNoneMixin` for own field types.
+
+- {class}`~.MongoEmailField`
+- {class}`~.MongoHiddenField`
+- {class}`~.MongoPasswordField`
+- {class}`~.MongoSearchField`
+- {class}`~.MongoStringField`
+- {class}`~.MongoTelField`
+- {class}`~.MongoTextAreaField`
+- {class}`~.MongoURLField`
 
 ### URLField
 
