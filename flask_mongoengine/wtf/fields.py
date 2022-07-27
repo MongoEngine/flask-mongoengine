@@ -268,3 +268,88 @@ class BinaryField(wtf_fields.TextAreaField):
         """
         if valuelist:
             self.data = bytes(valuelist[0], "utf-8")
+
+
+# noinspection PyUnresolvedReferences,PyAttributeOutsideInit
+class EmptyStringIsNoneMixin:
+    """
+    Special mixin to ignore empty strings **before** parent class processing.
+
+    Unlike old :class:`NoneStringField` we do it before parent class call, this allows
+    us to reuse this mixin in many more cases without errors.
+    """
+
+    def process_formdata(self, valuelist):
+        """
+        Ignores empty string and calls parent :func:`process_formdata` if data present.
+
+        :param valuelist: A list of strings to process.
+        """
+        if valuelist and valuelist[0] == "":
+            self.data = None
+        else:
+            super().process_formdata(valuelist)
+
+
+class MongoEmailField(EmptyStringIsNoneMixin, wtf_fields.EmailField):
+    """
+    Regular :class:`wtforms.fields.EmailField`, that transform empty string to `None`.
+    """
+
+    pass
+
+
+class MongoHiddenField(EmptyStringIsNoneMixin, wtf_fields.HiddenField):
+    """
+    Regular :class:`wtforms.fields.HiddenField`, that transform empty string to `None`.
+    """
+
+    pass
+
+
+class MongoPasswordField(EmptyStringIsNoneMixin, wtf_fields.PasswordField):
+    """
+    Regular :class:`wtforms.fields.PasswordField`, that transform empty string to `None`.
+    """
+
+    pass
+
+
+class MongoSearchField(EmptyStringIsNoneMixin, wtf_fields.SearchField):
+    """
+    Regular :class:`wtforms.fields.SearchField`, that transform empty string to `None`.
+    """
+
+    pass
+
+
+class MongoStringField(EmptyStringIsNoneMixin, wtf_fields.StringField):
+    """
+    Regular :class:`wtforms.fields.StringField`, that transform empty string to `None`.
+    """
+
+    pass
+
+
+class MongoTelField(EmptyStringIsNoneMixin, wtf_fields.TelField):
+    """
+    Regular :class:`wtforms.fields.TelField`, that transform empty string to `None`.
+    """
+
+    pass
+
+
+class MongoTextAreaField(EmptyStringIsNoneMixin, wtf_fields.TextAreaField):
+    """
+    Regular :class:`wtforms.fields.TextAreaField`, that transform empty string to `None`.
+    """
+
+    pass
+
+
+class MongoURLField(EmptyStringIsNoneMixin, wtf_fields.URLField):
+    """
+    Regular :class:`wtforms.fields.URLField`, that transform empty string to `None`.
+    """
+
+    pass
