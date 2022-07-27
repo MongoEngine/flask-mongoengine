@@ -54,6 +54,10 @@ class QuerySetSelectField(wtf_fields.SelectFieldBase):
         self.queryset = queryset
 
     def iter_choices(self):
+        """
+        Provides data for choice widget rendering. Must return a sequence or
+        iterable of (value, label, selected) tuples.
+        """
         if self.allow_blank:
             yield "__None", self.blank_text, self.data is None
 
@@ -75,6 +79,14 @@ class QuerySetSelectField(wtf_fields.SelectFieldBase):
             yield obj.id, label, selected
 
     def process_formdata(self, valuelist):
+        """
+        Process data received over the wire from a form.
+
+        This will be called during form construction with data supplied
+        through the `formdata` argument.
+
+        :param valuelist: A list of strings to process.
+        """
         if not valuelist or valuelist[0] == "__None" or self.queryset is None:
             self.data = None
             return
@@ -86,6 +98,11 @@ class QuerySetSelectField(wtf_fields.SelectFieldBase):
             self.data = None
 
     def pre_validate(self, form):
+        """
+        Field-level validation. Runs before any other validators.
+
+        :param form: The form the field belongs to.
+        """
         if (not self.allow_blank or self.data is not None) and not self.data:
             raise wtf_validators.ValidationError(_("Not a valid choice"))
 
@@ -95,6 +112,8 @@ class QuerySetSelectField(wtf_fields.SelectFieldBase):
 
 # noinspection PyAttributeOutsideInit,PyAbstractClass
 class QuerySetSelectMultipleField(QuerySetSelectField):
+    """Same as :class:`QuerySetSelectField` but with multiselect options."""
+
     widget = wtf_widgets.Select(multiple=True)
 
     def __init__(
@@ -113,6 +132,14 @@ class QuerySetSelectMultipleField(QuerySetSelectField):
         )
 
     def process_formdata(self, valuelist):
+        """
+        Process data received over the wire from a form.
+
+        This will be called during form construction with data supplied
+        through the `formdata` argument.
+
+        :param valuelist: A list of strings to process.
+        """
 
         if not valuelist or valuelist[0] == "__None" or not self.queryset:
             self.data = None
@@ -156,6 +183,8 @@ class ModelSelectMultipleField(QuerySetSelectMultipleField):
 
 # noinspection PyAttributeOutsideInit,PyAbstractClass
 class JSONField(wtf_fields.TextAreaField):
+    """Special version fo :class:`wtforms.fields.TextAreaField`."""
+
     def _value(self):
         # TODO: Investigate why raw mentioned.
         if self.raw_data:
@@ -163,18 +192,41 @@ class JSONField(wtf_fields.TextAreaField):
         else:
             return self.data and json.dumps(self.data) or ""
 
-    def process_formdata(self, value):
-        if value:
+    def process_formdata(self, valuelist):
+        """
+        Process data received over the wire from a form.
+
+        This will be called during form construction with data supplied
+        through the `formdata` argument.
+
+        :param valuelist: A list of strings to process.
+        """
+        if valuelist:
             try:
-                self.data = json.loads(value[0])
+                self.data = json.loads(valuelist[0])
             except ValueError as error:
                 raise ValueError(self.gettext("Invalid JSON data.")) from error
 
 
 class DictField(JSONField):
-    def process_formdata(self, value):
-        super(DictField, self).process_formdata(value)
-        if value and not isinstance(self.data, dict):
+    """
+    Special version fo :class:`JSONField` to be generated for
+    :class:`flask_mongoengine.db_fields.DictField`.
+
+    Used in generator before flask_mongoengine version 2.0
+    """
+
+    def process_formdata(self, valuelist):
+        """
+        Process data received over the wire from a form.
+
+        This will be called during form construction with data supplied
+        through the `formdata` argument.
+
+        :param valuelist: A list of strings to process.
+        """
+        super(DictField, self).process_formdata(valuelist)
+        if valuelist and not isinstance(self.data, dict):
             raise ValueError(self.gettext("Not a valid dictionary."))
 
 
@@ -185,6 +237,14 @@ class NoneStringField(wtf_fields.StringField):
     """
 
     def process_formdata(self, valuelist):
+        """
+        Process data received over the wire from a form.
+
+        This will be called during form construction with data supplied
+        through the `formdata` argument.
+
+        :param valuelist: A list of strings to process.
+        """
         if valuelist:
             self.data = valuelist[0]
         if self.data == "":
@@ -198,5 +258,13 @@ class BinaryField(wtf_fields.TextAreaField):
     """
 
     def process_formdata(self, valuelist):
+        """
+        Process data received over the wire from a form.
+
+        This will be called during form construction with data supplied
+        through the `formdata` argument.
+
+        :param valuelist: A list of strings to process.
+        """
         if valuelist:
             self.data = bytes(valuelist[0], "utf-8")
