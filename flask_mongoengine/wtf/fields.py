@@ -1,6 +1,10 @@
 """
 Useful form fields for use with the mongoengine.
 """
+__all__ = [
+    "ModelSelectField",
+    "QuerySetSelectField",
+]
 from gettext import gettext as _
 
 from flask import json
@@ -8,11 +12,6 @@ from mongoengine.queryset import DoesNotExist
 from wtforms import fields as wtf_fields
 from wtforms import validators as wtf_validators
 from wtforms import widgets as wtf_widgets
-
-__all__ = (
-    "ModelSelectField",
-    "QuerySetSelectField",
-)
 
 
 class QuerySetSelectField(wtf_fields.SelectFieldBase):
@@ -90,9 +89,8 @@ class QuerySetSelectField(wtf_fields.SelectFieldBase):
                     self.data = None
 
     def pre_validate(self, form):
-        if not self.allow_blank or self.data is not None:
-            if not self.data:
-                raise wtf_validators.ValidationError(_("Not a valid choice"))
+        if (not self.allow_blank or self.data is not None) and not self.data:
+            raise wtf_validators.ValidationError(_("Not a valid choice"))
 
     def _is_selected(self, item):
         return item == self.data
@@ -118,21 +116,13 @@ class QuerySetSelectMultipleField(QuerySetSelectField):
 
     def process_formdata(self, valuelist):
 
-        if valuelist:
-            if valuelist[0] == "__None":
-                self.data = None
-            else:
-                if not self.queryset:
-                    self.data = None
-                    return
+        if not valuelist or valuelist[0] == "__None" or not self.queryset:
+            self.data = None
+            return
 
-                self.queryset.rewind()
-                self.data = list(self.queryset(pk__in=valuelist))
-                if not len(self.data):
-                    self.data = None
-
-        # If no value passed, empty the list
-        else:
+        self.queryset.rewind()
+        self.data = list(self.queryset(pk__in=valuelist))
+        if not len(self.data):
             self.data = None
 
     def _is_selected(self, item):
