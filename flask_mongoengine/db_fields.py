@@ -61,6 +61,30 @@ except ImportError:  # pragma: no cover
     wtf_validators_ = None
 
 
+@wtf_required
+def _setup_strings_common_validators(options: dict, obj: fields.StringField) -> dict:
+    """
+    Extend :attr:`base_options` with common validators for string types.
+
+    :param options: dict, usually from :class:`WtfFieldMixin.wtf_generated_options`
+    :param obj: Any :class:`mongoengine.fields.StringField` subclass instance.
+    """
+    assert isinstance(obj, fields.StringField), "Improperly configured"
+    if obj.min_length or obj.max_length:
+        options["validators"].insert(
+            0,
+            wtf_validators_.Length(
+                min=obj.min_length or -1,
+                max=obj.max_length or -1,
+            ),
+        )
+
+    if obj.regex:
+        options["validators"].insert(0, wtf_validators_.Regexp(regex=obj.regex))
+
+    return options
+
+
 class WtfFieldMixin:
     """
     Extension wrapper class for mongoengine BaseField.
@@ -469,24 +493,21 @@ class EmailField(WtfFieldMixin, fields.EmailField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
 
     .. versionchanged:: 2.0.0
-        Default field output changed from :class:`.NoneStringField` to
-        :class:`wtforms.fields.EmailField`
+        Default form field output changed from :class:`.NoneStringField` to
+        :class:`flask_mongoengine.wtf.fields.MongoEmailField`
     """
 
-    DEFAULT_WTF_FIELD = wtf_fields.EmailField if wtf_fields else None
+    DEFAULT_WTF_FIELD = custom_fields.MongoEmailField if custom_fields else None
 
-    def to_wtf_field(
-        self,
-        *,
-        model: Optional[Type] = None,
-        field_kwargs: Optional[dict] = None,
-    ):
-        """
-        Protection from execution of :func:`to_wtf_field` in form generation.
+    @property
+    @wtf_required
+    def wtf_generated_options(self) -> dict:
+        """Extend form validators with :class:`wtforms.validators.Email`"""
+        options = super().wtf_generated_options
+        options = _setup_strings_common_validators(options, self)
+        options["validators"].insert(0, wtf_validators_.Email())
 
-        :raises NotImplementedError: Field converter to WTForm Field not implemented.
-        """
-        raise NotImplementedError("Field converter to WTForm Field not implemented.")
+        return options
 
 
 class EmbeddedDocumentField(WtfFieldMixin, fields.EmbeddedDocumentField):
@@ -1085,22 +1106,112 @@ class StringField(WtfFieldMixin, fields.StringField):
 
     For full list of arguments and keyword arguments, look parent field docs.
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
+
+    .. versionchanged:: 2.0.0
+        Default form field output changed from :class:`.NoneStringField` to
+        :class:`flask_mongoengine.wtf.fields.MongoTextAreaField`
     """
 
-    DEFAULT_WTF_FIELD = wtf_fields.TextAreaField if wtf_fields else None
+    DEFAULT_WTF_FIELD = custom_fields.MongoTextAreaField if custom_fields else None
 
-    def to_wtf_field(
+    def __init__(
         self,
         *,
-        model: Optional[Type] = None,
-        field_kwargs: Optional[dict] = None,
+        password: bool = False,
+        textarea: bool = False,
+        validators: Optional[Union[List, Callable]] = None,
+        filters: Optional[Union[List, Callable]] = None,
+        wtf_field_class: Optional[Type] = None,
+        wtf_filters: Optional[Union[List, Callable]] = None,
+        wtf_validators: Optional[Union[List, Callable]] = None,
+        wtf_choices_coerce: Optional[Callable] = None,
+        wtf_options: Optional[dict] = None,
+        **kwargs,
     ):
         """
-        Protection from execution of :func:`to_wtf_field` in form generation.
+        Extended :func:`__init__` method for mongoengine db field with WTForms options.
 
-        :raises NotImplementedError: Field converter to WTForm Field not implemented.
+        :param password:
+            DEPRECATED: Force to use :class:`~.MongoPasswordField` for field generation.
+            In case of :attr:`password` and :attr:`wtf_field_class` both set, then
+            :attr:`wtf_field_class` will be used.
+        :param textarea:
+            DEPRECATED: Force to use :class:`~.MongoTextAreaField` for field generation.
+            In case of :attr:`textarea` and :attr:`wtf_field_class` both set, then
+            :attr:`wtf_field_class` will be used.
+        :param filters:     DEPRECATED: wtf form field filters.
+        :param validators:  DEPRECATED: wtf form field validators.
+        :param wtf_field_class: Any subclass of :class:`wtforms.forms.core.Field` that
+            can be used for form field generation. Takes precedence over
+            :attr:`DEFAULT_WTF_FIELD`  and :attr:`DEFAULT_WTF_CHOICES_FIELD`
+        :param wtf_filters:     wtf form field filters.
+        :param wtf_validators:  wtf form field validators.
+        :param wtf_choices_coerce: Callable function to replace
+            :attr:`DEFAULT_WTF_CHOICES_COERCE` for choices fields.
+        :param wtf_options: Dictionary with WTForm Field settings.
+            Applied last, takes precedence over any generated field options.
+        :param kwargs: keyword arguments silently bypassed to normal mongoengine fields
         """
-        raise NotImplementedError("Field converter to WTForm Field not implemented.")
+        if password:
+            if textarea:
+                raise ValueError("Password field cannot use TextAreaField class.")
+
+            warnings.warn(
+                (
+                    "Passing 'password' keyword argument to field definition is "
+                    "deprecated and will be removed in version 3.0.0. "
+                    "Please use 'wtf_field_class' parameter to specify correct field "
+                    "class. If both values set, 'wtf_field_class' is used."
+                ),
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            wtf_field_class = wtf_field_class or custom_fields.MongoPasswordField
+
+        if textarea:
+            warnings.warn(
+                (
+                    "Passing 'textarea' keyword argument to field definition is "
+                    "deprecated and will be removed in version 3.0.0. "
+                    "Please use 'wtf_field_class' parameter to specify correct field "
+                    "class. If both values set, 'wtf_field_class' is used."
+                ),
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            wtf_field_class = wtf_field_class or custom_fields.MongoTextAreaField
+
+        super().__init__(
+            validators=validators,
+            filters=filters,
+            wtf_field_class=wtf_field_class,
+            wtf_filters=wtf_filters,
+            wtf_validators=wtf_validators,
+            wtf_choices_coerce=wtf_choices_coerce,
+            wtf_options=wtf_options,
+            **kwargs,
+        )
+
+    @property
+    def wtf_field_class(self) -> Type:
+        """Parent class overwrite with support of class adjustment by field size."""
+        if self._wtf_field_class:
+            return self._wtf_field_class
+        if self.max_length or self.min_length:
+            return custom_fields.MongoStringField
+        return super().wtf_field_class
+
+    @property
+    @wtf_required
+    def wtf_generated_options(self) -> dict:
+        """
+        Extend form validators with :class:`wtforms.validators.Regexp` and
+        :class:`wtforms.validators.Length`.
+        """
+        options = super().wtf_generated_options
+        options = _setup_strings_common_validators(options, self)
+
+        return options
 
 
 class URLField(WtfFieldMixin, fields.URLField):
@@ -1109,22 +1220,31 @@ class URLField(WtfFieldMixin, fields.URLField):
 
     For full list of arguments and keyword arguments, look parent field docs.
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
+
+    .. versionchanged:: 2.0.0
+        Default form field output changed from :class:`.NoneStringField` to
+        :class:`~flask_mongoengine.wtf.fields.MongoURLField`
+
+    .. versionchanged:: 2.0.0
+        Now appends :class:`~wtforms.validators.Regexp` and use regexp provided to
+        __init__ :attr:`url_regex`, instead of using non-configurable regexp from
+        :class:`~wtforms.validators.URL`. This includes configuration conflicts, between
+        modules.
     """
 
-    DEFAULT_WTF_FIELD = custom_fields.NoneStringField if custom_fields else None
+    DEFAULT_WTF_FIELD = custom_fields.MongoURLField if custom_fields else None
 
-    def to_wtf_field(
-        self,
-        *,
-        model: Optional[Type] = None,
-        field_kwargs: Optional[dict] = None,
-    ):
-        """
-        Protection from execution of :func:`to_wtf_field` in form generation.
+    @property
+    @wtf_required
+    def wtf_generated_options(self) -> dict:
+        """Extend form validators with :class:`wtforms.validators.Regexp`"""
+        options = super().wtf_generated_options
+        options = _setup_strings_common_validators(options, self)
+        options["validators"].insert(
+            0, wtf_validators_.Regexp(regex=self.url_regex, message="Invalid URL.")
+        )
 
-        :raises NotImplementedError: Field converter to WTForm Field not implemented.
-        """
-        raise NotImplementedError("Field converter to WTForm Field not implemented.")
+        return options
 
 
 class UUIDField(WtfFieldMixin, fields.UUIDField):
