@@ -5,6 +5,7 @@ import pytest
 from werkzeug.datastructures import MultiDict
 
 wtforms = pytest.importorskip("wtforms")
+from flask_mongoengine.wtf import fields  # noqa
 
 
 @pytest.fixture()
@@ -136,3 +137,37 @@ def test__full_document_form__does_not_create_any_unexpected_data_in_database(db
         "map_field": {},
         "sequence_field": 1,
     }
+
+
+class TestEmptyStringIsNoneMixin:
+    """Special mixin to ignore empty strings **before** parent class processing."""
+
+    class ParentClass:
+        def __init__(self):
+            self.data = True
+
+        def process_formdata(self, valuelist):
+            self.data = False
+
+    class FakeClass(fields.EmptyStringIsNoneMixin, ParentClass):
+        """Just MRO setter."""
+
+        pass
+
+    @pytest.mark.parametrize("value", ["", None, [], {}, (), (""), [""]])
+    def test__process_formdata__does_not_call_parent_method_if_value_is_empty(
+        self, value
+    ):
+        obj = self.FakeClass()
+        assert obj.data is True
+        obj.process_formdata(value)
+        assert obj.data is None
+
+    @pytest.mark.parametrize("value", [[None], [1], (1,), (" ",), [" "]])
+    def test__process_formdata__does_call_parent_method_if_value_is_not_empty(
+        self, value
+    ):
+        obj = self.FakeClass()
+        assert obj.data is True
+        obj.process_formdata(value)
+        assert obj.data is False
