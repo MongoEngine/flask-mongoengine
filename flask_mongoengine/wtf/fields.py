@@ -285,7 +285,7 @@ class EmptyStringIsNoneMixin:
 
         :param valuelist: A list of strings to process.
         """
-        if valuelist and valuelist[0] == "":
+        if not valuelist or valuelist[0] == "":
             self.data = None
         else:
             super().process_formdata(valuelist)
