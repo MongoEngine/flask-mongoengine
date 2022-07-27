@@ -74,19 +74,15 @@ class QuerySetSelectField(wtf_fields.SelectFieldBase):
             yield (obj.id, label, selected)
 
     def process_formdata(self, valuelist):
-        if valuelist:
-            if valuelist[0] == "__None":
-                self.data = None
-            else:
-                if self.queryset is None:
-                    self.data = None
-                    return
+        if not valuelist or valuelist[0] == "__None" or self.queryset is None:
+            self.data = None
+            return
 
-                try:
-                    obj = self.queryset.get(pk=valuelist[0])
-                    self.data = obj
-                except DoesNotExist:
-                    self.data = None
+        try:
+            obj = self.queryset.get(pk=valuelist[0])
+            self.data = obj
+        except DoesNotExist:
+            self.data = None
 
     def pre_validate(self, form):
         if (not self.allow_blank or self.data is not None) and not self.data:
