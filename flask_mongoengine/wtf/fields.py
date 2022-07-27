@@ -14,6 +14,7 @@ from wtforms import validators as wtf_validators
 from wtforms import widgets as wtf_widgets
 
 
+# noinspection PyAttributeOutsideInit,PyAbstractClass
 class QuerySetSelectField(wtf_fields.SelectFieldBase):
     """
     Given a QuerySet either at initialization or inside a view, will display a
@@ -54,7 +55,7 @@ class QuerySetSelectField(wtf_fields.SelectFieldBase):
 
     def iter_choices(self):
         if self.allow_blank:
-            yield ("__None", self.blank_text, self.data is None)
+            yield "__None", self.blank_text, self.data is None
 
         if self.queryset is None:
             return
@@ -71,7 +72,7 @@ class QuerySetSelectField(wtf_fields.SelectFieldBase):
                 selected = obj in self.data
             else:
                 selected = self._is_selected(obj)
-            yield (obj.id, label, selected)
+            yield obj.id, label, selected
 
     def process_formdata(self, valuelist):
         if not valuelist or valuelist[0] == "__None" or self.queryset is None:
@@ -92,6 +93,7 @@ class QuerySetSelectField(wtf_fields.SelectFieldBase):
         return item == self.data
 
 
+# noinspection PyAttributeOutsideInit,PyAbstractClass
 class QuerySetSelectMultipleField(QuerySetSelectField):
     widget = wtf_widgets.Select(multiple=True)
 
@@ -125,6 +127,7 @@ class QuerySetSelectMultipleField(QuerySetSelectField):
         return item in self.data if self.data else False
 
 
+# noinspection PyAttributeOutsideInit,PyAbstractClass
 class ModelSelectField(QuerySetSelectField):
     """
     Like a QuerySetSelectField, except takes a model class instead of a
@@ -138,6 +141,7 @@ class ModelSelectField(QuerySetSelectField):
         )
 
 
+# noinspection PyAttributeOutsideInit,PyAbstractClass
 class ModelSelectMultipleField(QuerySetSelectMultipleField):
     """
     Allows multiple select
@@ -150,6 +154,7 @@ class ModelSelectMultipleField(QuerySetSelectMultipleField):
         )
 
 
+# noinspection PyAttributeOutsideInit,PyAbstractClass
 class JSONField(wtf_fields.TextAreaField):
     def _value(self):
         # TODO: Investigate why raw mentioned.
@@ -162,8 +167,8 @@ class JSONField(wtf_fields.TextAreaField):
         if value:
             try:
                 self.data = json.loads(value[0])
-            except ValueError:
-                raise ValueError(self.gettext("Invalid JSON data."))
+            except ValueError as error:
+                raise ValueError(self.gettext("Invalid JSON data.")) from error
 
 
 class DictField(JSONField):
@@ -173,6 +178,7 @@ class DictField(JSONField):
             raise ValueError(self.gettext("Not a valid dictionary."))
 
 
+# noinspection PyAttributeOutsideInit
 class NoneStringField(wtf_fields.StringField):
     """
     Custom StringField that counts "" as None
@@ -185,6 +191,7 @@ class NoneStringField(wtf_fields.StringField):
             self.data = None
 
 
+# noinspection PyAttributeOutsideInit
 class BinaryField(wtf_fields.TextAreaField):
     """
     Custom TextAreaField that converts its value with binary_type.
