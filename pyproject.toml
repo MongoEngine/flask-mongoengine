@@ -47,7 +47,7 @@ maintainers = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-wtf = ["WTForms[email]>=2.3.1", "Flask-WTF>=0.14.3"]
+wtf = ["WTForms[email]>=3.0.0", "Flask-WTF>=0.14.3"]
 toolbar = ["Flask-DebugToolbar>=0.11.0"]
 dev = [
   "black==22.6.0",
@@ -57,6 +57,7 @@ dev = [
   "pytest-mock",
   "nox",
   "Pillow>=7.0.0",
+  "blinker",
 ]
 legacy = ["MarkupSafe==2.0.1"]
 legacy-dev = [
@@ -64,6 +65,7 @@ legacy-dev = [
   "pytest-cov",
   "pytest-mock",
   "Pillow>=7.0.0",
+  "blinker",
 ]
 
 [project.urls]
