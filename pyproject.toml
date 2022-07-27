@@ -120,3 +120,7 @@ use_parentheses = true
 [tool.pytest.ini_options]
 addopts = "--cov=flask_mongoengine --cov-config=setup.cfg"
 testpaths = ["tests"]
+filterwarnings = [
+  "ignore::DeprecationWarning:flask_mongoengine",
+  "ignore::DeprecationWarning:tests",
+  ]
