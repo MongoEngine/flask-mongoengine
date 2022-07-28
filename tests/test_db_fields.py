@@ -1,4 +1,5 @@
 """Tests for db_fields overwrite and WTForms integration."""
+import re
 from enum import Enum
 from unittest.mock import Mock
 
@@ -9,11 +10,16 @@ from pytest_mock import MockerFixture
 from flask_mongoengine import db_fields, documents
 
 try:
+    from wtforms import fields as wtf_fields
     from wtforms import validators as wtf_validators_
+
+    from flask_mongoengine.wtf import fields as mongo_fields
 
     wtforms_not_installed = False
 except ImportError:
     wtf_validators_ = None
+    wtf_fields = None
+    mongo_fields = None
     wtforms_not_installed = True
 
 
@@ -151,7 +157,6 @@ class TestWtfFieldMixin:
             db_fields.DecimalField,
             db_fields.DictField,
             db_fields.DynamicField,
-            db_fields.EmailField,
             db_fields.EmbeddedDocumentField,
             db_fields.EmbeddedDocumentListField,
             db_fields.EnumField,
@@ -178,8 +183,6 @@ class TestWtfFieldMixin:
             db_fields.ReferenceField,
             db_fields.SequenceField,
             db_fields.SortedListField,
-            db_fields.StringField,
-            db_fields.URLField,
             db_fields.UUIDField,
         ],
     )
@@ -503,6 +506,22 @@ class TestEmailField:
         base_init_spy.assert_called_once()
         field_init_spy.assert_called_once()
         mixin_init_spy.assert_called_once()
+
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
+    def test__form_field_class__is_email_field__even_if_size_given__and_validators_set(
+        self, db
+    ):
+        field = db.EmailField(max_length=3, min_length=1)
+
+        assert field.wtf_field_class is mongo_fields.MongoEmailField
+        validator = [
+            val
+            for val in field.wtf_field_options["validators"]
+            if val.__class__ is wtf_validators_.Length
+        ][0]
+        assert validator is not None
+        assert validator.min == 1
+        assert validator.max == 3
 
 
 class TestEmbeddedDocumentField:
@@ -874,6 +893,53 @@ class TestSortedListField:
         mixin_init_spy.assert_called_once()
 
 
+@pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
+@pytest.mark.parametrize(
+    "StringClass",
+    [
+        db_fields.StringField,
+        db_fields.URLField,
+        db_fields.EmailField,
+    ],
+)
+class TestStringFieldCommons:
+    """
+    Ensure all string based classes call :func:`~._setup_strings_common_validators`
+    and get expected results.
+    """
+
+    @pytest.mark.parametrize(
+        ["min_", "max_", "validator_min", "validator_max"],
+        [
+            [None, 3, -1, 3],
+            [3, None, 3, -1],
+            [3, 5, 3, 5],
+        ],
+    )
+    def test__init__method__set_length_validator__if_size_given(
+        self, StringClass, min_, max_, validator_min, validator_max
+    ):
+        field = StringClass(min_length=min_, max_length=max_)
+        validator = [
+            val
+            for val in field.wtf_field_options["validators"]
+            if val.__class__ is wtf_validators_.Length
+        ][0]
+        assert validator is not None
+        assert validator.min == validator_min
+        assert validator.max == validator_max
+
+    def test__init__method__set_regex_validator__if_option(self, StringClass):
+        field = StringClass(regex="something")
+        validator = [
+            val
+            for val in field.wtf_field_options["validators"]
+            if val.__class__ is wtf_validators_.Regexp
+        ][-1]
+        assert validator is not None
+        assert validator.regex == re.compile("something")
+
+
 class TestStringField:
     """Custom test set for :class:`~flask_mongoengine.wtf.db_fields.StringField`"""
 
@@ -886,6 +952,62 @@ class TestStringField:
         base_init_spy.assert_called_once()
         field_init_spy.assert_called_once()
         mixin_init_spy.assert_called_once()
+
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
+    def test__init__method_report_warning__if_password_keyword_setting_set(
+        self, recwarn
+    ):
+        field = db_fields.StringField(password=True)
+        assert str(recwarn.list[0].message) == (
+            "Passing 'password' keyword argument to field definition is "
+            "deprecated and will be removed in version 3.0.0. "
+            "Please use 'wtf_field_class' parameter to specify correct field "
+            "class. If both values set, 'wtf_field_class' is used."
+        )
+        assert issubclass(field.wtf_field_class, wtf_fields.PasswordField)
+
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
+    def test__init__method_report_warning__if_textarea_keyword_setting_set(
+        self, recwarn
+    ):
+        field = db_fields.StringField(textarea=True)
+        assert str(recwarn.list[0].message) == (
+            "Passing 'textarea' keyword argument to field definition is "
+            "deprecated and will be removed in version 3.0.0. "
+            "Please use 'wtf_field_class' parameter to specify correct field "
+            "class. If both values set, 'wtf_field_class' is used."
+        )
+        assert issubclass(field.wtf_field_class, wtf_fields.TextAreaField)
+
+    def test__init__method_raise_error__if_password_and_keyword_setting_both_set(self):
+        with pytest.raises(ValueError) as error:
+            db_fields.StringField(textarea=True, password=True)
+
+        assert str(error.value) == "Password field cannot use TextAreaField class."
+
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
+    def test__init__method__set_textarea__in__wtf_field_class__even_if_size_given(self):
+        field = db_fields.StringField(textarea=True, min_length=3)
+        assert field.wtf_field_class is mongo_fields.MongoTextAreaField
+
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
+    @pytest.mark.parametrize(
+        ["min_", "max_"],
+        [
+            [None, 3],
+            [3, None],
+            [3, 5],
+        ],
+    )
+    def test__init__method__set_string_field_class__if_size_given(self, min_, max_):
+        field = db_fields.StringField(min_length=min_, max_length=max_)
+        validator = [
+            val
+            for val in field.wtf_field_options["validators"]
+            if val.__class__ is wtf_validators_.Length
+        ]
+        assert field.wtf_field_class is mongo_fields.MongoStringField
+        assert validator is not None
 
 
 class TestURLField:
@@ -900,6 +1022,22 @@ class TestURLField:
         base_init_spy.assert_called_once()
         field_init_spy.assert_called_once()
         mixin_init_spy.assert_called_once()
+
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
+    def test__form_field_class__is_url_field__even_if_size_given__and_validators_set(
+        self, db
+    ):
+        field = db.URLField(max_length=3, min_length=1)
+
+        assert field.wtf_field_class is mongo_fields.MongoURLField
+        validator = [
+            val
+            for val in field.wtf_field_options["validators"]
+            if val.__class__ is wtf_validators_.Length
+        ][0]
+        assert validator is not None
+        assert validator.min == 1
+        assert validator.max == 3
 
 
 class TestUUIDField:

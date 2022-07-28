@@ -4,11 +4,21 @@
   <title>Flask MongoEngine</title>
   <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
 </head>
+<style>
+  body {
+    grid-template-columns: auto;
+  }
+
+  textarea:not([cols]) {
+    width: auto;
+  }
+</style>
 <body>
 <nav>
   <ul>
     <li><a href="{{ url_for("index") }}">Home</a></li>
     <li><a href="{{ url_for("pagination") }}">Pagination</a></li>
+    <li><a href="{{ url_for("strings_demo_view") }}">Strings demo</a></li>
   </ul>
 </nav>
 <div>
