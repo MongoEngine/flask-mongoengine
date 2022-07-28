@@ -507,6 +507,21 @@ class TestEmailField:
         field_init_spy.assert_called_once()
         mixin_init_spy.assert_called_once()
 
+    def test__form_field_class__is_email_field__even_if_size_given__and_validators_set(
+        self, db
+    ):
+        field = db.EmailField(max_length=3, min_length=1)
+
+        assert field.wtf_field_class is mongo_fields.MongoEmailField
+        validator = [
+            val
+            for val in field.wtf_field_options["validators"]
+            if val.__class__ is wtf_validators_.Length
+        ][0]
+        assert validator is not None
+        assert validator.min == 1
+        assert validator.max == 3
+
 
 class TestEmbeddedDocumentField:
     """Custom test set for :class:`~flask_mongoengine.wtf.db_fields.EmbeddedDocumentField`"""
@@ -1006,6 +1021,21 @@ class TestURLField:
         base_init_spy.assert_called_once()
         field_init_spy.assert_called_once()
         mixin_init_spy.assert_called_once()
+
+    def test__form_field_class__is_url_field__even_if_size_given__and_validators_set(
+        self, db
+    ):
+        field = db.URLField(max_length=3, min_length=1)
+
+        assert field.wtf_field_class is mongo_fields.MongoURLField
+        validator = [
+            val
+            for val in field.wtf_field_options["validators"]
+            if val.__class__ is wtf_validators_.Length
+        ][0]
+        assert validator is not None
+        assert validator.min == 1
+        assert validator.max == 3
 
 
 class TestUUIDField:
