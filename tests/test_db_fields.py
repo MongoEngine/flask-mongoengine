@@ -507,6 +507,7 @@ class TestEmailField:
         field_init_spy.assert_called_once()
         mixin_init_spy.assert_called_once()
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     def test__form_field_class__is_email_field__even_if_size_given__and_validators_set(
         self, db
     ):
@@ -1022,6 +1023,7 @@ class TestURLField:
         field_init_spy.assert_called_once()
         mixin_init_spy.assert_called_once()
 
+    @pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
     def test__form_field_class__is_url_field__even_if_size_given__and_validators_set(
         self, db
     ):
