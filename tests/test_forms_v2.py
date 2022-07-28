@@ -5,7 +5,9 @@ import pytest
 from werkzeug.datastructures import MultiDict
 
 wtforms = pytest.importorskip("wtforms")
-from flask_mongoengine.wtf import fields  # noqa
+from wtforms import fields as wtf_fields  # noqa
+
+from flask_mongoengine.wtf import fields as mongo_fields  # noqa
 
 
 @pytest.fixture()
@@ -143,18 +145,22 @@ class TestEmptyStringIsNoneMixin:
     """Special mixin to ignore empty strings **before** parent class processing."""
 
     class ParentClass:
+        """MRO parent."""
+
         def __init__(self):
             self.data = True
 
         def process_formdata(self, valuelist):
+            """Status changer"""
+            assert valuelist != ""
             self.data = False
 
-    class FakeClass(fields.EmptyStringIsNoneMixin, ParentClass):
+    class FakeClass(mongo_fields.EmptyStringIsNoneMixin, ParentClass):
         """Just MRO setter."""
 
         pass
 
-    @pytest.mark.parametrize("value", ["", None, [], {}, (), (""), [""]])
+    @pytest.mark.parametrize("value", ["", None, [], {}, (), "", ("",), [""]])
     def test__process_formdata__does_not_call_parent_method_if_value_is_empty(
         self, value
     ):
@@ -171,3 +177,110 @@ class TestEmptyStringIsNoneMixin:
         assert obj.data is True
         obj.process_formdata(value)
         assert obj.data is False
+
+
+class TestMongoEmailField:
+    def test_email_field_mro_not_changed(self):
+        field_mro = list(mongo_fields.MongoEmailField.__mro__[:4])
+        assert field_mro == [
+            mongo_fields.MongoEmailField,
+            mongo_fields.EmptyStringIsNoneMixin,
+            wtf_fields.EmailField,
+            wtf_fields.StringField,
+        ]
+
+
+class TestMongoHiddenField:
+    def test_hidden_field_mro_not_changed(self):
+        field_mro = list(mongo_fields.MongoHiddenField.__mro__[:4])
+        assert field_mro == [
+            mongo_fields.MongoHiddenField,
+            mongo_fields.EmptyStringIsNoneMixin,
+            wtf_fields.HiddenField,
+            wtf_fields.StringField,
+        ]
+
+
+class TestMongoPasswordField:
+    def test_password_field_mro_not_changed(self):
+        field_mro = list(mongo_fields.MongoPasswordField.__mro__[:4])
+        assert field_mro == [
+            mongo_fields.MongoPasswordField,
+            mongo_fields.EmptyStringIsNoneMixin,
+            wtf_fields.PasswordField,
+            wtf_fields.StringField,
+        ]
+
+
+class TestMongoSearchField:
+    def test_search_field_mro_not_changed(self):
+        field_mro = list(mongo_fields.MongoSearchField.__mro__[:4])
+        assert field_mro == [
+            mongo_fields.MongoSearchField,
+            mongo_fields.EmptyStringIsNoneMixin,
+            wtf_fields.SearchField,
+            wtf_fields.StringField,
+        ]
+
+
+class TestMongoStringField:
+    def test__parent__process_formdata__method_included_in_mro_chain(self, db, mocker):
+        """Test to protect from accidental incorrect __init__ method overwrite."""
+        base_init_spy = mocker.spy(wtf_fields.StringField, "process_formdata")
+        mixin_init_spy = mocker.spy(
+            mongo_fields.EmptyStringIsNoneMixin, "process_formdata"
+        )
+
+        class DocumentModel(db.Document):
+            """Test DB model."""
+
+            string_field = db.StringField()
+
+        DocumentForm = DocumentModel.to_wtf_form()
+        form = DocumentForm(formdata=MultiDict({"string_field": "1"}))
+        assert form.validate()
+        obj = form.save()
+        mixin_init_spy.assert_called_once()
+        base_init_spy.assert_called_once()
+        assert obj.string_field == "1"
+
+    def test_string_field_mro_not_changed(self):
+        field_mro = list(mongo_fields.MongoStringField.__mro__[:3])
+        assert field_mro == [
+            mongo_fields.MongoStringField,
+            mongo_fields.EmptyStringIsNoneMixin,
+            wtf_fields.StringField,
+        ]
+
+
+class TestMongoTelField:
+    def test_tel_field_mro_not_changed(self):
+        field_mro = list(mongo_fields.MongoTelField.__mro__[:4])
+        assert field_mro == [
+            mongo_fields.MongoTelField,
+            mongo_fields.EmptyStringIsNoneMixin,
+            wtf_fields.TelField,
+            wtf_fields.StringField,
+        ]
+
+
+class TestMongoTextAreaField:
+    def test_text_area_field_mro_not_changed(self):
+        field_mro = list(mongo_fields.MongoTextAreaField.__mro__[:4])
+        assert field_mro == [
+            mongo_fields.MongoTextAreaField,
+            mongo_fields.EmptyStringIsNoneMixin,
+            wtf_fields.TextAreaField,
+            wtf_fields.StringField,
+        ]
+
+
+class TestMongoURLField:
+    def test_url_field_mro_not_changed(self):
+        field_mro = list(mongo_fields.MongoURLField.__mro__[:4])
+        assert field_mro == [
+            mongo_fields.MongoURLField,
+            mongo_fields.EmptyStringIsNoneMixin,
+            wtf_fields.URLField,
+            wtf_fields.StringField,
+        ]
