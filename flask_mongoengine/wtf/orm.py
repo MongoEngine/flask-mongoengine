@@ -64,7 +64,7 @@ class ModelConverter(object):
             "default": field.default,
         }
         if field_args:
-            kwargs.update(field_args)
+            kwargs |= field_args
 
         # Create a copy of the lists since we will be modifying it, and if
         # validators set as shared list between fields - duplicates/conflicts may
@@ -132,9 +132,7 @@ class ModelConverter(object):
         textarea_field = kwargs.pop("textarea", False) or not field.max_length
         if password_field:
             return f.PasswordField(**kwargs)
-        if textarea_field:
-            return f.TextAreaField(**kwargs)
-        return f.StringField(**kwargs)
+        return f.TextAreaField(**kwargs) if textarea_field else f.StringField(**kwargs)
 
     @converts("URLField")
     def conv_URL(self, model, field, kwargs):

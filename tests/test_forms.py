@@ -210,12 +210,16 @@ def test_model_form_only(app, db):
 def test_model_form_with_custom_query_set(app, db):
     with app.test_request_context("/"):
 
+
+
+
         class Dog(db.Document):
             breed = db.StringField()
 
             @queryset_manager
-            def large_objects(cls, queryset):
+            def large_objects(self, queryset):
                 return queryset(breed__in=["german sheppard", "wolfhound"])
+
 
         class DogOwner(db.Document):
             dog = db.ReferenceField(document_type=Dog)
@@ -434,6 +438,7 @@ def test_sub_field_args(app, db):
 def test_modelselectfield_multiple_selected_elements_must_be_retained(app, db):
     with app.test_request_context("/"):
 
+
         class Dog(db.Document):
             name = db.StringField()
 
@@ -456,7 +461,7 @@ def test_modelselectfield_multiple_selected_elements_must_be_retained(app, db):
 
         # Should have one selected option
         assert m is not None
-        assert "fido" == m.group(1)
+        assert "fido" == m[1]
 
 
 def test_model_form_help_text(app, db):
@@ -505,6 +510,7 @@ def test_shared_field_args(app, db):
 def test_embedded_model_form(app, db):
     with app.test_request_context("/"):
 
+
         class Content(db.EmbeddedDocument):
             text = db.StringField()
             lang = db.StringField(max_length=3)
@@ -516,21 +522,25 @@ def test_embedded_model_form(app, db):
 
         PostForm = model_form(Post)
         form = PostForm()
-        assert "content-text" in "%s" % form.content.text
+        assert "content-text" in f"{form.content.text}"
 
 
 def test_form_label_modifier(app, db):
     with app.test_request_context("/"):
 
+
         class FoodItem(db.Document):
             title = db.StringField()
+
+
 
         class FoodStore(db.Document):
             title = db.StringField(max_length=120, required=True)
             food_items = db.ListField(field=db.ReferenceField(document_type=FoodItem))
 
-            def food_items_label_modifier(obj):
-                return obj.title
+            def food_items_label_modifier(self):
+                return self.title
+
 
         fruit_names = ["banana", "apple", "pear"]
 

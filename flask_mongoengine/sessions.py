@@ -58,9 +58,7 @@ class MongoEngineSessionInterface(SessionInterface):
     def open_session(self, app, request):
         sid = request.cookies.get(app.session_cookie_name)
         if sid:
-            stored_session = self.cls.objects(sid=sid).first()
-
-            if stored_session:
+            if stored_session := self.cls.objects(sid=sid).first():
                 expiration = stored_session.expiration
 
                 if not expiration.tzinfo:
