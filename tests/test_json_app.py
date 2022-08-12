@@ -18,7 +18,7 @@ def setup_endpoints(app, todo):
     @app.route("/aggregate")
     def aggregate():
         return flask.jsonify(
-            result=Todo.objects().aggregate({"$match": {"title": {"$ne": "lksdjh"}}})
+            result=Todo.objects().aggregate([{"$match": {"title": {"$ne": "lksdjh"}}}])
         )
 
     @app.route("/add", methods=["POST"])

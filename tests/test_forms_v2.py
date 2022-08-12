@@ -2,6 +2,7 @@
 import json
 
 import pytest
+from bson.json_util import RELAXED_JSON_OPTIONS
 from werkzeug.datastructures import MultiDict
 
 wtforms = pytest.importorskip("wtforms")
@@ -129,7 +130,7 @@ def test__full_document_form__does_not_create_any_unexpected_data_in_database(db
     form.save()
 
     obj = AllFieldsModel.objects.get(id=form.instance.pk)
-    object_dict = json.loads(obj.to_json())
+    object_dict = json.loads(obj.to_json(json_options=RELAXED_JSON_OPTIONS))
     object_dict.pop("_id")
 
     assert object_dict == {
