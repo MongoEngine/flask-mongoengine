@@ -6,6 +6,7 @@ from werkzeug.datastructures import MultiDict
 
 wtforms = pytest.importorskip("wtforms")
 from wtforms import fields as wtf_fields  # noqa
+from wtforms import widgets as wtf_widgets  # noqa
 
 from flask_mongoengine.wtf import fields as mongo_fields  # noqa
 
@@ -284,3 +285,9 @@ class TestMongoURLField:
             wtf_fields.URLField,
             wtf_fields.StringField,
         ]
+
+
+class TestMongoFloatField:
+    def test_ensure_widget_not_accidentally_replaced(self):
+        field = mongo_fields.MongoFloatField
+        assert isinstance(field.widget, wtf_widgets.NumberInput)

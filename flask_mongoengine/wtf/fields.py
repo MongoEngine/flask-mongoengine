@@ -353,3 +353,12 @@ class MongoURLField(EmptyStringIsNoneMixin, wtf_fields.URLField):
     """
 
     pass
+
+
+class MongoFloatField(wtf_fields.FloatField):
+    """
+    Regular :class:`wtforms.fields.FloatField`, with widget replaced to
+    :class:`wtforms.widgets.NumberInput`.
+    """
+
+    widget = wtf_widgets.NumberInput(step="any")

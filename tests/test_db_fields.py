@@ -154,21 +154,18 @@ class TestWtfFieldMixin:
             db_fields.ComplexDateTimeField,
             db_fields.DateField,
             db_fields.DateTimeField,
-            db_fields.DecimalField,
             db_fields.DictField,
             db_fields.DynamicField,
             db_fields.EmbeddedDocumentField,
             db_fields.EmbeddedDocumentListField,
             db_fields.EnumField,
             db_fields.FileField,
-            db_fields.FloatField,
             db_fields.GenericEmbeddedDocumentField,
             db_fields.GenericLazyReferenceField,
             db_fields.GenericReferenceField,
             db_fields.GeoJsonBaseField,
             db_fields.GeoPointField,
             db_fields.ImageField,
-            db_fields.IntField,
             db_fields.LazyReferenceField,
             db_fields.LineStringField,
             db_fields.ListField,
@@ -1052,3 +1049,38 @@ class TestUUIDField:
         base_init_spy.assert_called_once()
         field_init_spy.assert_called_once()
         mixin_init_spy.assert_called_once()
+
+
+@pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
+@pytest.mark.parametrize(
+    "NumberClass",
+    [
+        db_fields.FloatField,
+        db_fields.IntField,
+        db_fields.DecimalField,
+    ],
+)
+class TestNumberFieldCommons:
+    @pytest.mark.parametrize(
+        ["min_", "max_", "validator_min", "validator_max"],
+        [
+            [None, 3, None, 3],
+            [None, -3, None, -3],
+            [3, None, 3, None],
+            [-3, None, -3, None],
+            [-1, -3, -1, -3],
+            [3, 5, 3, 5],
+        ],
+    )
+    def test__init__method__set_number_range_validator__if_range_given(
+        self, NumberClass, min_, max_, validator_min, validator_max
+    ):
+        field = NumberClass(min_value=min_, max_value=max_)
+        validator = [
+            val
+            for val in field.wtf_field_options["validators"]
+            if val.__class__ is wtf_validators_.NumberRange
+        ][0]
+        assert validator is not None
+        assert validator.min == validator_min
+        assert validator.max == validator_max
