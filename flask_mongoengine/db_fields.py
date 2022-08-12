@@ -85,6 +85,30 @@ def _setup_strings_common_validators(options: dict, obj: fields.StringField) -> 
     return options
 
 
+@wtf_required
+def _setup_numbers_common_validators(
+    options: dict, obj: Union[fields.IntField, fields.DecimalField, fields.FloatField]
+) -> dict:
+    """
+    Extend :attr:`base_options` with common validators for number types.
+
+    :param options: dict, usually from :class:`WtfFieldMixin.wtf_generated_options`
+    :param obj: Any :class:`mongoengine.fields.IntField` or
+        :class:`mongoengine.fields.DecimalField` or
+        :class:`mongoengine.fields.FloatField` subclasses instance.
+    """
+    assert isinstance(
+        obj, (fields.IntField, fields.DecimalField, fields.FloatField)
+    ), "Improperly configured"
+
+    if obj.min_value or obj.max_value:
+        options["validators"].insert(
+            0, wtf_validators_.NumberRange(min=obj.min_value, max=obj.max_value)
+        )
+
+    return options
+
+
 class WtfFieldMixin:
     """
     Extension wrapper class for mongoengine BaseField.
@@ -425,18 +449,16 @@ class DecimalField(WtfFieldMixin, fields.DecimalField):
     DEFAULT_WTF_FIELD = wtf_fields.DecimalField if wtf_fields else None
     DEFAULT_WTF_CHOICES_COERCE = decimal.Decimal
 
-    def to_wtf_field(
-        self,
-        *,
-        model: Optional[Type] = None,
-        field_kwargs: Optional[dict] = None,
-    ):
+    @property
+    @wtf_required
+    def wtf_generated_options(self) -> dict:
         """
-        Protection from execution of :func:`to_wtf_field` in form generation.
+        Extend form validators with :class:`wtforms.validators.NumberRange`.
+        """
+        options = super().wtf_generated_options
+        options = _setup_numbers_common_validators(options, self)
 
-        :raises NotImplementedError: Field converter to WTForm Field not implemented.
-        """
-        raise NotImplementedError("Field converter to WTForm Field not implemented.")
+        return options
 
 
 class DictField(WtfFieldMixin, fields.DictField):
@@ -610,21 +632,19 @@ class FloatField(WtfFieldMixin, fields.FloatField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
-    DEFAULT_WTF_FIELD = wtf_fields.FloatField if wtf_fields else None
+    DEFAULT_WTF_FIELD = custom_fields.MongoFloatField if wtf_fields else None
     DEFAULT_WTF_CHOICES_COERCE = float
 
-    def to_wtf_field(
-        self,
-        *,
-        model: Optional[Type] = None,
-        field_kwargs: Optional[dict] = None,
-    ):
+    @property
+    @wtf_required
+    def wtf_generated_options(self) -> dict:
         """
-        Protection from execution of :func:`to_wtf_field` in form generation.
+        Extend form validators with :class:`wtforms.validators.NumberRange`.
+        """
+        options = super().wtf_generated_options
+        options = _setup_numbers_common_validators(options, self)
 
-        :raises NotImplementedError: Field converter to WTForm Field not implemented.
-        """
-        raise NotImplementedError("Field converter to WTForm Field not implemented.")
+        return options
 
 
 class GenericEmbeddedDocumentField(WtfFieldMixin, fields.GenericEmbeddedDocumentField):
@@ -770,18 +790,16 @@ class IntField(WtfFieldMixin, fields.IntField):
     DEFAULT_WTF_FIELD = wtf_fields.IntegerField if wtf_fields else None
     DEFAULT_WTF_CHOICES_COERCE = int
 
-    def to_wtf_field(
-        self,
-        *,
-        model: Optional[Type] = None,
-        field_kwargs: Optional[dict] = None,
-    ):
+    @property
+    @wtf_required
+    def wtf_generated_options(self) -> dict:
         """
-        Protection from execution of :func:`to_wtf_field` in form generation.
+        Extend form validators with :class:`wtforms.validators.NumberRange`.
+        """
+        options = super().wtf_generated_options
+        options = _setup_numbers_common_validators(options, self)
 
-        :raises NotImplementedError: Field converter to WTForm Field not implemented.
-        """
-        raise NotImplementedError("Field converter to WTForm Field not implemented.")
+        return options
 
 
 class LazyReferenceField(WtfFieldMixin, fields.LazyReferenceField):
