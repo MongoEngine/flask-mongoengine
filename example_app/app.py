@@ -4,6 +4,7 @@ from pymongo import monitoring
 
 from example_app import views
 from example_app.models import db
+from example_app.numbers_demo import numbers_demo_view
 from example_app.strings_demo import strings_demo_view
 from flask_mongoengine.panels import mongo_command_logger
 
@@ -44,6 +45,10 @@ app.add_url_rule("/pagination", view_func=views.pagination, methods=["GET", "POS
 app.add_url_rule("/strings_demo", view_func=strings_demo_view, methods=["GET", "POST"])
 app.add_url_rule(
     "/strings_demo/<pk>/", view_func=strings_demo_view, methods=["GET", "POST"]
+)
+app.add_url_rule("/numbers_demo", view_func=numbers_demo_view, methods=["GET", "POST"])
+app.add_url_rule(
+    "/numbers_demo/<pk>/", view_func=numbers_demo_view, methods=["GET", "POST"]
 )
 
 if __name__ == "__main__":
