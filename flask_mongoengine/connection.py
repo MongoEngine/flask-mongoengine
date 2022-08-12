@@ -121,8 +121,10 @@ def create_connections(config: dict):
     connections = {}
     for connection_setting in connection_settings:
         alias = connection_setting.setdefault(
-            "alias", mongoengine.DEFAULT_CONNECTION_NAME
+            "alias",
+            mongoengine.DEFAULT_CONNECTION_NAME,
         )
+        connection_setting.setdefault("uuidRepresentation", "standard")
         connections[alias] = mongoengine.connect(**connection_setting)
 
     return connections
