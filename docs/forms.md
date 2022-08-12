@@ -87,13 +87,169 @@ Not yet documented. Please help us with new pull request.
 
 Not yet documented. Please help us with new pull request.
 
+### ComplexDateTimeField
+
+- API: {class}`.db_fields.ComplexDateTimeField`
+- Default form field class: {class}`wtforms.fields.DateTimeLocalField`
+
+#### Form generation behaviour
+
+ComplexDateTimeField stores date and time information in database `string` format. This
+format allow precision up to microseconds dimension.
+
+Unfortunately, there is no HTML5 field, that allow so high precision. That's why, by
+default the generated field will use HTML5 `<input type="datetime-local">` with
+precision set to milliseconds.
+
+If you require concrete microseconds for edit purposes, please use
+{class}`wtforms.fields.DateTimeField` with correct format (see examples below).
+
+Field is easy adjustable, to use any other precision. Check examples and example app
+for more details.
+
+#### Examples
+
+dates_demo.py in example app contain basic non-requirement example. You can adjust
+it to any provided example for test purposes.
+
+##### ComplexDateTimeField with milliseconds precision
+
+```python
+"""dates_demo.py"""
+from example_app.models import db
+
+
+class DateTimeModel(db.Document):
+    """Documentation example model."""
+
+    complex_datetime = db.ComplexDateTimeField()
+```
+
+##### ComplexDateTimeField with seconds precision
+
+```python
+"""dates_demo.py"""
+from example_app.models import db
+
+
+class DateTimeModel(db.Document):
+    """Documentation example model."""
+
+    complex_datetime_sec = db.ComplexDateTimeField(
+        wtf_options={"render_kw": {"step": "1"}}
+    )
+```
+
+##### ComplexDateTimeField with microseconds precision (text)
+
+```python
+"""dates_demo.py"""
+from wtforms.fields import DateTimeField
+
+from example_app.models import db
+
+
+class DateTimeModel(db.Document):
+    """Documentation example model."""
+
+    complex_datetime_microseconds = db.ComplexDateTimeField(
+        wtf_field_class=DateTimeField, wtf_options={"format": "%Y-%m-%d %H:%M:%S.%f"}
+    )
+```
+
 ### DateField
 
-Not yet documented. Please help us with new pull request.
+- API: {class}`.db_fields.DateField`
+- Default form field class: {class}`wtforms.fields.DateField`
+
+#### Form generation behaviour
+
+DateField is one of the simplest fields in the forms generation process. By default,
+the field use {class}`wtforms.fields.DateField` WTForms class, representing a form
+input with standard HTML5 `<input type="date">`. No custom additional transformation
+done, during field generation. Field is fully controllable by [global transforms].
+
+#### Examples
+
+dates_demo.py in example app contain basic non-requirement example. You can adjust
+it to any provided example for test purposes.
+
+```python
+"""dates_demo.py"""
+from example_app.models import db
+
+
+class DateTimeModel(db.Document):
+    """Documentation example model."""
+
+    date = db.DateField()
+```
+
+##### Not limited DateField
+
+```python
+pass
+```
 
 ### DateTimeField
 
-Not yet documented. Please help us with new pull request.
+- API: {class}`.db_fields.DateTimeField`
+- Default form field class: {class}`wtforms.fields.DateTimeLocalField`
+
+#### Form generation behaviour
+
+DateTimeField stores date and time information in database `date` format. This
+format allow precision up to milliseconds dimension. By default, generated form will
+use HTML5 `<input type="datetime-local">` with precision set to seconds.
+
+Field is easy adjustable, to use any other precision. Check examples and example app
+for more details.
+
+It is possible to use {class}`wtforms.fields.DateTimeField` for text input behaviour.
+
+#### Examples
+
+dates_demo.py in example app contain basic non-requirement example. You can adjust
+it to any provided example for test purposes.
+
+##### DateTimeField with seconds precision
+
+```python
+"""dates_demo.py"""
+from example_app.models import db
+
+
+class DateTimeModel(db.Document):
+    """Documentation example model."""
+
+    datetime = db.DateTimeField()
+```
+
+##### DateTimeField without seconds
+
+```python
+"""dates_demo.py"""
+from example_app.models import db
+
+
+class DateTimeModel(db.Document):
+    """Documentation example model."""
+
+    datetime_no_sec = db.DateTimeField(wtf_options={"render_kw": {"step": "60"}})
+```
+
+##### DateTimeField with milliseconds precision
+
+```python
+"""dates_demo.py"""
+from example_app.models import db
+
+
+class DateTimeModel(db.Document):
+    """Documentation example model."""
+
+    datetime_ms = db.DateTimeField(wtf_options={"render_kw": {"step": "0.001"}})
+```
 
 ### DecimalField
 
@@ -530,10 +686,6 @@ class StringsDemoModel(db.Document):
 ## Unsupported fields
 
 ### CachedReferenceField
-
-Not yet documented. Please help us with new pull request.
-
-### ComplexDateTimeField
 
 Not yet documented. Please help us with new pull request.
 
