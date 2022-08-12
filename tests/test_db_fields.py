@@ -1049,3 +1049,38 @@ class TestUUIDField:
         base_init_spy.assert_called_once()
         field_init_spy.assert_called_once()
         mixin_init_spy.assert_called_once()
+
+
+@pytest.mark.skipif(condition=wtforms_not_installed, reason="No WTF CI/CD chain")
+@pytest.mark.parametrize(
+    "NumberClass",
+    [
+        db_fields.FloatField,
+        db_fields.IntField,
+        db_fields.DecimalField,
+    ],
+)
+class TestNumberFieldCommons:
+    @pytest.mark.parametrize(
+        ["min_", "max_", "validator_min", "validator_max"],
+        [
+            [None, 3, None, 3],
+            [None, -3, None, -3],
+            [3, None, 3, None],
+            [-3, None, -3, None],
+            [-1, -3, -1, -3],
+            [3, 5, 3, 5],
+        ],
+    )
+    def test__init__method__set_number_range_validator__if_range_given(
+        self, NumberClass, min_, max_, validator_min, validator_max
+    ):
+        field = NumberClass(min_value=min_, max_value=max_)
+        validator = [
+            val
+            for val in field.wtf_field_options["validators"]
+            if val.__class__ is wtf_validators_.NumberRange
+        ][0]
+        assert validator is not None
+        assert validator.min == validator_min
+        assert validator.max == validator_max
