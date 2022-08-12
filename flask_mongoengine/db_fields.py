@@ -630,6 +630,10 @@ class FloatField(WtfFieldMixin, fields.FloatField):
 
     For full list of arguments and keyword arguments, look parent field docs.
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
+
+    .. versionchanged:: 2.0.0
+        Default form field output changed from :class:`wtforms.fields.FloatField` to
+        :class:`flask_mongoengine.wtf.fields.MongoFloatField` with 'numbers' input type.
     """
 
     DEFAULT_WTF_FIELD = custom_fields.MongoFloatField if wtf_fields else None

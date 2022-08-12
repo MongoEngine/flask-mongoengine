@@ -97,7 +97,51 @@ Not yet documented. Please help us with new pull request.
 
 ### DecimalField
 
-Not yet documented. Please help us with new pull request.
+- API: {class}`.db_fields.DecimalField`
+- Default form field class: {class}`wtforms.fields.DecimalField`
+
+#### Form generation behaviour
+
+From form generation side this field is pretty standard and do not use any form
+generation adjustments.
+
+If database field definition has any of {attr}`min_value` or {attr}`max_value`, then
+{class}`~wtforms.validators.NumberRange` validator will be added to form field.
+
+#### Examples
+
+numbers_demo.py in example app contain basic non-requirement example. You can adjust
+it to any provided example for test purposes.
+
+##### Not limited DecimalField
+
+```python
+"""numbers_demo.py"""
+from example_app.models import db
+
+
+class NumbersDemoModel(db.Document):
+    """Documentation example model."""
+
+    decimal_field_unlimited = db.DecimalField()
+```
+
+##### Limited DecimalField
+
+```python
+"""numbers_demo.py"""
+from decimal import Decimal
+
+from example_app.models import db
+
+
+class NumbersDemoModel(db.Document):
+    """Documentation example model."""
+
+    decimal_field_limited = db.DecimalField(
+        min_value=Decimal("1"), max_value=Decimal("200.455")
+    )
+```
 
 ### DictField
 
@@ -163,11 +207,101 @@ Not yet documented. Please help us with new pull request.
 
 ### FloatField
 
-Not yet documented. Please help us with new pull request.
+```{versionchanged} 2.0.0
+Default form field class changed from: {class}`wtforms.fields.FloatField` to
+{class}`~.fields.MongoFloatField`.
+```
+
+- API: {class}`.db_fields.FloatField`
+- Default form field class: {class}`~.fields.MongoFloatField`
+
+#### Form generation behaviour
+
+For Mongo database {class}`~.db_fields.FloatField` special WTForm field was created.
+This field's behaviour is the same, as for {class}`wtforms.fields.FloatField`,
+but the widget is replaced to {class}`~wtforms.widgets.NumberInput`, this should make a
+look of generated form better. It is possible, that in some cases usage of base,
+{class}`wtforms.fields.FloatField` can be required by form design. Both fields are
+completely compatible, and replace can be done with {attr}`wtf_field_class` db form
+parameter.
+
+If database field definition has any of {attr}`min_value` or {attr}`max_value`, then
+{class}`~wtforms.validators.NumberRange` validator will be added to form field.
+
+#### Examples
+
+numbers_demo.py in example app contain basic non-requirement example. You can adjust
+it to any provided example for test purposes.
+
+##### Not limited FloatField
+
+```python
+"""numbers_demo.py"""
+from example_app.models import db
+
+
+class NumbersDemoModel(db.Document):
+    """Documentation example model."""
+
+    float_field_unlimited = db.FloatField()
+```
+
+##### Limited FloatField
+
+```python
+"""numbers_demo.py"""
+from example_app.models import db
+
+
+class NumbersDemoModel(db.Document):
+    """Documentation example model."""
+
+    float_field_limited = db.FloatField(min_value=float(1), max_value=200.455)
+```
 
 ### IntField
 
-Not yet documented. Please help us with new pull request.
+- API: {class}`.db_fields.IntField`
+- Default form field class: {class}`wtforms.fields.IntegerField`
+
+#### Form generation behaviour
+
+From form generation side this field is pretty standard and do not use any form
+generation adjustments.
+
+If database field definition has any of {attr}`min_value` or {attr}`max_value`, then
+{class}`~wtforms.validators.NumberRange` validator will be added to form field.
+
+#### Examples
+
+numbers_demo.py in example app contain basic non-requirement example. You can adjust
+it to any provided example for test purposes.
+
+##### Not limited IntField
+
+```python
+"""numbers_demo.py"""
+from example_app.models import db
+
+
+class NumbersDemoModel(db.Document):
+    """Documentation example model."""
+
+    integer_field_unlimited = db.IntField()
+```
+
+##### Limited IntField
+
+```python
+"""numbers_demo.py"""
+from example_app.models import db
+
+
+class NumbersDemoModel(db.Document):
+    """Documentation example model."""
+
+    integer_field_limited = db.IntField(min_value=1, max_value=200)
+```
 
 ### ListField
 
