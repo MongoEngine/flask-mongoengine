@@ -4,6 +4,7 @@ from flask import render_template, request
 from mongoengine.context_managers import switch_db
 
 from example_app import models
+from example_app.dates_demo import DateTimeModel
 from example_app.numbers_demo import NumbersDemoModel
 from example_app.strings_demo import StringsDemoModel
 
@@ -49,6 +50,7 @@ def delete_data():
     """Clear database."""
     with switch_db(models.Todo, "default"):
         models.Todo.objects().delete()
+        DateTimeModel.objects().delete()
         StringsDemoModel.objects().delete()
         NumbersDemoModel.objects().delete()
     with switch_db(models.Todo, "secondary"):

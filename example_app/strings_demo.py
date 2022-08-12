@@ -48,5 +48,9 @@ def strings_demo_view(pk=None):
     page = StringsDemoModel.objects.paginate(page=page_num, per_page=100)
 
     return render_template(
-        "strings_demo.html", page=page, form=form, model=StringsDemoModel
+        "form_demo.html",
+        view=strings_demo_view.__name__,
+        page=page,
+        form=form,
+        model=StringsDemoModel,
     )
