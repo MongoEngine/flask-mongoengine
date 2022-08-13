@@ -374,20 +374,33 @@ class ComplexDateTimeField(WtfFieldMixin, fields.ComplexDateTimeField):
 
     For full list of arguments and keyword arguments, look parent field docs.
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
+
+    .. important::
+        During WTForm generation this field uses :class:`wtforms.fields.DateTimeLocalField`
+        with milliseconds accuracy. Direct microseconds not supported by browsers for
+        this type of field. If exact microseconds support required, please use
+        :class:`wtforms.fields.DateTimeField` with extended text format set. Examples
+        available in example app.
+
+        This does not affect on in database accuracy.
     """
 
-    def to_wtf_field(
-        self,
-        *,
-        model: Optional[Type] = None,
-        field_kwargs: Optional[dict] = None,
-    ):
-        """
-        Protection from execution of :func:`to_wtf_field` in form generation.
+    DEFAULT_WTF_FIELD = wtf_fields.DateTimeLocalField if wtf_fields else None
 
-        :raises NotImplementedError: Field converter to WTForm Field not implemented.
-        """
-        raise NotImplementedError("Field converter to WTForm Field not implemented.")
+    @property
+    @wtf_required
+    def wtf_generated_options(self) -> dict:
+        """Extend form date time field with milliseconds support."""
+        options = super().wtf_generated_options
+        options["format"] = [
+            "%Y-%m-%d %H:%M:%S",
+            "%Y-%m-%dT%H:%M:%S",
+            "%Y-%m-%d %H:%M:%S.%f",
+            "%Y-%m-%dT%H:%M:%S.%f",
+        ]
+        options["render_kw"] = {"step": "0.000001"}
+
+        return options
 
 
 class DateField(WtfFieldMixin, fields.DateField):
@@ -400,19 +413,6 @@ class DateField(WtfFieldMixin, fields.DateField):
 
     DEFAULT_WTF_FIELD = wtf_fields.DateField if wtf_fields else None
 
-    def to_wtf_field(
-        self,
-        *,
-        model: Optional[Type] = None,
-        field_kwargs: Optional[dict] = None,
-    ):
-        """
-        Protection from execution of :func:`to_wtf_field` in form generation.
-
-        :raises NotImplementedError: Field converter to WTForm Field not implemented.
-        """
-        raise NotImplementedError("Field converter to WTForm Field not implemented.")
-
 
 class DateTimeField(WtfFieldMixin, fields.DateTimeField):
     """
@@ -422,20 +422,22 @@ class DateTimeField(WtfFieldMixin, fields.DateTimeField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
-    DEFAULT_WTF_FIELD = wtf_fields.DateTimeField if wtf_fields else None
+    DEFAULT_WTF_FIELD = wtf_fields.DateTimeLocalField if wtf_fields else None
 
-    def to_wtf_field(
-        self,
-        *,
-        model: Optional[Type] = None,
-        field_kwargs: Optional[dict] = None,
-    ):
-        """
-        Protection from execution of :func:`to_wtf_field` in form generation.
+    @property
+    @wtf_required
+    def wtf_generated_options(self) -> dict:
+        """Extend form date time field with milliseconds support."""
+        options = super().wtf_generated_options
+        options["format"] = [
+            "%Y-%m-%d %H:%M:%S",
+            "%Y-%m-%dT%H:%M:%S",
+            "%Y-%m-%d %H:%M:%S.%f",
+            "%Y-%m-%dT%H:%M:%S.%f",
+        ]
+        options["render_kw"] = {"step": "1"}
 
-        :raises NotImplementedError: Field converter to WTForm Field not implemented.
-        """
-        raise NotImplementedError("Field converter to WTForm Field not implemented.")
+        return options
 
 
 class DecimalField(WtfFieldMixin, fields.DecimalField):

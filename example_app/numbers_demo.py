@@ -42,5 +42,9 @@ def numbers_demo_view(pk=None):
     page = NumbersDemoModel.objects.paginate(page=page_num, per_page=100)
 
     return render_template(
-        "numbers_demo.html", page=page, form=form, model=NumbersDemoModel
+        "form_demo.html",
+        view=numbers_demo_view.__name__,
+        page=page,
+        form=form,
+        model=NumbersDemoModel,
     )

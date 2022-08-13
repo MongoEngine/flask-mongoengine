@@ -9,7 +9,7 @@
       <thead>
       <tr>
         {% for field in model._fields_ordered %}
-          <th>{{ model[field].name }}</th>
+          <th>{{ model[field].verbose_name or model[field].name}}</th>
         {% endfor %}
         <th>Edit</th>
       </tr>
@@ -20,14 +20,14 @@
           {% for field in page_object._fields_ordered %}
             <td>{{ page_object[field] }}</td>
           {% endfor %}
-          <td><a href="{{ url_for('strings_demo_view', pk=page_object.pk) }}">edit</a></td>
+          <td><a href="{{ url_for(view, pk=page_object.pk) }}">edit</a></td>
         </tr>
       {% endfor %}
       </tbody>
     </table>
   </div>
   <div>
-    {{ render_navigation(page, "strings_demo_view") }}
+    {{ render_navigation(page, view) }}
   </div>
   <div>
     <form method="POST">
