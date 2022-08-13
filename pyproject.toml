@@ -123,6 +123,7 @@ use_parentheses = true
 addopts = "--cov=flask_mongoengine --cov-config=setup.cfg"
 testpaths = ["tests"]
 filterwarnings = [
+  "error",
   "ignore::DeprecationWarning:flask_mongoengine",
   "ignore::DeprecationWarning:tests",
   ]
