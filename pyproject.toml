@@ -124,6 +124,7 @@ addopts = "--cov=flask_mongoengine --cov-config=setup.cfg"
 testpaths = ["tests"]
 filterwarnings = [
   "error",
+  "ignore::ResourceWarning",
   "ignore::DeprecationWarning:flask_mongoengine",
   "ignore::DeprecationWarning:tests",
   ]
