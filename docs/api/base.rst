@@ -28,6 +28,7 @@ flask_mongoengine.json module
 -----------------------------
 
 .. automodule:: flask_mongoengine.json
+   :exclude-members: MongoEngineJSONProvider
 
 flask_mongoengine.pagination module
 -----------------------------------

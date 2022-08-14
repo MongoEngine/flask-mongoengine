@@ -1,12 +1,18 @@
+"""Extension of app JSON capabilities."""
 import flask
 import pytest
 
 from flask_mongoengine import MongoEngine
+from flask_mongoengine.json import use_json_provider
 
 
 @pytest.fixture()
 def extended_db(app):
-    app.json_encoder = DummyEncoder
+    """Provider config fixture."""
+    if use_json_provider():
+        app.json_provider_class = DummyProvider
+    else:
+        app.json_encoder = DummyEncoder
     app.config["MONGODB_SETTINGS"] = [
         {
             "db": "flask_mongoengine_test_db",
@@ -43,11 +49,29 @@ class DummyEncoder(flask.json.JSONEncoder):
     """
 
 
+DummyProvider = None
+if use_json_provider():
+
+    class DummyProvider(flask.json.provider.DefaultJSONProvider):
+        """Dummy Provider, to test correct MRO in new flask versions."""
+
+
+@pytest.mark.skipif(condition=use_json_provider(), reason="New flask use other test")
 @pytest.mark.usefixtures("extended_db")
-def test_inheritance(app):
+def test_inheritance_old_flask(app):
     assert issubclass(app.json_encoder, DummyEncoder)
     json_encoder_name = app.json_encoder.__name__
 
-    # Since the class is dynamically derrived, must compare class names
-    # rather than class objects.
     assert json_encoder_name == "MongoEngineJSONEncoder"
+
+
+@pytest.mark.skipif(
+    condition=not use_json_provider(), reason="Old flask use other test"
+)
+@pytest.mark.usefixtures("extended_db")
+def test_inheritance(app):
+    assert issubclass(app.json_provider_class, DummyProvider)
+    json_provider_class = app.json_provider_class.__name__
+
+    assert json_provider_class == "MongoEngineJSONProvider"
+    assert isinstance(app.json, DummyProvider)
