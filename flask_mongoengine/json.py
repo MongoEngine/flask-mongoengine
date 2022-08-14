@@ -16,6 +16,23 @@ def use_json_provider() -> bool:
     return int(version[0]) > 2 or (int(version[0]) == 2 and int(version[1]) > 1)
 
 
+# noinspection PyProtectedMember
+def _convert_mongo_objects(obj):
+    """Convert objects, related to Mongo database to JSON."""
+    converted = None
+    if isinstance(obj, BaseDocument):
+        converted = json_util._json_convert(obj.to_mongo())
+    elif isinstance(obj, QuerySet):
+        converted = json_util._json_convert(obj.as_pymongo())
+    elif isinstance(obj, CommandCursor):
+        converted = json_util._json_convert(obj)
+    elif isinstance(obj, DBRef):
+        converted = obj.id
+    elif isinstance(obj, ObjectId):
+        converted = obj.__str__()
+    return converted
+
+
 def _make_encoder(superclass):
     """Extend Flask JSON Encoder 'default' method with support of Mongo objects."""
     import warnings
@@ -35,20 +52,14 @@ def _make_encoder(superclass):
         documents and queryset objects.
         """
 
-        # noinspection PyProtectedMember, DuplicatedCode
         def default(self, obj):
             """Extend JSONEncoder default method, with Mongo objects."""
-            if isinstance(obj, BaseDocument):
-                return json_util._json_convert(obj.to_mongo())
-            elif isinstance(obj, QuerySet):
-                return json_util._json_convert(obj.as_pymongo())
-            elif isinstance(obj, CommandCursor):
-                return json_util._json_convert(obj)
-            elif isinstance(obj, DBRef):
-                return obj.id
-            elif isinstance(obj, ObjectId):
-                return obj.__str__()
-            return superclass.default(self, obj)
+            if isinstance(
+                obj,
+                (BaseDocument, QuerySet, CommandCursor, DBRef, ObjectId),
+            ):
+                return _convert_mongo_objects(obj)
+            return super().default(obj)
 
     return MongoEngineJSONEncoder
 
@@ -59,20 +70,14 @@ def _update_json_provider(superclass):
     class MongoEngineJSONProvider(superclass):
         """A JSON Provider update for Flask 2.2.0+"""
 
-        # noinspection PyProtectedMember, DuplicatedCode
         @staticmethod
         def default(obj):
             """Extend JSONProvider default static method, with Mongo objects."""
-            if isinstance(obj, BaseDocument):
-                return json_util._json_convert(obj.to_mongo())
-            elif isinstance(obj, QuerySet):
-                return json_util._json_convert(obj.as_pymongo())
-            elif isinstance(obj, CommandCursor):
-                return json_util._json_convert(obj)
-            elif isinstance(obj, DBRef):
-                return obj.id
-            elif isinstance(obj, ObjectId):
-                return obj.__str__()
+            if isinstance(
+                obj,
+                (BaseDocument, QuerySet, CommandCursor, DBRef, ObjectId),
+            ):
+                return _convert_mongo_objects(obj)
             return super().default(obj)
 
     return MongoEngineJSONProvider
