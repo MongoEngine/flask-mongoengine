@@ -240,7 +240,7 @@ man_pages = [
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "flask": ("https://flask.palletsprojects.com/en/2.1.x/", None),
+    "flask": ("https://flask.palletsprojects.com/en/2.2.x/", None),
     "werkzeug": ("https://werkzeug.palletsprojects.com/en/2.1.x/", None),
     "pymongo": ("https://pymongo.readthedocs.io/en/stable/", None),
     "mongoengine": ("https://docs.mongoengine.org/", None),
