@@ -329,21 +329,7 @@ class BooleanField(WtfFieldMixin, fields.BooleanField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
-    DEFAULT_WTF_FIELD = wtf_fields.BooleanField if wtf_fields else None
-    DEFAULT_WTF_CHOICES_COERCE = bool
-
-    def to_wtf_field(
-        self,
-        *,
-        model: Optional[Type] = None,
-        field_kwargs: Optional[dict] = None,
-    ):
-        """
-        Protection from execution of :func:`to_wtf_field` in form generation.
-
-        :raises NotImplementedError: Field converter to WTForm Field not implemented.
-        """
-        raise NotImplementedError("Field converter to WTForm Field not implemented.")
+    DEFAULT_WTF_FIELD = custom_fields.MongoBooleanField if custom_fields else None
 
 
 class CachedReferenceField(WtfFieldMixin, fields.CachedReferenceField):

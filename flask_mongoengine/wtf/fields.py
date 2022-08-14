@@ -6,12 +6,30 @@ __all__ = [
     "QuerySetSelectField",
 ]
 from gettext import gettext as _
+from typing import Optional
 
 from flask import json
 from mongoengine.queryset import DoesNotExist
 from wtforms import fields as wtf_fields
 from wtforms import validators as wtf_validators
 from wtforms import widgets as wtf_widgets
+
+
+def coerce_boolean(value: Optional[str]) -> Optional[bool]:
+    """Transform SelectField boolean value from string and in reverse direction."""
+    try:
+        value = value.lower()
+    except AttributeError:
+        pass
+
+    if value is None or value in {"", "none", "null"}:
+        return None
+    elif value is False or value in {"no", "n", "false"}:
+        return False
+    elif value is True or value in {"yes", "y", "true"}:
+        return True
+    else:
+        raise ValueError("Unexpected string value.")
 
 
 # noinspection PyAttributeOutsideInit,PyAbstractClass
@@ -289,6 +307,40 @@ class EmptyStringIsNoneMixin:
             self.data = None
         else:
             super().process_formdata(valuelist)
+
+
+class MongoBooleanField(wtf_fields.SelectField):
+    """Mongo SelectField field for BooleanFields, that correctly coerce values."""
+
+    def __init__(
+        self,
+        label=None,
+        validators=None,
+        coerce=None,
+        choices=None,
+        validate_choice=True,
+        **kwargs,
+    ):
+        """
+        Replaces defaults of :class:`wtforms.fields.SelectField` with for Boolean values.
+
+        Fully compatible with :class:`wtforms.fields.SelectField` and have same parameters.
+
+
+        """
+        if coerce is None:
+            coerce = coerce_boolean
+        if choices is None:
+            choices = [("", "---"), ("yes", "yes"), ("no", "no")]
+
+        super().__init__(
+            label=label,
+            validators=validators,
+            coerce=coerce,
+            choices=choices,
+            validate_choice=validate_choice,
+            **kwargs,
+        )
 
 
 class MongoEmailField(EmptyStringIsNoneMixin, wtf_fields.EmailField):

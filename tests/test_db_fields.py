@@ -149,7 +149,6 @@ class TestWtfFieldMixin:
         "FieldClass",
         [
             db_fields.BinaryField,
-            db_fields.BooleanField,
             db_fields.CachedReferenceField,
             db_fields.DictField,
             db_fields.DynamicField,

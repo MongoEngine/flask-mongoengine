@@ -18,6 +18,37 @@ def local_app(app):
         yield app
 
 
+@pytest.mark.parametrize(
+    ["value", "expected_value"],
+    [
+        ("", None),
+        ("none", None),
+        ("nOne", None),
+        ("None", None),
+        ("null", None),
+        (None, None),
+        ("no", False),
+        ("N", False),
+        ("n", False),
+        ("false", False),
+        ("False", False),
+        (False, False),
+        ("yes", True),
+        ("y", True),
+        ("true", True),
+        (True, True),
+    ],
+)
+def test_coerce_boolean__return_correct_value(value, expected_value):
+    assert mongo_fields.coerce_boolean(value) == expected_value
+
+
+def test_coerce_boolean__raise_on_unexpected_value():
+    with pytest.raises(ValueError) as error:
+        mongo_fields.coerce_boolean("some")
+    assert str(error.value) == "Unexpected string value."
+
+
 def test__full_document_form__does_not_create_any_unexpected_data_in_database(db):
     """
     Test to ensure that we are following own promise in documentation, read:

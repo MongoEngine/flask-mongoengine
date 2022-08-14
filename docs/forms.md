@@ -85,7 +85,119 @@ Not yet documented. Please help us with new pull request.
 
 ### BooleanField
 
-Not yet documented. Please help us with new pull request.
+- API: {class}`.db_fields.BooleanField`
+- Default form field class: {class}`~.MongoBooleanField`
+
+#### Form generation behaviour
+
+BooleanField is very complicated in terms of Mongo database support. In
+Flask-Mongoengine before version **2.0.0+** database BooleanField used
+{class}`wtforms.fields.BooleanField` as form representation, this raised several not
+clear problems, that was related to how {class}`wtforms.fields.BooleanField` parse
+and work with form values. Known problems in version, before **2.0.0+**:
+
+- Default value of field, specified in database definition was ignored, if default
+  is `None` and nulls allowed, i.e. {attr}`null=True` (Value was always `False`).
+- Field was always created in database document, even if not checked, as there is
+  impossible to split `None` and `False` values, when only checkbox available.
+
+To fix all these issues, and do not create database field by default, Flask-Mongoengine
+**2.0.0+** uses dropdown field by default.
+
+By default, database BooleanField not allowing `None` value, meaning that field can
+be `True`, `False` or not created in database at all. If database field configuration
+allowing `None` values, i.e. {attr}`null=True`, then, when nothing selected in
+dropdown, the field will be created with `None` value.
+
+```{important}
+It is responsobility of developer, to correctly setup database field definition and
+make proper tests before own application release. BooleanField can create unexpected
+application behavior in if checks. Developer, should recheck all if checks like:
+
+- `if filed_value:` this will match `True` database value
+- `if not filed_value:` this will match `False` or `None` database value or not existing
+  document key
+- `if field_value is None:` this will match `None` database value or not existing
+  document key
+- `if field_value is True:` this will match `True` database value
+- `if field_value is False:` this will match `False` database value
+- `if field_value is not None:` this will match `True`, `False` database value
+- `if field_value is not True:` this will match `False`, `None` database value or not
+  existing document key
+- `if filed_value is not False:` this will match `True`, `None` database value or not
+  existing document key
+```
+
+#### Examples
+
+##### BooleanField with default dropdown
+
+Such definition will not create any field in document, if dropdown not selected.
+
+```python
+"""boolean_demo.py"""
+from example_app.models import db
+
+
+class BooleanDemoModel(db.Document):
+    """Documentation example model."""
+
+    boolean_field = db.BooleanField()
+```
+
+##### BooleanField with allowed `None` value
+
+Such definition will create document field, even if nothing selected. The value will
+be `None`. If, during edit, `yes` or `no` dropdown values replaced to `---`, then
+saved value in document will be aslo changed to `None`.
+
+By default, `None` value represented as `---` text in dropdown.
+
+```python
+"""boolean_demo.py"""
+from example_app.models import db
+
+
+class BooleanDemoModel(db.Document):
+    """Documentation example model."""
+
+    boolean_field_with_null = db.BooleanField(null=True)
+```
+
+##### BooleanField with replaced dropdown text
+
+Dropdown text can be easily replaced, there is only one requirement: New choices,
+should be correctly coerced by {func}`~.coerce_boolean`, or function should be
+replaced too.
+
+```python
+"""boolean_demo.py"""
+from example_app.models import db
+
+
+class BooleanDemoModel(db.Document):
+    """Documentation example model."""
+
+    boolean_field_with_as_choices_replace = db.BooleanField(
+        wtf_options={
+            "choices": [("", "Not selected"), ("yes", "Positive"), ("no", "Negative")]
+        }
+    )
+
+```
+
+##### BooleanField with default `True` value, but with allowed nulls
+
+```python
+"""boolean_demo.py"""
+from example_app.models import db
+
+
+class BooleanDemoModel(db.Document):
+    """Documentation example model."""
+
+    true_boolean_field_with_allowed_null = db.BooleanField(default=True, null=True)
+```
 
 ### ComplexDateTimeField
 
@@ -174,6 +286,8 @@ done, during field generation. Field is fully controllable by [global transforms
 dates_demo.py in example app contain basic non-requirement example. You can adjust
 it to any provided example for test purposes.
 
+##### Not limited DateField
+
 ```python
 """dates_demo.py"""
 from example_app.models import db
@@ -183,12 +297,6 @@ class DateTimeModel(db.Document):
     """Documentation example model."""
 
     date = db.DateField()
-```
-
-##### Not limited DateField
-
-```python
-pass
 ```
 
 ### DateTimeField
