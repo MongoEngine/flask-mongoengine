@@ -77,18 +77,16 @@ versions; PRs are welcome.
 Some additional transformations are made by specific field, check exact field
 documentation below for more info.
 
-## Supported fields
-
-### BinaryField
+## BinaryField
 
 Not yet documented. Please help us with new pull request.
 
-### BooleanField
+## BooleanField
 
 - API: {class}`.db_fields.BooleanField`
 - Default form field class: {class}`~.MongoBooleanField`
 
-#### Form generation behaviour
+### Form generation behaviour
 
 BooleanField is very complicated in terms of Mongo database support. In
 Flask-Mongoengine before version **2.0.0+** database BooleanField used
@@ -128,9 +126,9 @@ application behavior in if checks. Developer, should recheck all if checks like:
   existing document key
 ```
 
-#### Examples
+### Examples
 
-##### BooleanField with default dropdown
+#### BooleanField with default dropdown
 
 Such definition will not create any field in document, if dropdown not selected.
 
@@ -145,7 +143,7 @@ class BooleanDemoModel(db.Document):
     boolean_field = db.BooleanField()
 ```
 
-##### BooleanField with allowed `None` value
+#### BooleanField with allowed `None` value
 
 Such definition will create document field, even if nothing selected. The value will
 be `None`. If, during edit, `yes` or `no` dropdown values replaced to `---`, then
@@ -164,7 +162,7 @@ class BooleanDemoModel(db.Document):
     boolean_field_with_null = db.BooleanField(null=True)
 ```
 
-##### BooleanField with replaced dropdown text
+#### BooleanField with replaced dropdown text
 
 Dropdown text can be easily replaced, there is only one requirement: New choices,
 should be correctly coerced by {func}`~.coerce_boolean`, or function should be
@@ -186,7 +184,7 @@ class BooleanDemoModel(db.Document):
 
 ```
 
-##### BooleanField with default `True` value, but with allowed nulls
+#### BooleanField with default `True` value, but with allowed nulls
 
 ```python
 """boolean_demo.py"""
@@ -199,12 +197,12 @@ class BooleanDemoModel(db.Document):
     true_boolean_field_with_allowed_null = db.BooleanField(default=True, null=True)
 ```
 
-### ComplexDateTimeField
+## ComplexDateTimeField
 
 - API: {class}`.db_fields.ComplexDateTimeField`
 - Default form field class: {class}`wtforms.fields.DateTimeLocalField`
 
-#### Form generation behaviour
+### Form generation behaviour
 
 ComplexDateTimeField stores date and time information in database `string` format. This
 format allow precision up to microseconds dimension.
@@ -219,12 +217,12 @@ If you require concrete microseconds for edit purposes, please use
 Field is easy adjustable, to use any other precision. Check examples and example app
 for more details.
 
-#### Examples
+### Examples
 
 dates_demo.py in example app contain basic non-requirement example. You can adjust
 it to any provided example for test purposes.
 
-##### ComplexDateTimeField with milliseconds precision
+#### ComplexDateTimeField with milliseconds precision
 
 ```python
 """dates_demo.py"""
@@ -237,7 +235,7 @@ class DateTimeModel(db.Document):
     complex_datetime = db.ComplexDateTimeField()
 ```
 
-##### ComplexDateTimeField with seconds precision
+#### ComplexDateTimeField with seconds precision
 
 ```python
 """dates_demo.py"""
@@ -252,7 +250,7 @@ class DateTimeModel(db.Document):
     )
 ```
 
-##### ComplexDateTimeField with microseconds precision (text)
+#### ComplexDateTimeField with microseconds precision (text)
 
 ```python
 """dates_demo.py"""
@@ -269,24 +267,24 @@ class DateTimeModel(db.Document):
     )
 ```
 
-### DateField
+## DateField
 
 - API: {class}`.db_fields.DateField`
 - Default form field class: {class}`wtforms.fields.DateField`
 
-#### Form generation behaviour
+### Form generation behaviour
 
 DateField is one of the simplest fields in the forms generation process. By default,
 the field use {class}`wtforms.fields.DateField` WTForms class, representing a form
 input with standard HTML5 `<input type="date">`. No custom additional transformation
 done, during field generation. Field is fully controllable by [global transforms].
 
-#### Examples
+### Examples
 
 dates_demo.py in example app contain basic non-requirement example. You can adjust
 it to any provided example for test purposes.
 
-##### Not limited DateField
+#### Not limited DateField
 
 ```python
 """dates_demo.py"""
@@ -299,12 +297,12 @@ class DateTimeModel(db.Document):
     date = db.DateField()
 ```
 
-### DateTimeField
+## DateTimeField
 
 - API: {class}`.db_fields.DateTimeField`
 - Default form field class: {class}`wtforms.fields.DateTimeLocalField`
 
-#### Form generation behaviour
+### Form generation behaviour
 
 DateTimeField stores date and time information in database `date` format. This
 format allow precision up to milliseconds dimension. By default, generated form will
@@ -315,12 +313,12 @@ for more details.
 
 It is possible to use {class}`wtforms.fields.DateTimeField` for text input behaviour.
 
-#### Examples
+### Examples
 
 dates_demo.py in example app contain basic non-requirement example. You can adjust
 it to any provided example for test purposes.
 
-##### DateTimeField with seconds precision
+#### DateTimeField with seconds precision
 
 ```python
 """dates_demo.py"""
@@ -333,7 +331,7 @@ class DateTimeModel(db.Document):
     datetime = db.DateTimeField()
 ```
 
-##### DateTimeField without seconds
+#### DateTimeField without seconds
 
 ```python
 """dates_demo.py"""
@@ -346,7 +344,7 @@ class DateTimeModel(db.Document):
     datetime_no_sec = db.DateTimeField(wtf_options={"render_kw": {"step": "60"}})
 ```
 
-##### DateTimeField with milliseconds precision
+#### DateTimeField with milliseconds precision
 
 ```python
 """dates_demo.py"""
@@ -359,12 +357,12 @@ class DateTimeModel(db.Document):
     datetime_ms = db.DateTimeField(wtf_options={"render_kw": {"step": "0.001"}})
 ```
 
-### DecimalField
+## DecimalField
 
 - API: {class}`.db_fields.DecimalField`
 - Default form field class: {class}`wtforms.fields.DecimalField`
 
-#### Form generation behaviour
+### Form generation behaviour
 
 From form generation side this field is pretty standard and do not use any form
 generation adjustments.
@@ -372,12 +370,12 @@ generation adjustments.
 If database field definition has any of {attr}`min_value` or {attr}`max_value`, then
 {class}`~wtforms.validators.NumberRange` validator will be added to form field.
 
-#### Examples
+### Examples
 
 numbers_demo.py in example app contain basic non-requirement example. You can adjust
 it to any provided example for test purposes.
 
-##### Not limited DecimalField
+#### Not limited DecimalField
 
 ```python
 """numbers_demo.py"""
@@ -390,7 +388,7 @@ class NumbersDemoModel(db.Document):
     decimal_field_unlimited = db.DecimalField()
 ```
 
-##### Limited DecimalField
+#### Limited DecimalField
 
 ```python
 """numbers_demo.py"""
@@ -407,16 +405,16 @@ class NumbersDemoModel(db.Document):
     )
 ```
 
-### DictField
+## DictField
 
 Not yet documented. Please help us with new pull request.
 
-### EmailField
+## EmailField
 
 - API: {class}`.db_fields.EmailField`
 - Default form field class: {class}`~.MongoEmailField`
 
-#### Form generation behaviour
+### Form generation behaviour
 
 Unlike [StringField] WTForm class of the field is not adjusted by normal form
 generation sequence and always match {class}`~.MongoEmailField`. All other
@@ -430,12 +428,12 @@ Field respect user's adjustments in {attr}`wtf_field_class` option of
 {class}`.db_fields.EmailField`. This will change form field display, but will not
 change inserted validators.
 
-#### Examples
+### Examples
 
 strings_demo.py in example app contain basic non-requirement example. You can adjust
 it to any provided example for test purposes.
 
-##### Not required EmailField
+#### Not required EmailField
 
 ```python
 """strings_demo.py"""
@@ -448,7 +446,7 @@ class StringsDemoModel(db.Document):
     url_field = db.EmailField()
 ````
 
-##### Required EmailField
+#### Required EmailField
 
 ```python
 """strings_demo.py"""
@@ -461,15 +459,15 @@ class StringsDemoModel(db.Document):
     required_url_field = db.EmailField(required=True)
 ````
 
-### EmbeddedDocumentField
+## EmbeddedDocumentField
 
 Not yet documented. Please help us with new pull request.
 
-### FileField
+## FileField
 
 Not yet documented. Please help us with new pull request.
 
-### FloatField
+## FloatField
 
 ```{versionchanged} 2.0.0
 Default form field class changed from: {class}`wtforms.fields.FloatField` to
@@ -479,7 +477,7 @@ Default form field class changed from: {class}`wtforms.fields.FloatField` to
 - API: {class}`.db_fields.FloatField`
 - Default form field class: {class}`~.fields.MongoFloatField`
 
-#### Form generation behaviour
+### Form generation behaviour
 
 For Mongo database {class}`~.db_fields.FloatField` special WTForm field was created.
 This field's behaviour is the same, as for {class}`wtforms.fields.FloatField`,
@@ -492,12 +490,12 @@ parameter.
 If database field definition has any of {attr}`min_value` or {attr}`max_value`, then
 {class}`~wtforms.validators.NumberRange` validator will be added to form field.
 
-#### Examples
+### Examples
 
 numbers_demo.py in example app contain basic non-requirement example. You can adjust
 it to any provided example for test purposes.
 
-##### Not limited FloatField
+#### Not limited FloatField
 
 ```python
 """numbers_demo.py"""
@@ -510,7 +508,7 @@ class NumbersDemoModel(db.Document):
     float_field_unlimited = db.FloatField()
 ```
 
-##### Limited FloatField
+#### Limited FloatField
 
 ```python
 """numbers_demo.py"""
@@ -523,12 +521,12 @@ class NumbersDemoModel(db.Document):
     float_field_limited = db.FloatField(min_value=float(1), max_value=200.455)
 ```
 
-### IntField
+## IntField
 
 - API: {class}`.db_fields.IntField`
 - Default form field class: {class}`wtforms.fields.IntegerField`
 
-#### Form generation behaviour
+### Form generation behaviour
 
 From form generation side this field is pretty standard and do not use any form
 generation adjustments.
@@ -536,12 +534,12 @@ generation adjustments.
 If database field definition has any of {attr}`min_value` or {attr}`max_value`, then
 {class}`~wtforms.validators.NumberRange` validator will be added to form field.
 
-#### Examples
+### Examples
 
 numbers_demo.py in example app contain basic non-requirement example. You can adjust
 it to any provided example for test purposes.
 
-##### Not limited IntField
+#### Not limited IntField
 
 ```python
 """numbers_demo.py"""
@@ -554,7 +552,7 @@ class NumbersDemoModel(db.Document):
     integer_field_unlimited = db.IntField()
 ```
 
-##### Limited IntField
+#### Limited IntField
 
 ```python
 """numbers_demo.py"""
@@ -567,24 +565,24 @@ class NumbersDemoModel(db.Document):
     integer_field_limited = db.IntField(min_value=1, max_value=200)
 ```
 
-### ListField
+## ListField
 
 Not yet documented. Please help us with new pull request.
 
-### ReferenceField
+## ReferenceField
 
 Not yet documented. Please help us with new pull request.
 
-### SortedListField (partly?)
+## SortedListField (partly?)
 
 Not yet documented. Please help us with new pull request.
 
-### StringField
+## StringField
 
 - API: {class}`.db_fields.StringField`
 - Default form field class: Selected by field settings combination
 
-#### Form generation behaviour
+### Form generation behaviour
 
 By default, during WTForm generation for fields without specified size (
 {attr}`min_length` or {attr}`max_length`) class {class}`.MongoTextAreaField` is used,
@@ -600,7 +598,7 @@ as on document, as well as on form generation steps.
 If database field definition has {attr}`regex` parameter set, then
 {class}`~wtforms.validators.Regexp` validator will be added to the form field.
 
-#### Features deprecated
+### Features deprecated
 
 Field declaration step keyword arguments {attr}`password` and {attr}`textarea` are
 deprecated in Flask-Mongoengine version **2.0.0** and exist only to make migration
@@ -609,7 +607,7 @@ steps easy.
 To implement same behaviour, user should use {attr}`wtf_field_class` setting on
 {class}`.db_fields.StringField` init.
 
-#### Related WTForm custom fields
+### Related WTForm custom fields
 
 Several special WTForms field implementation was created to support mongodb database
 behaviour and do not create any values in database, in case of empty fields. They
@@ -627,12 +625,12 @@ in another database fields too, but all of them based on
 - {class}`~.MongoTextAreaField`
 - {class}`~.MongoURLField`
 
-#### Examples
+### Examples
 
 strings_demo.py in example app contain basic non-requirement example. You can adjust
 it to any provided example for test purposes.
 
-##### Not limited StringField as MongoTextAreaField
+#### Not limited StringField as MongoTextAreaField
 
 ```python
 """strings_demo.py"""
@@ -645,7 +643,7 @@ class StringsDemoModel(db.Document):
     string_field = db.StringField()
 ```
 
-##### Not limited StringField as MongoTelField
+#### Not limited StringField as MongoTelField
 
 ```python
 """strings_demo.py"""
@@ -659,7 +657,7 @@ class StringsDemoModel(db.Document):
     tel_field = db.StringField(wtf_field_class=mongo_fields.MongoTelField)
 ```
 
-##### Not limited StringField as MongoTextAreaField with https regex
+#### Not limited StringField as MongoTextAreaField with https regex
 
 [mongoengine] and [wtforms] projects are not consistent in how they work with regex.
 You will be safe, if you use {func}`re.compile` each time, when you work with regex
@@ -680,7 +678,7 @@ class StringsDemoModel(db.Document):
     ))
 ```
 
-##### Size limited StringField as MongoStringField
+#### Size limited StringField as MongoStringField
 
 ```python
 """strings_demo.py"""
@@ -693,7 +691,7 @@ class StringsDemoModel(db.Document):
     sized_string_field = db.StringField(min_length=5)
 ```
 
-##### Required password field with minimum size
+#### Required password field with minimum size
 
 ```python
 """strings_demo.py"""
@@ -711,12 +709,12 @@ class StringsDemoModel(db.Document):
     )
 ```
 
-### URLField
+## URLField
 
 - API: {class}`.db_fields.URLField`
 - Default form field class: {class}`~.MongoURLField`
 
-#### Form generation behaviour
+### Form generation behaviour
 
 Unlike [StringField] WTForm class of the field is not adjusted by normal form
 generation sequence and always match {class}`~.MongoURLField`. All other
@@ -739,12 +737,12 @@ Field respect user's adjustments in {attr}`wtf_field_class` option of
 {class}`.db_fields.URLField`. This will change form field display, but will not
 change inserted validators.
 
-#### Examples
+### Examples
 
 strings_demo.py in example app contain basic non-requirement example. You can adjust
 it to any provided example for test purposes.
 
-##### Not required URLField
+#### Not required URLField
 
 ```python
 """strings_demo.py"""
@@ -757,7 +755,7 @@ class StringsDemoModel(db.Document):
     url_field = db.URLField()
 ````
 
-##### Required URLField with minimum size
+#### Required URLField with minimum size
 
 ```python
 """strings_demo.py"""
@@ -770,7 +768,7 @@ class StringsDemoModel(db.Document):
     required_url_field = db.URLField(required=True, min_length=25)
 ````
 
-##### URLField with https only regexp check, if data exist
+#### URLField with https only regexp check, if data exist
 
 Regexp for {attr}`url_regex` should be prepared by {mod}`re`.
 
@@ -884,8 +882,6 @@ Not yet documented. Please help us with new pull request.
 Not yet documented. Please help us with new pull request.
 
 [mongoengine]: https://docs.mongoengine.org/
-
-[supported fields]: #supported-fields
 
 [#379]: https://github.com/MongoEngine/flask-mongoengine/issues/379
 
