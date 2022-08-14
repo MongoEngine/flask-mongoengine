@@ -2,7 +2,8 @@ ignore: []
 
 refactor:
   include: []
-  skip: []
+  skip:
+    - use-contextlib-suppress
   rule_types:
     - refactoring
     - suggestion
