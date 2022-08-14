@@ -38,7 +38,15 @@ def app() -> Flask:
 
 @pytest.fixture()
 def db(app) -> MongoEngine:
-    app.config["MONGODB_HOST"] = "mongodb://localhost:27017/flask_mongoengine_test_db"
+    app.config["MONGODB_SETTINGS"] = [
+        {
+            "db": "flask_mongoengine_test_db",
+            "host": "localhost",
+            "port": 27017,
+            "alias": "default",
+            "uuidRepresentation": "standard",
+        }
+    ]
     test_db = MongoEngine(app)
     db_name = (
         test_db.connection["default"].get_database("flask_mongoengine_test_db").name
