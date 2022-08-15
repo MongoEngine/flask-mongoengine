@@ -7,6 +7,7 @@ flask_mongoengine.wtf.fields module
 -----------------------------------
 
 .. automodule:: flask_mongoengine.wtf.fields
+   :special-members: __init__
 
 flask_mongoengine.wtf.models module
 -----------------------------------

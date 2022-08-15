@@ -5,8 +5,7 @@ __all__ = [
     "ModelSelectField",
     "QuerySetSelectField",
 ]
-from gettext import gettext as _
-from typing import Optional
+from typing import Callable, Optional
 
 from flask import json
 from mongoengine.queryset import DoesNotExist
@@ -63,6 +62,7 @@ class QuerySetSelectField(wtf_fields.SelectFieldBase):
         label_modifier=None,
         **kwargs,
     ):
+        """Init docstring placeholder."""
 
         super(QuerySetSelectField, self).__init__(label, validators, **kwargs)
         self.label_attr = label_attr
@@ -122,7 +122,7 @@ class QuerySetSelectField(wtf_fields.SelectFieldBase):
         :param form: The form the field belongs to.
         """
         if (not self.allow_blank or self.data is not None) and not self.data:
-            raise wtf_validators.ValidationError(_("Not a valid choice"))
+            raise wtf_validators.ValidationError(self.gettext("Not a valid choice"))
 
     def _is_selected(self, item):
         return item == self.data
@@ -414,3 +414,72 @@ class MongoFloatField(wtf_fields.FloatField):
     """
 
     widget = wtf_widgets.NumberInput(step="any")
+
+
+class MongoDictField(MongoTextAreaField):
+    """Form field to handle JSON in :class:`~flask_mongoengine.db_fields.DictField`."""
+
+    def __init__(
+        self,
+        json_encoder: Optional[Callable] = None,
+        json_encoder_kwargs: Optional[dict] = None,
+        json_decoder: Optional[Callable] = None,
+        json_decoder_kwargs: Optional[dict] = None,
+        *args,
+        **kwargs,
+    ):
+        """
+        Special WTForms field for :class:`~flask_mongoengine.db_fields.DictField`
+
+        Configuration available with providing :attr:`wtf_options` on
+        :class:`~flask_mongoengine.db_fields.DictField` initialization.
+
+        :param json_encoder: Any function, capable to transform dict to string, by
+            default :func:`json.dumps`
+        :param json_encoder_kwargs: Any dictionary with parameters to
+            :func:`json_encoder`, by default: `{"indent":4}`
+        :param json_decoder: Any function, capable to transform string to dict, by
+            default :func:`json.loads`
+        :param json_decoder_kwargs: Any dictionary with parameters to
+            :func:`json_decoder`, by default: `{}`
+        """
+
+        self.json_encoder = json_encoder or json.dumps
+        self.json_encoder_kwargs = json_encoder_kwargs or {"indent": 4}
+        self.json_decoder = json_decoder or json.loads
+        self.json_decoder_kwargs = json_decoder_kwargs or {}
+        self.data = None
+        super().__init__(*args, **kwargs)
+
+    def _parse_json_data(self):
+        """Tries to load JSON data with python internal JSON library."""
+        try:
+            self.data = self.json_decoder(self.data, **self.json_decoder_kwargs)
+        except ValueError as error:
+            raise wtf_validators.ValidationError(
+                self.gettext(f"Cannot load data: {error}")
+            ) from error
+
+    def _ensure_data_is_dict(self):
+        """Ensures that saved data is dict, not a list or other valid parsed JSON."""
+        if not isinstance(self.data, dict):
+            raise wtf_validators.ValidationError(
+                self.gettext("Not a valid dictionary (list input detected).")
+            )
+
+    def process_formdata(self, valuelist):
+        """Process text form data to dictionary or raise JSONDecodeError."""
+        super().process_formdata(valuelist)
+        if self.data is not None:
+            self._parse_json_data()
+            self._ensure_data_is_dict()
+
+    def _value(self):
+        """Show existing data as pretty-formatted, or show raw data/empty dict."""
+        if self.data:
+            if isinstance(self.data, dict):
+                return self.json_encoder(self.data, **self.json_encoder_kwargs)
+            else:
+                # This allows to fix/see input errors, without escaping.
+                return self.data
+        return "{}"
