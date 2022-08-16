@@ -19,9 +19,6 @@ class NumbersDemoModel(db.Document):
     integer_field_limited = db.IntField(min_value=1, max_value=200)
 
 
-NumbersDemoForm = NumbersDemoModel.to_wtf_form()
-
-
 def numbers_demo_view(pk=None):
     """Return all fields demonstration."""
     from example_app.views import demo_view

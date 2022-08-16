@@ -24,9 +24,6 @@ class DictDemoModel(db.Document):
     )
 
 
-DictDemoForm = DictDemoModel.to_wtf_form()
-
-
 def dict_demo_view(pk=None):
     """Return all fields demonstration."""
     from example_app.views import demo_view

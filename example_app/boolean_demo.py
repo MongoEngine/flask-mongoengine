@@ -17,9 +17,6 @@ class BooleanDemoModel(db.Document):
     )
 
 
-BooleanDemoForm = BooleanDemoModel.to_wtf_form()
-
-
 def boolean_demo_view(pk=None):
     """Return all fields demonstration."""
     from example_app.views import demo_view

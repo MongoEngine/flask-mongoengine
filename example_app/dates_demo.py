@@ -22,9 +22,6 @@ class DateTimeModel(db.Document):
     )
 
 
-DateTimeDemoForm = DateTimeModel.to_wtf_form()
-
-
 def dates_demo_view(pk=None):
     """Return all fields demonstration."""
     from example_app.views import demo_view
