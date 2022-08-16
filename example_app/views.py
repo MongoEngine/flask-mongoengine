@@ -6,6 +6,7 @@ from mongoengine.context_managers import switch_db
 from example_app import models
 from example_app.boolean_demo import BooleanDemoModel
 from example_app.dates_demo import DateTimeModel
+from example_app.dict_demo import DictDemoModel
 from example_app.numbers_demo import NumbersDemoModel
 from example_app.strings_demo import StringsDemoModel
 
@@ -53,6 +54,7 @@ def delete_data():
         models.Todo.objects().delete()
         BooleanDemoModel.objects().delete()
         DateTimeModel.objects().delete()
+        DictDemoModel.objects().delete()
         StringsDemoModel.objects().delete()
         NumbersDemoModel.objects().delete()
     with switch_db(models.Todo, "secondary"):
@@ -96,6 +98,7 @@ def demo_view(model, view_name, pk=None):
 
     if request.method == "POST" and form.validate_on_submit():
         form.save()
+        # form = FormClass(obj=form.instance)
     page_num = int(request.args.get("page") or 1)
     page = model.objects.paginate(page=page_num, per_page=100)
 
