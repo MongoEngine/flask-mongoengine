@@ -1,7 +1,5 @@
 """Booleans fields demo model."""
 
-from flask import render_template, request
-
 from example_app.models import db
 
 
@@ -24,25 +22,8 @@ BooleanDemoForm = BooleanDemoModel.to_wtf_form()
 
 def boolean_demo_view(pk=None):
     """Return all fields demonstration."""
-    form = BooleanDemoForm()
-    obj = None
-    if pk:
-        obj = BooleanDemoModel.objects.get(pk=pk)
-        form = BooleanDemoForm(obj=obj)
+    from example_app.views import demo_view
 
-    if request.method == "POST" and form.validate_on_submit():
-        if pk:
-            form.populate_obj(obj)
-            obj.save()
-        else:
-            form.save()
-    page_num = int(request.args.get("page") or 1)
-    page = BooleanDemoModel.objects.paginate(page=page_num, per_page=100)
-
-    return render_template(
-        "form_demo.html",
-        view=boolean_demo_view.__name__,
-        page=page,
-        form=form,
-        model=BooleanDemoModel,
+    return demo_view(
+        model=BooleanDemoModel, view_name=boolean_demo_view.__name__, pk=pk
     )

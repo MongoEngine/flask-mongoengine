@@ -150,7 +150,6 @@ class TestWtfFieldMixin:
         [
             db_fields.BinaryField,
             db_fields.CachedReferenceField,
-            db_fields.DictField,
             db_fields.DynamicField,
             db_fields.EmbeddedDocumentField,
             db_fields.EmbeddedDocumentListField,

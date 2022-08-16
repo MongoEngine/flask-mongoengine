@@ -2,8 +2,6 @@
 
 from decimal import Decimal
 
-from flask import render_template, request
-
 from example_app.models import db
 
 
@@ -26,25 +24,8 @@ NumbersDemoForm = NumbersDemoModel.to_wtf_form()
 
 def numbers_demo_view(pk=None):
     """Return all fields demonstration."""
-    form = NumbersDemoForm()
-    obj = None
-    if pk:
-        obj = NumbersDemoModel.objects.get(pk=pk)
-        form = NumbersDemoForm(obj=obj)
+    from example_app.views import demo_view
 
-    if request.method == "POST" and form.validate_on_submit():
-        if pk:
-            form.populate_obj(obj)
-            obj.save()
-        else:
-            form.save()
-    page_num = int(request.args.get("page") or 1)
-    page = NumbersDemoModel.objects.paginate(page=page_num, per_page=100)
-
-    return render_template(
-        "form_demo.html",
-        view=numbers_demo_view.__name__,
-        page=page,
-        form=form,
-        model=NumbersDemoModel,
+    return demo_view(
+        model=NumbersDemoModel, view_name=numbers_demo_view.__name__, pk=pk
     )

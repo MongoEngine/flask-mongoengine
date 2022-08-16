@@ -457,20 +457,14 @@ class DictField(WtfFieldMixin, fields.DictField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
-    DEFAULT_WTF_FIELD = custom_fields.DictField if custom_fields else None
+    DEFAULT_WTF_FIELD = custom_fields.MongoDictField if custom_fields else None
 
-    def to_wtf_field(
-        self,
-        *,
-        model: Optional[Type] = None,
-        field_kwargs: Optional[dict] = None,
-    ):
-        """
-        Protection from execution of :func:`to_wtf_field` in form generation.
-
-        :raises NotImplementedError: Field converter to WTForm Field not implemented.
-        """
-        raise NotImplementedError("Field converter to WTForm Field not implemented.")
+    @property
+    def wtf_generated_options(self) -> dict:
+        """Extends default field options with `null` bypass."""
+        options = super().wtf_generated_options
+        options["null"] = self.null
+        return options
 
 
 class DynamicField(WtfFieldMixin, fields.DynamicField):

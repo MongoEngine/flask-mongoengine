@@ -5,6 +5,7 @@ from pymongo import monitoring
 from example_app import views
 from example_app.boolean_demo import boolean_demo_view
 from example_app.dates_demo import dates_demo_view
+from example_app.dict_demo import dict_demo_view
 from example_app.models import db
 from example_app.numbers_demo import numbers_demo_view
 from example_app.strings_demo import strings_demo_view
@@ -52,6 +53,8 @@ app.add_url_rule("/dates", view_func=dates_demo_view, methods=["GET", "POST"])
 app.add_url_rule("/dates/<pk>/", view_func=dates_demo_view, methods=["GET", "POST"])
 app.add_url_rule("/bool", view_func=boolean_demo_view, methods=["GET", "POST"])
 app.add_url_rule("/bool/<pk>/", view_func=boolean_demo_view, methods=["GET", "POST"])
+app.add_url_rule("/dict", view_func=dict_demo_view, methods=["GET", "POST"])
+app.add_url_rule("/dict/<pk>/", view_func=dict_demo_view, methods=["GET", "POST"])
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)

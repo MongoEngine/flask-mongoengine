@@ -3,6 +3,7 @@ import json
 
 import pytest
 from bson.json_util import RELAXED_JSON_OPTIONS
+from markupsafe import Markup
 from werkzeug.datastructures import MultiDict
 
 wtforms = pytest.importorskip("wtforms")
@@ -212,6 +213,101 @@ class TestEmptyStringIsNoneMixin:
         assert obj.data is False
 
 
+class TestMongoDictField:
+    def test_mongo_dict_field_mro_not_changed(self):
+        field_mro = list(mongo_fields.MongoDictField.__mro__[:5])
+        assert field_mro == [
+            mongo_fields.MongoDictField,
+            mongo_fields.MongoTextAreaField,
+            mongo_fields.EmptyStringIsNoneMixin,
+            wtf_fields.TextAreaField,
+            wtf_fields.StringField,
+        ]
+
+    def test_mongo_dict_field_default_dict_in_form_object(self, db):
+        class DefaultDictModel(db.Document):
+            """Should populate form with {}."""
+
+            dict_field = db.DictField()
+
+        DefaultDictForm = DefaultDictModel.to_wtf_form()
+
+        form = DefaultDictForm()
+
+        assert str(form.dict_field) == Markup(
+            '<textarea id="dict_field" name="dict_field">\r\n{}</textarea>'
+        )
+        assert form.dict_field.data == {}  # This is mongoengine default
+        assert form.dict_field.null is False
+
+        assert form.validate()
+        form.save()
+
+        obj = DefaultDictModel.objects.get(id=form.instance.pk)
+        object_dict = json.loads(obj.to_json(json_options=RELAXED_JSON_OPTIONS))
+        object_dict.pop("_id")
+
+        assert object_dict == {"dict_field": {}}
+
+    @pytest.mark.parametrize(
+        ["null", "expected_obj"],
+        [
+            (True, {"placeholder_string": "1", "null_dict_field": None}),
+            (False, {"placeholder_string": "1"}),
+        ],
+    )
+    def test_mongo_dict_field_default_null_dict_in_form_object(
+        self, db, null, expected_obj
+    ):
+        class DefaultDictModel(db.Document):
+            """Should populate form with empty form."""
+
+            placeholder_string = db.StringField(default="1")
+            null_dict_field = db.DictField(default=None, null=null)
+
+        DefaultDictForm = DefaultDictModel.to_wtf_form()
+
+        form = DefaultDictForm()
+
+        assert str(form.null_dict_field) == Markup(
+            '<textarea id="null_dict_field" name="null_dict_field">\r\n</textarea>'
+        )
+        assert form.null_dict_field.data is None
+
+        assert form.validate()
+        form.save()
+
+        obj = DefaultDictModel.objects.get(id=form.instance.pk)
+        object_dict = json.loads(obj.to_json(json_options=RELAXED_JSON_OPTIONS))
+        object_dict.pop("_id")
+
+        assert object_dict == expected_obj
+
+    def test__parse_json_data__raise_error_when_input_is_incorrect_json(self, db):
+        class DictModel(db.Document):
+            """Should populate form with empty form."""
+
+            dict_field = db.DictField()
+
+        FormClass = DictModel.to_wtf_form()
+        form = FormClass(MultiDict({"dict_field": "foobar"}))
+        assert not form.validate()
+        assert "Cannot load data" in form.errors["dict_field"][0]
+
+    def test__ensure_data_is_dict__raise_error_when_input_is_a_list(self, db):
+        class DictModel(db.Document):
+            """Should populate form with empty form."""
+
+            dict_field = db.DictField()
+
+        FormClass = DictModel.to_wtf_form()
+        form = FormClass(MultiDict({"dict_field": "[]"}))
+        assert not form.validate()
+        assert form.errors == {
+            "dict_field": ["Not a valid dictionary (list input detected)."]
+        }
+
+
 class TestMongoEmailField:
     def test_email_field_mro_not_changed(self):
         field_mro = list(mongo_fields.MongoEmailField.__mro__[:4])
@@ -221,6 +317,12 @@ class TestMongoEmailField:
             wtf_fields.EmailField,
             wtf_fields.StringField,
         ]
+
+
+class TestMongoFloatField:
+    def test_ensure_widget_not_accidentally_replaced(self):
+        field = mongo_fields.MongoFloatField
+        assert isinstance(field.widget, wtf_widgets.NumberInput)
 
 
 class TestMongoHiddenField:
@@ -317,9 +419,3 @@ class TestMongoURLField:
             wtf_fields.URLField,
             wtf_fields.StringField,
         ]
-
-
-class TestMongoFloatField:
-    def test_ensure_widget_not_accidentally_replaced(self):
-        field = mongo_fields.MongoFloatField
-        assert isinstance(field.widget, wtf_widgets.NumberInput)

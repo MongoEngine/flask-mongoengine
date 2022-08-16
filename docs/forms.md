@@ -147,7 +147,7 @@ class BooleanDemoModel(db.Document):
 
 Such definition will create document field, even if nothing selected. The value will
 be `None`. If, during edit, `yes` or `no` dropdown values replaced to `---`, then
-saved value in document will be aslo changed to `None`.
+saved value in document will be also changed to `None`.
 
 By default, `None` value represented as `---` text in dropdown.
 
@@ -407,7 +407,162 @@ class NumbersDemoModel(db.Document):
 
 ## DictField
 
-Not yet documented. Please help us with new pull request.
+- API: {class}`.db_fields.DictField`
+- Default form field class: {class}`~.MongoDictField`
+
+DictField has `Object` type in terms of Mongo database itself, so basically it defines
+document inside document, but without pre-defined structure. That's why this is one
+of fields, that has default value specified inside Mongoengine itself, and that's
+why is always (almost) created.
+
+The developer should understand that database keyword argument {attr}`default` is
+forwarded to form by default, but can be separately overwritten in form. This brings
+a lot of options for form field configuration.
+
+Also, should be additionally noted that database `Null` value in form is represented as
+empty string. Non-existing field is represented with form {attr}`default` for new
+forms (without instance inside) or with empty string for non-empty forms.
+
+Complicated? Probably. That's why this field was completely rewritten in version
+**2.0.0**. Check examples, and everything will be clear.
+
+### Form generation behaviour
+
+Our default form generation follow Mongoengine internals and will use database field
+default (empty dict) to populate to new form or to not filled field in existing form.
+
+In the same time, we are allowing extending of this behaviour, and not creating
+field in database, if default value provided as `None`. In this case, generated
+field for new form will be empty, without any pre-filled value.
+
+Same empty field will be displayed in case, when both {attr}`default=None` and
+{attr}`null=True` selected, during database form initialization. In this case form
+field will be empty, without any placeholder, but on save `null` object will be
+created in document.
+
+Also, we even support separated defaults for form field and database field, allowing
+any form+database behaviour.
+
+### Examples
+
+#### DictField with default empty dict value
+
+Will place `{}` to form for existing/new fields. This value is hardcodded in parent
+MongoEngine project.
+
+```python
+"""dict_demo.py"""
+from example_app.models import db
+
+
+class DictDemoModel(db.Document):
+    """Documentation example model."""
+
+    dict_field = db.DictField()
+```
+
+#### DictField with default `None` value, ignored by database
+
+Reminder: Such field is empty in form, and will not create anything in database if
+not filled.
+
+```python
+"""dict_demo.py"""
+from example_app.models import db
+
+
+class DictDemoModel(db.Document):
+    """Documentation example model."""
+
+    no_dict_field = db.DictField(default=None)
+```
+
+#### DictField with default `None` value, saved to database
+
+Reminder: Such field is empty in form, and will create `null` object in database if
+not filled.
+
+```python
+"""dict_demo.py"""
+from example_app.models import db
+
+
+class DictDemoModel(db.Document):
+    """Documentation example model."""
+
+    null_dict_field = db.DictField(default=None, null=True)
+```
+
+#### DictField with pre-defined default dict
+
+This value is pre-defined on database level. So behaviour of form and in-code
+creation of such objects will be the same - default dict will be saved to database,
+if nothing provided to form/instance. Form will be pre-filled with default dict.
+
+```python
+"""dict_demo.py"""
+from example_app.models import db
+
+
+def get_default_dict():
+    """Example of default dict specification."""
+    return {"alpha": 1, "text": "text", "float": 1.2}
+
+
+class DictDemoModel(db.Document):
+    """Documentation example model."""
+
+    dict_default = db.DictField(default=get_default_dict)
+```
+
+#### DictField with pre-defined value and no document object creation on `Null`
+
+This is a case when you do not want to create any record in database document, if
+user completely delete pre-filled value in new document form. Here we use different
+`null` and `default` values in form field generation and during database object
+generation.
+
+```python
+"""dict_demo.py"""
+from example_app.models import db
+
+
+def get_default_dict():
+    """Example of default dict specification."""
+    return {"alpha": 1, "text": "text", "float": 1.2}
+
+
+class DictDemoModel(db.Document):
+    """Documentation example model."""
+
+    no_dict_prefilled = db.DictField(
+        default=None,
+        null=False,
+        wtf_options={"default": get_default_dict, "null": True},
+    )
+```
+
+#### DictField with pre-defined default dict with `Null` fallback
+
+This is very rare case, when some default value is given, meaning that this
+value will be populated to the field, but if completely deleted, than `Null` will be
+saved in database.
+
+```python
+"""dict_demo.py"""
+from example_app.models import db
+
+
+def get_default_dict():
+    """Example of default dict specification."""
+    return {"alpha": 1, "text": "text", "float": 1.2}
+
+
+class DictDemoModel(db.Document):
+    """Documentation example model."""
+
+    null_dict_default = db.DictField(default=get_default_dict, null=True)
+```
 
 ## EmailField
 
