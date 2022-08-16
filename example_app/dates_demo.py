@@ -1,6 +1,5 @@
 """Date and DateTime fields demo model."""
 
-from flask import render_template, request
 from wtforms.fields import DateTimeField
 
 from example_app.models import db
@@ -28,25 +27,6 @@ DateTimeDemoForm = DateTimeModel.to_wtf_form()
 
 def dates_demo_view(pk=None):
     """Return all fields demonstration."""
-    form = DateTimeDemoForm()
-    obj = None
-    if pk:
-        obj = DateTimeModel.objects.get(pk=pk)
-        form = DateTimeDemoForm(obj=obj)
+    from example_app.views import demo_view
 
-    if request.method == "POST" and form.validate_on_submit():
-        if pk:
-            form.populate_obj(obj)
-            obj.save()
-        else:
-            form.save()
-    page_num = int(request.args.get("page") or 1)
-    page = DateTimeModel.objects.paginate(page=page_num, per_page=100)
-
-    return render_template(
-        "form_demo.html",
-        view=dates_demo_view.__name__,
-        page=page,
-        form=form,
-        model=DateTimeModel,
-    )
+    return demo_view(model=DateTimeModel, view_name=dates_demo_view.__name__, pk=pk)

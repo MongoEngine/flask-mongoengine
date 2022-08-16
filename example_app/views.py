@@ -84,3 +84,21 @@ def pagination():
         todos_page = models.Todo.objects.paginate(page=page_num, per_page=3)
 
     return render_template("pagination.html", todos_page=todos_page, form=form)
+
+
+def demo_view(model, view_name, pk=None):
+    """Return all fields demonstration."""
+    FormClass = model.to_wtf_form()
+    form = FormClass()
+    if pk:
+        obj = model.objects.get(pk=pk)
+        form = FormClass(obj=obj)
+
+    if request.method == "POST" and form.validate_on_submit():
+        form.save()
+    page_num = int(request.args.get("page") or 1)
+    page = model.objects.paginate(page=page_num, per_page=100)
+
+    return render_template(
+        "form_demo.html", view=view_name, page=page, form=form, model=model
+    )
