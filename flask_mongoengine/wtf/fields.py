@@ -425,6 +425,7 @@ class MongoDictField(MongoTextAreaField):
         json_encoder_kwargs: Optional[dict] = None,
         json_decoder: Optional[Callable] = None,
         json_decoder_kwargs: Optional[dict] = None,
+        null: Optional[bool] = None,
         *args,
         **kwargs,
     ):
@@ -449,7 +450,14 @@ class MongoDictField(MongoTextAreaField):
         self.json_decoder = json_decoder or json.loads
         self.json_decoder_kwargs = json_decoder_kwargs or {}
         self.data = None
+        self.null = null
         super().__init__(*args, **kwargs)
+        try:
+            self._default = self.default()
+        except TypeError:
+            self._default = self.default
+        if isinstance(self._default, dict):
+            self._default = self.json_encoder(self._default, **self.json_encoder_kwargs)
 
     def _parse_json_data(self):
         """Tries to load JSON data with python internal JSON library."""
@@ -476,10 +484,10 @@ class MongoDictField(MongoTextAreaField):
 
     def _value(self):
         """Show existing data as pretty-formatted, or show raw data/empty dict."""
-        if self.data:
-            if isinstance(self.data, dict):
-                return self.json_encoder(self.data, **self.json_encoder_kwargs)
-            else:
-                # This allows to fix/see input errors, without escaping.
-                return self.data
-        return "{}"
+        if self.data is not None:
+            return (
+                self.json_encoder(self.data, **self.json_encoder_kwargs)
+                if isinstance(self.data, dict)
+                else self.data
+            )
+        return self._default if self._default is not None and not self.null else ""

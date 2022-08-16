@@ -459,6 +459,13 @@ class DictField(WtfFieldMixin, fields.DictField):
 
     DEFAULT_WTF_FIELD = custom_fields.MongoDictField if custom_fields else None
 
+    @property
+    def wtf_generated_options(self) -> dict:
+        """Extends default field options with `null` bypass."""
+        options = super().wtf_generated_options
+        options["null"] = self.null
+        return options
+
 
 class DynamicField(WtfFieldMixin, fields.DynamicField):
     """
