@@ -305,20 +305,7 @@ class BinaryField(WtfFieldMixin, fields.BinaryField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
-    DEFAULT_WTF_FIELD = custom_fields.BinaryField if custom_fields else None
-
-    def to_wtf_field(
-        self,
-        *,
-        model: Optional[Type] = None,
-        field_kwargs: Optional[dict] = None,
-    ):
-        """
-        Protection from execution of :func:`to_wtf_field` in form generation.
-
-        :raises NotImplementedError: Field converter to WTForm Field not implemented.
-        """
-        raise NotImplementedError("Field converter to WTForm Field not implemented.")
+    DEFAULT_WTF_FIELD = custom_fields.MongoBinaryField if custom_fields else None
 
 
 class BooleanField(WtfFieldMixin, fields.BooleanField):

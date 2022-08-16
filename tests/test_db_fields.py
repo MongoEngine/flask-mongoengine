@@ -148,7 +148,6 @@ class TestWtfFieldMixin:
     @pytest.mark.parametrize(
         "FieldClass",
         [
-            db_fields.BinaryField,
             db_fields.CachedReferenceField,
             db_fields.DynamicField,
             db_fields.EmbeddedDocumentField,

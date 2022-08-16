@@ -309,6 +309,26 @@ class EmptyStringIsNoneMixin:
             super().process_formdata(valuelist)
 
 
+# noinspection PyAttributeOutsideInit
+class MongoBinaryField(wtf_fields.TextAreaField):
+    """
+    Special WTForm :class:`~.wtforms.fields.TextAreaField` that convert input to binary.
+    """
+
+    def process_formdata(self, valuelist):
+        """Converts string form value to binary type and ignoring empty form fields."""
+        if not valuelist or valuelist[0] == "":
+            self.data = None
+        else:
+            self.data = valuelist[0].encode("utf-8")
+
+    def _value(self):
+        """
+        Ensures that encoded string data will not be encoded once more on form edit.
+        """
+        return self.data.decode("utf-8") if self.data is not None else ""
+
+
 class MongoBooleanField(wtf_fields.SelectField):
     """Mongo SelectField field for BooleanFields, that correctly coerce values."""
 
@@ -325,8 +345,6 @@ class MongoBooleanField(wtf_fields.SelectField):
         Replaces defaults of :class:`wtforms.fields.SelectField` with for Boolean values.
 
         Fully compatible with :class:`wtforms.fields.SelectField` and have same parameters.
-
-
         """
         if coerce is None:
             coerce = coerce_boolean
