@@ -292,11 +292,7 @@ class TestMongoDictField:
         FormClass = DictModel.to_wtf_form()
         form = FormClass(MultiDict({"dict_field": "foobar"}))
         assert not form.validate()
-        assert form.errors == {
-            "dict_field": [
-                "Cannot load data: Expecting value: line 1 column 1 (char 0)"
-            ]
-        }
+        assert "Cannot load data" in form.errors["dict_field"][0]
 
     def test__ensure_data_is_dict__raise_error_when_input_is_a_list(self, db):
         class DictModel(db.Document):
