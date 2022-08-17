@@ -153,7 +153,6 @@ class TestWtfFieldMixin:
             db_fields.EmbeddedDocumentField,
             db_fields.EmbeddedDocumentListField,
             db_fields.EnumField,
-            db_fields.FileField,
             db_fields.GenericEmbeddedDocumentField,
             db_fields.GenericLazyReferenceField,
             db_fields.GenericReferenceField,
