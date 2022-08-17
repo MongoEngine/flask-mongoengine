@@ -9,9 +9,13 @@ from typing import Callable, Optional
 
 from flask import json
 from mongoengine.queryset import DoesNotExist
+from werkzeug.datastructures import FileStorage
 from wtforms import fields as wtf_fields
 from wtforms import validators as wtf_validators
 from wtforms import widgets as wtf_widgets
+from wtforms.utils import unset_value
+
+from flask_mongoengine.wtf import widgets as mongo_widgets
 
 
 def coerce_boolean(value: Optional[str]) -> Optional[bool]:
@@ -29,6 +33,14 @@ def coerce_boolean(value: Optional[str]) -> Optional[bool]:
         return True
     else:
         raise ValueError("Unexpected string value.")
+
+
+def _is_empty_file(file_object):
+    """Detects empty files and file streams."""
+    file_object.seek(0)
+    first_char = file_object.read(1)
+    file_object.seek(0)
+    return not bool(first_char)
 
 
 # noinspection PyAttributeOutsideInit,PyAbstractClass
@@ -369,6 +381,53 @@ class MongoEmailField(EmptyStringIsNoneMixin, wtf_fields.EmailField):
     pass
 
 
+class MongoFileField(wtf_fields.FileField):
+    """GridFS file field."""
+
+    widget = mongo_widgets.MongoFileInput()
+
+    def __init__(self, **kwargs):
+        """Extends base field arguments with file delete marker."""
+        super().__init__(**kwargs)
+
+        self._should_delete = False
+        self._marker = f"_{self.name}_delete"
+
+    def process(self, formdata, data=unset_value, extra_filters=None):
+        """Extracts 'delete' marker option, if exists in request."""
+        if formdata and self._marker in formdata:
+            self._should_delete = True
+        return super().process(formdata, data=data, extra_filters=extra_filters)
+
+    def populate_obj(self, obj, name):
+        """Upload, replace or delete file from database, according form action."""
+        field = getattr(obj, name, None)
+
+        if field is None:
+            return None
+
+        if self._should_delete:
+            field.delete()
+            return None
+
+        if isinstance(self.data, FileStorage) and not _is_empty_file(self.data.stream):
+            action = field.replace if field.grid_id else field.put
+            action(
+                self.data.stream,
+                filename=self.data.filename,
+                content_type=self.data.content_type,
+            )
+
+
+class MongoFloatField(wtf_fields.FloatField):
+    """
+    Regular :class:`wtforms.fields.FloatField`, with widget replaced to
+    :class:`wtforms.widgets.NumberInput`.
+    """
+
+    widget = wtf_widgets.NumberInput(step="any")
+
+
 class MongoHiddenField(EmptyStringIsNoneMixin, wtf_fields.HiddenField):
     """
     Regular :class:`wtforms.fields.HiddenField`, that transform empty string to `None`.
@@ -423,15 +482,6 @@ class MongoURLField(EmptyStringIsNoneMixin, wtf_fields.URLField):
     """
 
     pass
-
-
-class MongoFloatField(wtf_fields.FloatField):
-    """
-    Regular :class:`wtforms.fields.FloatField`, with widget replaced to
-    :class:`wtforms.widgets.NumberInput`.
-    """
-
-    widget = wtf_widgets.NumberInput(step="any")
 
 
 class MongoDictField(MongoTextAreaField):
