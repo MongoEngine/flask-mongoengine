@@ -25,9 +25,6 @@ class StringsDemoModel(db.Document):
     url_field = db.URLField()
 
 
-StringsDemoForm = StringsDemoModel.to_wtf_form()
-
-
 def strings_demo_view(pk=None):
     """Return all fields demonstration."""
     from example_app.views import demo_view

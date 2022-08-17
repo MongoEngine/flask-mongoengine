@@ -305,20 +305,7 @@ class BinaryField(WtfFieldMixin, fields.BinaryField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
-    DEFAULT_WTF_FIELD = custom_fields.BinaryField if custom_fields else None
-
-    def to_wtf_field(
-        self,
-        *,
-        model: Optional[Type] = None,
-        field_kwargs: Optional[dict] = None,
-    ):
-        """
-        Protection from execution of :func:`to_wtf_field` in form generation.
-
-        :raises NotImplementedError: Field converter to WTForm Field not implemented.
-        """
-        raise NotImplementedError("Field converter to WTForm Field not implemented.")
+    DEFAULT_WTF_FIELD = custom_fields.MongoBinaryField if custom_fields else None
 
 
 class BooleanField(WtfFieldMixin, fields.BooleanField):
@@ -590,20 +577,7 @@ class FileField(WtfFieldMixin, fields.FileField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
-    DEFAULT_WTF_FIELD = wtf_fields.FileField if wtf_fields else None
-
-    def to_wtf_field(
-        self,
-        *,
-        model: Optional[Type] = None,
-        field_kwargs: Optional[dict] = None,
-    ):
-        """
-        Protection from execution of :func:`to_wtf_field` in form generation.
-
-        :raises NotImplementedError: Field converter to WTForm Field not implemented.
-        """
-        raise NotImplementedError("Field converter to WTForm Field not implemented.")
+    DEFAULT_WTF_FIELD = custom_fields.MongoFileField if custom_fields else None
 
 
 class FloatField(WtfFieldMixin, fields.FloatField):
@@ -751,18 +725,15 @@ class ImageField(WtfFieldMixin, fields.ImageField):
     All arguments should be passed as keyword arguments, to exclude unexpected behaviour.
     """
 
-    def to_wtf_field(
-        self,
-        *,
-        model: Optional[Type] = None,
-        field_kwargs: Optional[dict] = None,
-    ):
-        """
-        Protection from execution of :func:`to_wtf_field` in form generation.
+    DEFAULT_WTF_FIELD = custom_fields.MongoImageField if custom_fields else None
 
-        :raises NotImplementedError: Field converter to WTForm Field not implemented.
-        """
-        raise NotImplementedError("Field converter to WTForm Field not implemented.")
+    @property
+    @wtf_required
+    def wtf_generated_options(self) -> dict:
+        """Inserts accepted type in widget rendering (does not do validation)."""
+        options = super().wtf_generated_options
+        options["render_kw"] = {"accept": "image/*"}
+        return options
 
 
 class IntField(WtfFieldMixin, fields.IntField):
