@@ -436,6 +436,12 @@ class MongoHiddenField(EmptyStringIsNoneMixin, wtf_fields.HiddenField):
     pass
 
 
+class MongoImageField(MongoFileField):
+    """GridFS image field."""
+
+    widget = mongo_widgets.MongoImageInput()
+
+
 class MongoPasswordField(EmptyStringIsNoneMixin, wtf_fields.PasswordField):
     """
     Regular :class:`wtforms.fields.PasswordField`, that transform empty string to `None`.

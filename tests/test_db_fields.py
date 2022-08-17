@@ -158,7 +158,6 @@ class TestWtfFieldMixin:
             db_fields.GenericReferenceField,
             db_fields.GeoJsonBaseField,
             db_fields.GeoPointField,
-            db_fields.ImageField,
             db_fields.LazyReferenceField,
             db_fields.LineStringField,
             db_fields.ListField,
