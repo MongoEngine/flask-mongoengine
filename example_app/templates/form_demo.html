@@ -30,7 +30,7 @@
     {{ render_navigation(page, view) }}
   </div>
   <div>
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
       {% for field in form %}
         {{ render_field(field, style='font-weight: bold') }}
       {% endfor %}

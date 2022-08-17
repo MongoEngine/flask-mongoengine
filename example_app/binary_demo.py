@@ -9,6 +9,7 @@ class BinaryDemoModel(db.Document):
     string_field = db.StringField()
     binary_field = db.BinaryField()
     binary_field_with_default = db.BinaryField(default=lambda: "foobar".encode("utf-8"))
+    file_field = db.FileField()
 
 
 def binary_demo_view(pk=None):
