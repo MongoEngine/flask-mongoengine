@@ -1,10 +1,10 @@
 """Custom widgets for Mongo fields."""
 from markupsafe import Markup, escape
-from mongoengine.fields import GridFSProxy
-from wtforms.widgets import html_params
+from mongoengine.fields import GridFSProxy, ImageGridFsProxy
+from wtforms.widgets.core import FileInput
 
 
-class MongoFileInput(object):
+class MongoFileInput(FileInput):
     """Renders a file input field with delete option."""
 
     template = """
@@ -14,21 +14,27 @@ class MongoFileInput(object):
         </div>
         """
 
-    def __call__(self, field, **kwargs):
-        kwargs.setdefault("id", field.id)
+    def _is_supported_file(self, field) -> bool:
+        """Checks type of file input."""
+        return field.data and isinstance(field.data, GridFSProxy)
+
+    def __call__(self, field, **kwargs) -> Markup:
         placeholder = ""
-        if field.data and isinstance(field.data, GridFSProxy):
-            data = field.data
+
+        if self._is_supported_file(field):
             placeholder = self.template % {
-                "name": escape(data.name),
-                "content_type": escape(data.content_type),
-                "size": data.length // 1024,
+                "name": escape(field.data.name),
+                "content_type": escape(field.data.content_type),
+                "size": field.data.length // 1024,
                 "marker": f"_{field.name}_delete",
             }
 
-        return Markup(
-            (
-                "%s<input %s>"
-                % (placeholder, html_params(name=field.name, type="file", **kwargs))
-            )
-        )
+        return Markup(placeholder) + super().__call__(field, **kwargs)
+
+
+class MongoImageInput(MongoFileInput):
+    """Renders an image input field with delete option."""
+
+    def _is_supported_file(self, field) -> bool:
+        """Checks type of file input."""
+        return field.data and isinstance(field.data, ImageGridFsProxy)
