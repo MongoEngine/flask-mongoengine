@@ -108,7 +108,7 @@ allowing `None` values, i.e. {attr}`null=True`, then, when nothing selected in
 dropdown, the field will be created with `None` value.
 
 ```{important}
-It is responsobility of developer, to correctly setup database field definition and
+It is responsibility of developer, to correctly setup database field definition and
 make proper tests before own application release. BooleanField can create unexpected
 application behavior in if checks. Developer, should recheck all if checks like:
 
@@ -447,7 +447,7 @@ any form+database behaviour.
 
 #### DictField with default empty dict value
 
-Will place `{}` to form for existing/new fields. This value is hardcodded in parent
+Will place `{}` to form for existing/new fields. This value is hardcoded in parent
 MongoEngine project.
 
 ```python

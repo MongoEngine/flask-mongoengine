@@ -151,7 +151,7 @@ Rendered documentation will be available under: <http://localhost:9812/>
 - Avoid mocking of external libraries; Mocking allowed only in tests.
 - Avoid complex structures, for complex classes/methods/functions try to separate to
   little objects, to simplify code reuse and testing.
-- Avoid code duplications, try to exctract duplicate code to function. (Code
+- Avoid code duplications, try to extract duplicate code to function. (Code
   duplication in tests is allowed.)
 - Write docstrings for new classes and methods.
 - Write tests and make sure they pass.
@@ -159,7 +159,7 @@ Rendered documentation will be available under: <http://localhost:9812/>
 
 ### Code style guide
 
-- Docstrings are using RST format. Developer encouraged to include any signigicant
+- Docstrings are using RST format. Developer encouraged to include any significant
   information to docstrings.
 - Developers are encouraged to include typing information in functions signatures.
 - Developers should avoid including typing information to docstrings, if possible.
