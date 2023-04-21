@@ -1,32 +1,31 @@
 # WTForms integration
 
 ```{important}
-Documentation below is related to project version 2.0.0 or higher, old versions has
-completely different approach for forms generation.
+The documentation below describes flask-mongoengine version 2.0.0 or higher.
+Older versions use a completely different approach for forms generation.
 
-And despite the fact that the old code is included in version 2.0.0 to keep correct
-deprecation workflow (where possible), it is not documented (and was not) and not
-maintained.
+Although version 2.0.0 has (where possible) retained older behaviours for
+backward compatibility and to ease migration, these are not, and never were, documented
+and are no longer maintained.
 
-If you faced any forms problems, consider migration to new methods and approach.
+Please therefore consider migration to the new approach described below at an early date.
 ```
 
-Flask-Mongoengine and Flask-WTF/WTForms are heavily integrated, to reduce amount of
-boilerplate code, required to make database model and online form. In the same time
-a lot of options was created to keep extreme flexibility.
+Flask-Mongoengine and Flask-WTF/WTForms are heavily integrated
+to reduce the amount of boilerplate code required to make database models
+and corresponding online forms.
+A design goal was to allow extreme flexibility in form configuration
+while making it easy to generate straightforward code for standard needs.
 
-After database model definition user does not require to repeat same code in form
-definition, instead it is possible to use integrated converter, that will do most of
-the work.
+As far as possible Flask-mongoengine uses the properties of the document model fields
+to establish each form field's validators, reducing form creation in many cases to a
+single function call.
+You can supplement or override those properties to modify the form's characteristics.
+Features applicable across multiple field types are described in [global transforms];
+additional features for individual field types are documented below.
 
-Flask-Mongoengine will transform some model's properties to Flask-WTF/WTForms
-validators, so user does not need to care about standards. For full list of
-transformations, please review [global transforms] and specific field documentation
-below.
-
-In the same time, user is able to adjust database fields definition with
-specific settings as on stage of Document model definition, as on form generation stage.
-This allows to create several forms for same model, for different circumstances.
+By providing different arguments at form creation time
+you can create multiple forms from the same Document definition.
 
 ## Requirements
 
