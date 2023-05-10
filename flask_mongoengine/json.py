@@ -78,7 +78,7 @@ def _update_json_provider(superclass):
                 (BaseDocument, QuerySet, CommandCursor, DBRef, ObjectId),
             ):
                 return _convert_mongo_objects(obj)
-            return super().default(obj)
+            return superclass.default(obj)
 
     return MongoEngineJSONProvider
 
