@@ -15,6 +15,7 @@ You can also use `WTForms <http://wtforms.simplecodes.com/>`_ as model forms for
    forms
    migration_to_v2
    custom_queryset
+   custom_json_encoder
    wtf_forms
    session_interface
    debug_toolbar
