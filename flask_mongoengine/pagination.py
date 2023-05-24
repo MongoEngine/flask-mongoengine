@@ -24,7 +24,7 @@ class Pagination(object):
                 .limit(self.per_page)
             )
             if max_depth is not None:
-                self.items.select_related(max_depth)
+                self.items = self.items.select_related(max_depth)
         else:
             start_index = (page - 1) * per_page
             end_index = page * per_page
