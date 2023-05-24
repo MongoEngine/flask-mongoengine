@@ -22,7 +22,6 @@ class Pagination(object):
             self.items = (
                 self.iterable.skip(self.per_page * (self.page - 1))
                 .limit(self.per_page)
-                .select_related()
             )
             if max_depth is not None:
                 self.items.select_related(max_depth)
