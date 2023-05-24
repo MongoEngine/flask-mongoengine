@@ -8,7 +8,7 @@ __all__ = ("Pagination", "ListFieldPagination")
 
 
 class Pagination(object):
-    def __init__(self, iterable, page, per_page):
+    def __init__(self, iterable, page, per_page, max_depth=None):
 
         if page < 1:
             abort(404)
@@ -24,6 +24,8 @@ class Pagination(object):
                 .limit(self.per_page)
                 .select_related()
             )
+            if max_depth is not None:
+                self.items.select_related(max_depth)
         else:
             start_index = (page - 1) * per_page
             end_index = page * per_page
