@@ -1,18 +1,30 @@
+import flask
 import pytest
-from werkzeug.exceptions import NotFound
 
 from flask_mongoengine import ListFieldPagination, Pagination
+from flask_mongoengine.exceptions import InvalidPage
 
 
-def test_queryset_paginator(app, todo):
+@pytest.fixture(autouse=True)
+def setup_endpoints(app, todo):
     Todo = todo
     for i in range(42):
         Todo(title=f"post: {i}").save()
 
-    with pytest.raises(NotFound):
+    @app.route("/")
+    def index():
+        page = int(flask.request.form.get("page"))
+        per_page = int(flask.request.form.get("per_page"))
+        return Pagination(iterable=Todo.objects, page=page, per_page=per_page)
+
+
+def test_queryset_paginator(app, todo):
+    Todo = todo
+
+    with pytest.raises(InvalidPage):
         Pagination(iterable=Todo.objects, page=0, per_page=10)
 
-    with pytest.raises(NotFound):
+    with pytest.raises(InvalidPage):
         Pagination(iterable=Todo.objects, page=6, per_page=10)
 
     paginator = Pagination(Todo.objects, 1, 10)
@@ -26,10 +38,10 @@ def test_queryset_paginator(app, todo):
 
 
 def test_paginate_plain_list():
-    with pytest.raises(NotFound):
+    with pytest.raises(InvalidPage):
         Pagination(iterable=range(1, 42), page=0, per_page=10)
 
-    with pytest.raises(NotFound):
+    with pytest.raises(InvalidPage):
         Pagination(iterable=range(1, 42), page=6, per_page=10)
 
     paginator = Pagination(range(1, 42), 1, 10)
@@ -68,14 +80,14 @@ def _test_paginator(paginator):
 
         if i == 1:
             assert not paginator.has_prev
-            with pytest.raises(NotFound):
+            with pytest.raises(InvalidPage):
                 paginator.prev()
         else:
             assert paginator.has_prev
 
         if i == 5:
             assert not paginator.has_next
-            with pytest.raises(NotFound):
+            with pytest.raises(InvalidPage):
                 paginator.next()
         else:
             assert paginator.has_next
@@ -90,3 +102,16 @@ def _test_paginator(paginator):
         # Paginate to the next page
         if i < 5:
             paginator = paginator.next()
+
+
+def test_flask_pagination(app, todo):
+    client = app.test_client()
+    response = client.get(f"/", data={"page": 0, "per_page": 10})
+    print(response.status_code)
+    assert response.status_code == 404
+    assert "Invalid page number" in response.text
+
+    response = client.get(f"/", data={"page": 6, "per_page": 10})
+    print(response.status_code)
+    assert response.status_code == 404
+    assert "Invalid page number" in response.text
