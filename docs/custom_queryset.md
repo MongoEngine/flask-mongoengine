@@ -6,7 +6,8 @@ flask-mongoengine attaches the following methods to Mongoengine's default QueryS
   Optional arguments: *message* - custom message to display.
 * **first_or_404**: same as above, except for .first().
   Optional arguments: *message* - custom message to display.
-* **paginate**: paginates the QuerySet. Takes two arguments, *page* and *per_page*.
+* **paginate**: paginates the QuerySet. Takes two required arguments, *page* and *per_page*.
+   And one optional arguments *max_depth*.
 * **paginate_field**: paginates a field from one document in the QuerySet.
   Arguments: *field_name*, *doc_id*, *page*, *per_page*.
 

@@ -1,15 +1,22 @@
 """Module responsible for custom pagination."""
 import math
+
 from flask import abort
-
 from mongoengine.queryset import QuerySet
-
 
 __all__ = ("Pagination", "ListFieldPagination")
 
 
 class Pagination(object):
-    def __init__(self, iterable, page, per_page, max_depth=None):
+    def __init__(self, iterable, page: int, per_page: int, max_depth: int = None):
+        """
+        :param iterable: iterable object .
+        :param page: Required page number start from 1.
+        :param per_page: Required number of documents per page.
+        :param max_depth: Option for limit number of dereference documents.
+
+
+        """
 
         if page < 1:
             abort(404)
