@@ -1,6 +1,6 @@
 """Module responsible for custom pagination."""
 import math
-from flask import abort, make_response, jsonify
+from flask import abort
 
 from mongoengine.queryset import QuerySet
 
