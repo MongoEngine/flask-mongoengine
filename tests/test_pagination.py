@@ -124,8 +124,6 @@ def test_flask_pagination_next(app, todo):
     page = 1
     while has_next:
         response = client.get(f"/", data={"page": page, "per_page": 10})
-        print(response.status_code)
-        print(response.json)
         assert response.status_code == 200
         has_next = response.json['has_next']
         page += 1
