@@ -1,7 +1,7 @@
 # Custom Json Encoder
 
 flask-mongoengine have option to add custom encoder for flask
-By this way you can handel encoding special object
+By this way you can handle encoding special object
 
 Examples:
 
