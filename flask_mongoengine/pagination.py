@@ -1,9 +1,9 @@
 """Module responsible for custom pagination."""
 import math
+from flask import abort, make_response, jsonify
 
 from mongoengine.queryset import QuerySet
 
-from flask_mongoengine.exceptions import InvalidPage
 
 __all__ = ("Pagination", "ListFieldPagination")
 
@@ -12,7 +12,7 @@ class Pagination(object):
     def __init__(self, iterable, page, per_page, max_depth=None):
 
         if page < 1:
-            raise InvalidPage
+            abort(404)
 
         self.iterable = iterable
         self.page = page
@@ -32,7 +32,7 @@ class Pagination(object):
             self.total = len(iterable)
             self.items = iterable[start_index:end_index]
         if not self.items and page != 1:
-            raise InvalidPage
+            abort(404)
 
     @property
     def pages(self):
@@ -134,7 +134,7 @@ class ListFieldPagination(Pagination):
         elsewhere, but we still use array.length as a fallback.
         """
         if page < 1:
-            raise InvalidPage
+            abort(404)
 
         self.page = page
         self.per_page = per_page
@@ -154,7 +154,7 @@ class ListFieldPagination(Pagination):
         )
 
         if not self.items and page != 1:
-            raise InvalidPage
+            abort(404)
 
     def prev(self, error_out=False):
         """Returns a :class:`Pagination` object for the previous page."""
