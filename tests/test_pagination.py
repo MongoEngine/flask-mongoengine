@@ -1,14 +1,29 @@
+import flask
 import pytest
 from werkzeug.exceptions import NotFound
 
 from flask_mongoengine import ListFieldPagination, Pagination
 
 
-def test_queryset_paginator(app, todo):
+@pytest.fixture(autouse=True)
+def setup_endpoints(app, todo):
     Todo = todo
     for i in range(42):
         Todo(title=f"post: {i}").save()
 
+    @app.route("/")
+    def index():
+        page = int(flask.request.form.get("page"))
+        per_page = int(flask.request.form.get("per_page"))
+        query_set = Todo.objects().paginate(page=page, per_page=per_page)
+        return {'data': [_ for _ in query_set.items],
+                'total': query_set.total,
+                'has_next': query_set.has_next,
+                }
+
+
+def test_queryset_paginator(app, todo):
+    Todo = todo
     with pytest.raises(NotFound):
         Pagination(iterable=Todo.objects, page=0, per_page=10)
 
@@ -90,3 +105,26 @@ def _test_paginator(paginator):
         # Paginate to the next page
         if i < 5:
             paginator = paginator.next()
+
+
+
+def test_flask_pagination(app, todo):
+    client = app.test_client()
+    response = client.get(f"/", data={"page": 0, "per_page": 10})
+    print(response.status_code)
+    assert response.status_code == 404
+
+    response = client.get(f"/", data={"page": 6, "per_page": 10})
+    print(response.status_code)
+    assert response.status_code == 404
+
+
+def test_flask_pagination_next(app, todo):
+    client = app.test_client()
+    has_next = True
+    page = 1
+    while has_next:
+        response = client.get(f"/", data={"page": page, "per_page": 10})
+        assert response.status_code == 200
+        has_next = response.json['has_next']
+        page += 1
