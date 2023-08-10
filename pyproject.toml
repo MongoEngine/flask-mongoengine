@@ -3,7 +3,7 @@ name = "flask-mongoengine"
 description = "Flask extension that provides integration with MongoEngine and WTF model forms."
 readme = "README.md"
 requires-python = ">=3.7"
-license = {text = "BSD 3-Clause License"}
+license = { text = "BSD 3-Clause License" }
 classifiers = [
   "Development Status :: 4 - Beta",
   "Environment :: Web Environment",
@@ -17,6 +17,7 @@ classifiers = [
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: Implementation :: PyPy",
   "Programming Language :: Python :: Implementation :: CPython",
   "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
@@ -39,10 +40,10 @@ keywords = [
   "extension"
 ]
 authors = [
-  {name = "Ross Lawley", email = "ross.lawley@gmail.com"}
+  { name = "Ross Lawley", email = "ross.lawley@gmail.com" }
 ]
 maintainers = [
-  {name = "Andrey Shpak", email = "ashpak@ashpak.ru"}
+  { name = "Andrey Shpak", email = "ashpak@ashpak.ru" }
 ]
 dynamic = ["version"]
 
@@ -85,10 +86,10 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 zip-safe = false
 platforms = ["any"]
-packages=["flask_mongoengine", "flask_mongoengine.wtf"]
+packages = ["flask_mongoengine", "flask_mongoengine.wtf"]
 
 [tool.setuptools.dynamic]
-version = {attr = "flask_mongoengine._version.version"}
+version = { attr = "flask_mongoengine._version.version" }
 
 [tool.setuptools_scm]
 write_to = "flask_mongoengine/_version.py"
@@ -127,4 +128,4 @@ filterwarnings = [
   "ignore::ResourceWarning",
   "ignore::DeprecationWarning:flask_mongoengine",
   "ignore::DeprecationWarning:tests",
-  ]
+]
