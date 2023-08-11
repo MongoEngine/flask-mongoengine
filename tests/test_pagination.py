@@ -65,7 +65,6 @@ def _test_paginator(paginator):
     assert [1, 2, 3, 4, 5] == list(paginator.iter_pages())
 
     for i in [1, 2, 3, 4, 5]:
-
         if i == 1:
             assert not paginator.has_prev
             with pytest.raises(NotFound):

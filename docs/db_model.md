@@ -2,9 +2,9 @@
 
 ```{important}
 Flask-Mongoengine does not adjust database level behaviour of [mongoengine] fields
-definition, except [keyword only definition] requirement. Everything other on
-database level match [mongoengine] project. All parent methods, arguments (as
-keyword arguments) and keyword arguments are supported.
+definition, except [keyword only definition](#keyword-only-definition) requirement.
+Everything other on database level match [mongoengine] project. All parent methods,
+arguments (as keyword arguments) and keyword arguments are supported.
 
 If you are not intend to use WTForms integration, you are free to use fields classes
 from parent [mongoengine] project; this should not break anything.
@@ -44,4 +44,3 @@ check issue [#379] as example of one of such cases.
 [mongoengine]: https://docs.mongoengine.org/
 [#379]: https://github.com/MongoEngine/flask-mongoengine/issues/379
 [integration]: forms
-[keyword only definition]: #keyword-only-definition

@@ -105,6 +105,4 @@ Flask-MongoEngine is distributed under [BSD 3-Clause License].
 
 [Contribution guidelines]: CONTRIBUTING.md
 
-[nox]: https://nox.thea.codes/en/stable/usage.html
-
 [complete connection settings description]: http://docs.mongoengine.org/projects/flask-mongoengine/flask_config.html

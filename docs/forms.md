@@ -30,7 +30,7 @@ This allows to create several forms for same model, for different circumstances.
 
 ## Requirements
 
-For correct integration behavior several requirements should be met:
+For correct [integration] behavior several requirements should be met:
 
 - Document classes should be used from Flask-Mongoengine
   {class}`flask_mongoengine.MongoEngine` class, or from
@@ -41,7 +41,7 @@ For correct integration behavior several requirements should be met:
 
 ## Global transforms
 
-For all fields, processed by Flask-Mongoengine integration:
+For all fields, processed by Flask-Mongoengine [integration]:
 
 - If model field definition have {attr}`wtf_validators` defined, they will be
   forwarded to WTForm as {attr}`validators`. This is not protection from
@@ -1037,8 +1037,6 @@ Not yet documented. Please help us with new pull request.
 Not yet documented. Please help us with new pull request.
 
 [mongoengine]: https://docs.mongoengine.org/
-
-[#379]: https://github.com/MongoEngine/flask-mongoengine/issues/379
 
 [integration]: forms
 

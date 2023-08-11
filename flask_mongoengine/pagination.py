@@ -9,7 +9,6 @@ __all__ = ("Pagination", "ListFieldPagination")
 
 class Pagination(object):
     def __init__(self, iterable, page, per_page):
-
         if page < 1:
             abort(404)
 

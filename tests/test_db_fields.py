@@ -70,7 +70,6 @@ class TestWtfFormMixin:
     def test__get_fields_names__hold_correct_fields_ordering_for_only(
         self, TempDocument
     ):
-
         field_names = TempDocument._get_fields_names(
             only=["field_five", "field_one"], exclude=None
         )

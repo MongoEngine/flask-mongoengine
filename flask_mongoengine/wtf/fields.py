@@ -144,7 +144,6 @@ class QuerySetSelectMultipleField(QuerySetSelectField):
         blank_text="---",
         **kwargs,
     ):
-
         super(QuerySetSelectMultipleField, self).__init__(
             label, validators, queryset, label_attr, allow_blank, blank_text, **kwargs
         )

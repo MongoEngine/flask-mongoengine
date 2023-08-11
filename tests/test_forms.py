@@ -15,7 +15,6 @@ wtforms = pytest.importorskip("wtforms")
 
 
 def test_binaryfield(app, db):
-
     with app.test_request_context("/"):
 
         class Binary(db.Document):
@@ -28,9 +27,7 @@ def test_binaryfield(app, db):
 
 
 def test_choices_coerce(app, db):
-
     with app.test_request_context("/"):
-
         CHOICES = ((1, "blue"), (2, "red"))
 
         class MyChoices(db.Document):
@@ -44,9 +41,7 @@ def test_choices_coerce(app, db):
 
 
 def test_list_choices_coerce(app, db):
-
     with app.test_request_context("/"):
-
         CHOICES = ((1, "blue"), (2, "red"))
 
         class MyChoices(db.Document):
@@ -60,7 +55,6 @@ def test_list_choices_coerce(app, db):
 
 
 def test_emailfield(app, db):
-
     with app.test_request_context("/"):
 
         class Email(db.Document):
@@ -343,7 +337,6 @@ def test_modelselectfield_multiple_initalvalue_None(app, db):
 
 def test_modelradiofield(app, db):
     with app.test_request_context("/"):
-
         choices = [("male", "Male"), ("female", "Female"), ("other", "Other")]
 
         class Poll(db.Document):
@@ -383,7 +376,6 @@ def test_passwordfield(app, db):
 
 
 def test_unique_with(app, db):
-
     with app.test_request_context("/"):
 
         class Item(db.Document):
