@@ -20,7 +20,7 @@ jobs:
         mongodb-version: [5.0]
         include:
           - name: "coverage"
-            python: "3.10"
+            python: "3.11"
 
     steps:
     - uses: actions/checkout@v3
@@ -33,7 +33,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install nox virtualenv
     - name: Start MongoDB
-      uses: supercharge/mongodb-github-action@1.7.0
+      uses: supercharge/mongodb-github-action@v1.10.0
       with:
         mongodb-version: ${{ matrix.mongodb-version }}
     - name: Test build
@@ -43,7 +43,7 @@ jobs:
       with:
         file: ./coverage.xml
     - name: Send coverage report to codeclimate
-      uses: paambaati/codeclimate-action@v3.0.0
+      uses: paambaati/codeclimate-action@v5.0.0
       continue-on-error: true
       with:
         coverageCommand: echo "Ignore rerun"

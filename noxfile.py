@@ -49,7 +49,9 @@ def lint(session):
     session.run("pre-commit", "run", "-a")
 
 
-@nox.session(python=["3.7", "3.8", "3.9", "3.10", "pypy3.7"])
+@nox.session(
+    python=["3.7", "3.8", "3.9", "3.10", "3.11", "pypy3.7", "pypy3.8", "pypy3.9"]
+)
 @nox.parametrize("flask", ["==1.1.4", "==2.0.3", ">=2.1.2"])
 @nox.parametrize("mongoengine", ["==0.21.0", "==0.22.1", "==0.23.1", ">=0.24.1"])
 @nox.parametrize("toolbar", [True, False])
@@ -78,7 +80,9 @@ def _run_in_docker(session):
         session.run_always("docker", "rm", "-fv", "nox_docker_test", external=True)
 
 
-@nox.session(python=["3.7", "3.8", "3.9", "3.10", "pypy3.7"])
+@nox.session(
+    python=["3.7", "3.8", "3.9", "3.10", "3.11", "pypy3.7", "pypy3.8", "pypy3.9"]
+)
 @nox.parametrize("flask", ["==1.1.4", "==2.0.3", ">=2.1.2"])
 @nox.parametrize("mongoengine", ["==0.21.0", "==0.22.1", "==0.23.1", ">=0.24.1"])
 @nox.parametrize("toolbar", [True, False])
@@ -89,12 +93,14 @@ def full_tests(session, flask, mongoengine, toolbar, wtf):
     _run_in_docker(session)
 
 
-@nox.session(python=["3.7", "3.8", "3.9", "3.10", "pypy3.7"])
+@nox.session(
+    python=["3.7", "3.8", "3.9", "3.10", "3.11", "pypy3.7", "pypy3.8", "pypy3.9"]
+)
 @nox.parametrize("toolbar", [True, False])
 @nox.parametrize("wtf", [True, False])
 def latest(session, toolbar, wtf):
     """Run minimum tests for checking minimum code quality."""
-    flask = ">=2.1.2"
+    flask = "==2.1.3"
     mongoengine = ">=0.24.1"
     session = base_install(session, flask, mongoengine, toolbar, wtf)
     if session.interactive:
@@ -103,13 +109,13 @@ def latest(session, toolbar, wtf):
         session.run("pytest", *session.posargs)
 
 
-@nox.session(python="3.10")
+@nox.session(python="3.11")
 def documentation_tests(session):
     """Run documentation tests."""
     return docs(session, batch_run=True)
 
 
-@nox.session(python="3.10")
+@nox.session(python="3.11")
 def docs(session, batch_run: bool = False):
     """Build the documentation or serve documentation interactively."""
     shutil.rmtree(Path("docs").joinpath("_build"), ignore_errors=True)
