@@ -126,6 +126,7 @@ testpaths = ["tests"]
 filterwarnings = [
   "error",
   "ignore::ResourceWarning",
+  "ignore::DeprecationWarning",
   "ignore::DeprecationWarning:flask_mongoengine",
   "ignore::DeprecationWarning:tests",
 ]
