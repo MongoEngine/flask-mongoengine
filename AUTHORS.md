@@ -7,6 +7,7 @@
 This project is made by incredible authors:
 
 - Adam Chainz
+- Ahmet Elgun
 - aliaksandr.askerka
 - Alistair Roche
 - Almog Cohen

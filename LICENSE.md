@@ -1,6 +1,6 @@
 # BSD 3-Clause License
 
-Copyright (c) 2010-2022, the respective contributors, as shown by
+Copyright (c) 2010-2023, the respective contributors, as shown by
 the [AUTHORS.md](AUTHORS.md) file.
 
 Redistribution and use in source and binary forms, with or without

@@ -21,3 +21,4 @@ venv/
 htmlcov/
 coverage.xml
 _version.py
+.python-version
