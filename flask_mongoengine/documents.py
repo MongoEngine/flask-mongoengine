@@ -8,7 +8,7 @@ from mongoengine.errors import DoesNotExist
 from mongoengine.queryset import QuerySet
 
 from flask_mongoengine.decorators import wtf_required
-from flask_mongoengine.pagination import ListFieldPagination, Pagination
+from flask_mongoengine.pagination import ListFieldPagination, Pagination, KeysetPagination
 
 try:
     from flask_mongoengine.wtf.models import ModelForm
@@ -59,6 +59,13 @@ class BaseQuerySet(QuerySet):
         and return docs for a given page.
         """
         return Pagination(self, page, per_page)
+
+    def paginate_by_keyset(self, per_page, field_filter_by, last_field_value):
+        """
+        Paginate the QuerySet with a certain number of docs per page
+        and return docs for a given page.
+        """
+        return KeysetPagination(self, per_page, field_filter_by, last_field_value)
 
     def paginate_field(self, field_name, doc_id, page, per_page, total=None):
         """
