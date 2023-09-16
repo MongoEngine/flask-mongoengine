@@ -84,6 +84,5 @@ class KeysetPagination(Pagination):
     def __next__(self):
         if getattr(self, 'first_page_read', False):
             return self.next()
-        else:
-            self.first_page_read = True
-            return self
+        self.first_page_read = True
+        return self
