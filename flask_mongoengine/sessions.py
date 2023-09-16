@@ -1,9 +1,12 @@
 import uuid
 from datetime import datetime, timedelta
+import logging
 
 from bson.tz_util import utc
 from flask.sessions import SessionInterface, SessionMixin
 from werkzeug.datastructures import CallbackDict
+
+logger = logging.getLogger("flask_mongoengine")
 
 __all__ = ("MongoEngineSession", "MongoEngineSessionInterface")
 
@@ -28,6 +31,11 @@ class MongoEngineSessionInterface(SessionInterface):
         :param db: The app's db eg: MongoEngine()
         :param collection: The session collection name defaults to "session"
         """
+
+        logger.warning('Session management by flask-mongoengine soon to be deprecat.'
+                       'We recommended to migrate to flask-session.'
+                       'for migration guid follow this instruction: '
+                       'http://docs.mongoengine.org/projects/flask-mongoengine/en/latest/session_interface.html')
 
         if not isinstance(collection, str):
             raise ValueError("Collection argument should be string")
