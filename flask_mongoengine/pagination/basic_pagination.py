@@ -22,7 +22,9 @@ class Pagination(object):
 
         if isinstance(self.iterable, QuerySet):
             self.total = iterable.count()
-            self.items = self.iterable.skip(self.per_page * (self.page - 1)).limit(self.per_page)
+            self.items = self.iterable.skip(self.per_page * (self.page - 1)).limit(
+                self.per_page
+            )
             if max_depth is not None:
                 self.items = self.items.select_related(max_depth)
         else:

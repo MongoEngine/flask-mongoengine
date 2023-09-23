@@ -1,6 +1,7 @@
 """Module responsible for custom pagination."""
 
 from flask import abort
+
 from flask_mongoengine.pagination.basic_pagination import Pagination
 
 

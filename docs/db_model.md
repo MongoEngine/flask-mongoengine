@@ -44,4 +44,3 @@ check issue [#379] as example of one of such cases.
 [mongoengine]: https://docs.mongoengine.org/
 [#379]: https://github.com/MongoEngine/flask-mongoengine/issues/379
 [integration]: forms
-[keyword only definition]: #keyword-only-definition

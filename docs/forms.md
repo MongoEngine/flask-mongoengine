@@ -1038,10 +1038,6 @@ Not yet documented. Please help us with new pull request.
 
 [mongoengine]: https://docs.mongoengine.org/
 
-[#379]: https://github.com/MongoEngine/flask-mongoengine/issues/379
-
-[integration]: forms
-
 [global transforms]: #global-transforms
 
 [stringfield]: #stringfield

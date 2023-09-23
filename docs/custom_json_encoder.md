@@ -3,7 +3,6 @@
 flask-mongoengine have option to add custom encoder for flask
 By this way you can handle encoding special object
 
-
 Examples:
 
 ```python

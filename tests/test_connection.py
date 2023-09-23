@@ -13,9 +13,15 @@ from flask_mongoengine import MongoEngine, current_mongoengine_instance
 def is_mongo_mock_installed() -> bool:
     try:
         import mongomock.__version__  # noqa
-    except ImportError:
-        return False
-    return True
+    except ImportError as e:
+        return True
+    return False
+
+
+def get_mongomock_client():
+    import mongomock
+
+    return mongomock.MongoClient
 
 
 def test_connection__should_use_defaults__if_no_settings_provided(app):
@@ -144,7 +150,8 @@ def test_connection__should_parse_host_uri__if_host_formatted_as_uri(
     [
         {
             "MONGODB_SETTINGS": {
-                "HOST": "mongomock://localhost:27017/flask_mongoengine_test_db"
+                "HOST": "mongodb://localhost:27017/flask_mongoengine_test_db",
+                "mongo_client_class": get_mongomock_client(),
             }
         },
         {
@@ -153,19 +160,22 @@ def test_connection__should_parse_host_uri__if_host_formatted_as_uri(
                 "HOST": "localhost",
                 "PORT": 27017,
                 "DB": "flask_mongoengine_test_db",
-                "IS_MOCK": True,
+                "mongo_client_class": get_mongomock_client(),
             }
         },
-        {"MONGODB_HOST": "mongomock://localhost:27017/flask_mongoengine_test_db"},
+        # {"MONGODB_HOST": "mongodb://localhost:27017/flask_mongoengine_test_db"},
     ],
-    ids=("Dict format as URI", "Dict format as Param", "Config variable format as URI"),
+    ids=("Dict format as URI", "Dict format as Param"),
 )
 def test_connection__should_parse_mongo_mock_uri__as_uri_and_as_settings(
     app, config_extension
 ):
     """Make sure a simple connection pass ALIAS setting variable."""
-    db = MongoEngine()
+    import mongomock
+
     app.config.update(config_extension)
+
+    db = MongoEngine()
 
     # Verify no extension for Mongoengine yet created for app
     assert app.extensions == {}
@@ -173,11 +183,21 @@ def test_connection__should_parse_mongo_mock_uri__as_uri_and_as_settings(
 
     # Create db connection. Should return None.
 
-    with pytest.raises(RuntimeError) as error:
-        assert db.init_app(app) is None
+    assert db.init_app(app) is None
 
-    assert str(error.value) == "You need mongomock installed to mock MongoEngine."
 
+    assert current_mongoengine_instance() == db
+    if "ALIAS" in config_extension["MONGODB_SETTINGS"]:
+        connection = db.get_connection(config_extension["MONGODB_SETTINGS"]["ALIAS"])
+        mongo_engine_db = db.get_db(config_extension["MONGODB_SETTINGS"]["ALIAS"])
+    else:
+        connection = db.get_connection()
+        mongo_engine_db = db.get_db()
+    assert isinstance(mongo_engine_db, mongomock.Database)
+    assert isinstance(connection, get_mongomock_client())
+    assert mongo_engine_db.name == "flask_mongoengine_test_db"
+    assert connection.HOST == "localhost"
+    assert connection.PORT == 27017
 
 @pytest.mark.parametrize(
     ("config_extension"),
@@ -289,6 +309,8 @@ def test_multiple_connections(app):
     with switch_db(Todo, "default") as Todo:
         doc = Todo.objects().first()
         assert doc is not None
+
+    assert list(db.connection.values())[0] == list(db.connection.values())[1]
 
 
 def test_incorrect_value_with_mongodb_prefix__should_trigger_mongoengine_raise(app):

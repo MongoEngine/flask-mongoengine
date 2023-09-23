@@ -8,7 +8,11 @@ from mongoengine.errors import DoesNotExist
 from mongoengine.queryset import QuerySet
 
 from flask_mongoengine.decorators import wtf_required
-from flask_mongoengine.pagination import ListFieldPagination, Pagination, KeysetPagination
+from flask_mongoengine.pagination import (
+    KeysetPagination,
+    ListFieldPagination,
+    Pagination,
+)
 
 try:
     from flask_mongoengine.wtf.models import ModelForm

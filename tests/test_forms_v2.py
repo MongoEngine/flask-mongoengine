@@ -1,5 +1,6 @@
 """Integration tests for new WTForms generation in Flask-Mongoengine 2.0."""
 import json
+from enum import Enum
 
 import pytest
 from bson.json_util import RELAXED_JSON_OPTIONS
@@ -57,6 +58,10 @@ def test__full_document_form__does_not_create_any_unexpected_data_in_database(db
     http://docs.mongoengine.org/projects/flask-mongoengine/en/latest/migration_to_v2.html#empty-fields-are-not-created-in-database
     """
 
+    class NumberEnum(Enum):
+        one = 1
+        two = 2
+
     class Todo(db.Document):
         """Test model for AllFieldsModel."""
 
@@ -92,7 +97,7 @@ def test__full_document_form__does_not_create_any_unexpected_data_in_database(db
         embedded_document_list_field = db.EmbeddedDocumentListField(
             document_type=Embedded
         )
-        enum_field = db.EnumField(enum=[1, 2])
+        enum_field = db.EnumField(enum=NumberEnum)
         generic_embedded_document_field = db.GenericEmbeddedDocumentField()
         generic_lazy_reference_field = db.GenericLazyReferenceField()
         geo_json_base_field = db.GeoJsonBaseField()

@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.3.0
+    rev: v4.4.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -24,23 +24,23 @@ repos:
         args: [--remove]
       - id: mixed-line-ending
   - repo: https://github.com/psf/black
-    rev: 22.6.0
+    rev: 23.9.1
     hooks:
       - id: black
-        language_version: python3.7
+        language_version: python3.10
         exclude: ^docs/
-  - repo: https://gitlab.com/pycqa/flake8
-    rev: 4.0.1
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.1.0
     hooks:
       - id: flake8
         exclude: ^docs/|^examples/
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.31.1
+    rev: v0.37.0
     hooks:
       - id: markdownlint
         args: [-f]
         exclude: ^(.github|tests)
   - repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
+    rev: 5.12.0
     hooks:
       - id: isort

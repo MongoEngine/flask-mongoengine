@@ -104,7 +104,7 @@ app = flask.Flask("example_app")
 db.init_app(app, config=db_config)
 ```
 
-## Deprecated: MONGODB_ inside MONGODB_SETTINGS dictionary
+## Deprecated: MONGODB_inside MONGODB_SETTINGS dictionary
 
 ```{eval-rst}
 .. deprecated:: 2.0.0

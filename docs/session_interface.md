@@ -3,6 +3,7 @@
 ```{warning}
 Soon to be deprecated
 ```
+
 To use MongoEngine as your session store simple configure the session interface:
 
 ```python
@@ -13,13 +14,11 @@ db = MongoEngine(app)
 app.session_interface = MongoEngineSessionInterface(db)
 ```
 
-
 ## How to migrate to Flask-session
-
 
 ### Step 1
 
-Read at https://flask-session.readthedocs.io/en/latest/index.html
+Read at <https://flask-session.readthedocs.io/en/latest/index.html>
 How to implement
 
 ```python
@@ -38,7 +37,6 @@ Session(app)
 
 app.session_interface.cls.objects.update(rename__data='val')
 ```
-
 
 ### Step 2
 
