@@ -1,8 +1,9 @@
 import flask
 import pytest
+import copy
 from werkzeug.exceptions import NotFound
 
-from flask_mongoengine import ListFieldPagination, Pagination
+from flask_mongoengine import ListFieldPagination, Pagination, KeysetPagination
 
 
 @pytest.fixture(autouse=True)
@@ -38,6 +39,31 @@ def test_queryset_paginator(app, todo):
             Todo.objects.paginate(page=page, per_page=5).items
         ):
             assert todo.title == f"post: {(page-1) * 5 + index}"
+
+
+def test_keyset_queryset_paginator(app, todo):
+    Todo = todo
+
+    last_field_value = None
+    for page in range(1, 10):
+        p = Todo.objects.paginate_by_keyset(per_page=5, field_filter_by='id', last_field_value=last_field_value)
+        for index, todo in enumerate(p.items):
+            assert todo.title == f"post: {(page-1) * 5 + index}"
+        last_field_value = list(p.items)[-1].pk
+
+    # Pagination
+    paginator = KeysetPagination(Todo.objects, per_page=5, field_filter_by='id')
+    for page_index, page in enumerate(paginator):
+        for index, todo in enumerate(page.items):
+            assert todo.title == f"post: {(page_index) * 5 + index}"
+
+    # Pagination with prev function
+    paginator_2 = KeysetPagination(Todo.objects, per_page=5, field_filter_by='id')
+    a = copy.deepcopy(paginator_2.next().items)
+    paginator_2.next()
+    a2 = paginator_2.prev().items
+    for index, item in enumerate(a2):
+        assert a[4-index].title == item.title
 
 
 def test_paginate_plain_list():
