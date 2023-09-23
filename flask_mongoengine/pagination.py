@@ -8,7 +8,13 @@ __all__ = ("Pagination", "ListFieldPagination")
 
 
 class Pagination(object):
-    def __init__(self, iterable, page, per_page):
+    def __init__(self, iterable, page: int, per_page: int, max_depth: int = None):
+        """
+        :param iterable: iterable object .
+        :param page: Required page number start from 1.
+        :param per_page: Required number of documents per page.
+        :param max_depth: Option for limit number of dereference documents.
+        """
 
         if page < 1:
             abort(404)
@@ -19,11 +25,9 @@ class Pagination(object):
 
         if isinstance(self.iterable, QuerySet):
             self.total = iterable.count()
-            self.items = (
-                self.iterable.skip(self.per_page * (self.page - 1))
-                .limit(self.per_page)
-                .select_related()
-            )
+            self.items = self.iterable.skip(self.per_page * (self.page - 1)).limit(self.per_page)
+            if max_depth is not None:
+                self.items = self.items.select_related(max_depth)
         else:
             start_index = (page - 1) * per_page
             end_index = page * per_page
