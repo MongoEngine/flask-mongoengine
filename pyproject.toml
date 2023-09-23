@@ -58,6 +58,7 @@ dev = [
   "nox",
   "Pillow>=7.0.0",
   "blinker",
+  "mongomock",
 ]
 legacy = ["MarkupSafe==2.0.1"]
 legacy-dev = [
