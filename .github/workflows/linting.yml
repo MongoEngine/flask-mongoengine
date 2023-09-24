@@ -19,7 +19,7 @@ jobs:
       matrix:
         include:
           - name: "linting"
-            python: "3.7"
+            python: "3.10"
 
     steps:
     - uses: actions/checkout@v3
