@@ -138,11 +138,11 @@ def _test_paginator(paginator):
 
 def test_flask_pagination(app, todo):
     client = app.test_client()
-    response = client.get(f"/", data={"page": 0, "per_page": 10})
+    response = client.get("/", data={"page": 0, "per_page": 10})
     print(response.status_code)
     assert response.status_code == 404
 
-    response = client.get(f"/", data={"page": 6, "per_page": 10})
+    response = client.get("/", data={"page": 6, "per_page": 10})
     print(response.status_code)
     assert response.status_code == 404
 
@@ -152,7 +152,7 @@ def test_flask_pagination_next(app, todo):
     has_next = True
     page = 1
     while has_next:
-        response = client.get(f"/", data={"page": page, "per_page": 10})
+        response = client.get("/", data={"page": page, "per_page": 10})
         assert response.status_code == 200
         has_next = response.json["has_next"]
         page += 1

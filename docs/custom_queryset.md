@@ -8,7 +8,8 @@ flask-mongoengine attaches the following methods to Mongoengine's default QueryS
   Optional arguments: *message* - custom message to display.
 * **paginate**: paginates the QuerySet. Takes two required arguments, *page* and *per_page*.
    And one optional arguments *max_depth*.
-* **paginate_by_keyset**: paginates the QuerySet. Takes two required arguments, *per_page* and *field_filter_by*.
+* **paginate_by_keyset**: paginates the QuerySet. Takes two required arguments,
+  *per_page* and *field_filter_by*.
   from the second page you need also the last id of the previous page.
   Arguments: *per_page*, *field_filter_by*, *last_field_value*.
 * **paginate_field**: paginates a field from one document in the QuerySet.

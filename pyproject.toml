@@ -47,7 +47,10 @@ maintainers = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-wtf = ["WTForms[email]>=3.0.0", "Flask-WTF>=0.14.3"]
+wtf = ["WTForms[email]>=3.0.0",
+  #  "Flask-WTF>=0.14.3",
+  "flask-wtf @ git+https://github.com/wtforms/flask-wtf.git" #TEMP
+]
 toolbar = ["Flask-DebugToolbar>=0.11.0"]
 dev = [
   "black==22.6.0",
@@ -58,7 +61,7 @@ dev = [
   "nox",
   "Pillow>=7.0.0",
   "blinker",
-  "mongomock",
+  "mongomock@git+https://github.com/idoshr/mongomock.git",  # TEMP
 ]
 legacy = ["MarkupSafe==2.0.1"]
 legacy-dev = [

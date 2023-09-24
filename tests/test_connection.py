@@ -10,10 +10,12 @@ from pymongo.read_preferences import ReadPreference
 from flask_mongoengine import MongoEngine, current_mongoengine_instance
 
 
-def is_mongo_mock_installed() -> bool:
+def is_mongo_mock_not_installed() -> bool:
     try:
         import mongomock.__version__  # noqa
-    except ImportError as e:
+    except ImportError:
+        return True
+    except DeprecationWarning:
         return True
     return False
 
@@ -143,7 +145,7 @@ def test_connection__should_parse_host_uri__if_host_formatted_as_uri(
 
 
 @pytest.mark.skipif(
-    is_mongo_mock_installed(), reason="This test require mongomock not exist"
+    is_mongo_mock_not_installed(), reason="This test require mongomock not exist"
 )
 @pytest.mark.parametrize(
     ("config_extension"),
@@ -185,7 +187,6 @@ def test_connection__should_parse_mongo_mock_uri__as_uri_and_as_settings(
 
     assert db.init_app(app) is None
 
-
     assert current_mongoengine_instance() == db
     if "ALIAS" in config_extension["MONGODB_SETTINGS"]:
         connection = db.get_connection(config_extension["MONGODB_SETTINGS"]["ALIAS"])
@@ -198,6 +199,7 @@ def test_connection__should_parse_mongo_mock_uri__as_uri_and_as_settings(
     assert mongo_engine_db.name == "flask_mongoengine_test_db"
     assert connection.HOST == "localhost"
     assert connection.PORT == 27017
+
 
 @pytest.mark.parametrize(
     ("config_extension"),
