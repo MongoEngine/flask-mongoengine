@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mongodb-version: [5.0]
+        mongodb-version: [6.0]
         include:
           - name: "coverage"
             python: "3.10"
@@ -37,7 +37,7 @@ jobs:
       with:
         mongodb-version: ${{ matrix.mongodb-version }}
     - name: Test build
-      run: "nox -s 'latest-${{ matrix.python }}(wtf=True, toolbar=True)' -- --cov-report=xml --cov-report=html"
+      run: "nox -s \"latest-${{ matrix.python }}(db_version='6.0', wtf=True, toolbar=True)\" -- --cov-report=xml --cov-report=html"
     - name: Send coverage report to codecov
       uses: codecov/codecov-action@v3
       with:
