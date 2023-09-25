@@ -22,8 +22,12 @@ def is_mongo_mock_not_installed() -> bool:
 
 def get_mongomock_client():
     import mongomock
-
     return mongomock.MongoClient
+
+
+def is_mongoengine_version_greater_than(major, minor, patch):
+    v = tuple(mongoengine.__version__.split('.'))
+    return int(v[0]) >= major and int(v[1]) >= minor and int(v[2]) >= patch
 
 
 def test_connection__should_use_defaults__if_no_settings_provided(app):
@@ -144,35 +148,7 @@ def test_connection__should_parse_host_uri__if_host_formatted_as_uri(
     assert connection.PORT == 27017
 
 
-@pytest.mark.skipif(
-    is_mongo_mock_not_installed(), reason="This test require mongomock not exist"
-)
-@pytest.mark.parametrize(
-    ("config_extension"),
-    [
-        {
-            "MONGODB_SETTINGS": {
-                "HOST": "mongodb://localhost:27017/flask_mongoengine_test_db",
-                "mongo_client_class": get_mongomock_client(),
-            }
-        },
-        {
-            "MONGODB_SETTINGS": {
-                "ALIAS": "simple_conn",
-                "HOST": "localhost",
-                "PORT": 27017,
-                "DB": "flask_mongoengine_test_db",
-                "mongo_client_class": get_mongomock_client(),
-            }
-        },
-        # {"MONGODB_HOST": "mongodb://localhost:27017/flask_mongoengine_test_db"},
-    ],
-    ids=("Dict format as URI", "Dict format as Param"),
-)
-def test_connection__should_parse_mongo_mock_uri__as_uri_and_as_settings(
-    app, config_extension
-):
-    """Make sure a simple connection pass ALIAS setting variable."""
+def should_parse_mongo_mock_uri__as_uri_and_as_settings(app, config_extension):
     import mongomock
 
     app.config.update(config_extension)
@@ -199,6 +175,71 @@ def test_connection__should_parse_mongo_mock_uri__as_uri_and_as_settings(
     assert mongo_engine_db.name == "flask_mongoengine_test_db"
     assert connection.HOST == "localhost"
     assert connection.PORT == 27017
+
+
+@pytest.mark.skipif(
+    is_mongo_mock_not_installed() or not is_mongoengine_version_greater_than(0, 27, 0),
+    reason="This test require mongomock not exist and mongoengine version greater than 0.27.0"
+)
+@pytest.mark.parametrize(
+    ("config_extension"),
+    [
+        {
+            "MONGODB_SETTINGS": {
+                "HOST": "mongodb://localhost:27017/flask_mongoengine_test_db",
+                "mongo_client_class": get_mongomock_client(),
+            }
+        },
+        {
+            "MONGODB_SETTINGS": {
+                "ALIAS": "simple_conn",
+                "HOST": "localhost",
+                "PORT": 27017,
+                "DB": "flask_mongoengine_test_db",
+                "mongo_client_class": get_mongomock_client(),
+            }
+        },
+        # {"MONGODB_HOST": "mongodb://localhost:27017/flask_mongoengine_test_db"},
+    ],
+    ids=("Dict format as URI", "Dict format as Param"),
+)
+def test_connection__should_parse_mongo_mock_uri__as_uri_and_as_settings_new(
+    app, config_extension
+):
+    should_parse_mongo_mock_uri__as_uri_and_as_settings(app, config_extension)
+
+
+@pytest.mark.skipif(
+    is_mongo_mock_not_installed() or is_mongoengine_version_greater_than(0, 27, 0),
+    reason="This test require mongomock not exist and mongoengine version less than 0.27.0"
+
+)
+@pytest.mark.parametrize(
+    ("config_extension"),
+    [
+        {
+            "MONGODB_SETTINGS": {
+                "HOST": "mongomock://localhost:27017/flask_mongoengine_test_db"
+            }
+        },
+        {
+            "MONGODB_SETTINGS": {
+                "ALIAS": "simple_conn",
+                "HOST": "localhost",
+                "PORT": 27017,
+                "DB": "flask_mongoengine_test_db",
+                "IS_MOCK": True,
+            }
+        },
+        {"MONGODB_HOST": "mongomock://localhost:27017/flask_mongoengine_test_db"},
+    ],
+    ids=("Dict format as URI", "Dict format as Param", "Config variable format as URI"),
+)
+def test_connection__should_parse_mongo_mock_uri__as_uri_and_as_settings_old(
+    app, config_extension
+):
+    """Make sure a simple connection pass ALIAS setting variable."""
+    should_parse_mongo_mock_uri__as_uri_and_as_settings(app, config_extension)
 
 
 @pytest.mark.parametrize(

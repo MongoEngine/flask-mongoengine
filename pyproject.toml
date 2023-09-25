@@ -70,6 +70,7 @@ legacy-dev = [
   "pytest-mock",
   "Pillow>=7.0.0",
   "blinker",
+  "mongomock",
 ]
 
 [project.urls]
