@@ -22,11 +22,12 @@ def is_mongo_mock_not_installed() -> bool:
 
 def get_mongomock_client():
     import mongomock
+
     return mongomock.MongoClient
 
 
 def is_mongoengine_version_greater_than(major, minor, patch):
-    v = tuple(mongoengine.__version__.split('.'))
+    v = tuple(mongoengine.__version__.split("."))
     return int(v[0]) >= major and int(v[1]) >= minor and int(v[2]) >= patch
 
 
@@ -179,7 +180,7 @@ def should_parse_mongo_mock_uri__as_uri_and_as_settings(app, config_extension):
 
 @pytest.mark.skipif(
     is_mongo_mock_not_installed() or not is_mongoengine_version_greater_than(0, 27, 0),
-    reason="This test require mongomock not exist and mongoengine version greater than 0.27.0"
+    reason="This test require mongomock not exist and mongoengine version greater than 0.27.0",
 )
 @pytest.mark.parametrize(
     ("config_extension"),
@@ -211,8 +212,7 @@ def test_connection__should_parse_mongo_mock_uri__as_uri_and_as_settings_new(
 
 @pytest.mark.skipif(
     is_mongo_mock_not_installed() or is_mongoengine_version_greater_than(0, 27, 0),
-    reason="This test require mongomock not exist and mongoengine version less than 0.27.0"
-
+    reason="This test require mongomock not exist and mongoengine version less than 0.27.0",
 )
 @pytest.mark.parametrize(
     ("config_extension"),
