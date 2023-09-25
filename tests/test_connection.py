@@ -165,7 +165,7 @@ def should_parse_mongo_mock_uri__as_uri_and_as_settings(app, config_extension):
     assert db.init_app(app) is None
 
     assert current_mongoengine_instance() == db
-    if "ALIAS" in config_extension["MONGODB_SETTINGS"]:
+    if "ALIAS" in config_extension.get('MONGODB_SETTINGS', {}):
         connection = db.get_connection(config_extension["MONGODB_SETTINGS"]["ALIAS"])
         mongo_engine_db = db.get_db(config_extension["MONGODB_SETTINGS"]["ALIAS"])
     else:
