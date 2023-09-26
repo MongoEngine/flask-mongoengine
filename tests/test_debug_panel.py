@@ -8,6 +8,7 @@ import contextlib
 import jinja2
 import pymongo
 import pytest
+import flask
 from flask import Flask
 
 flask_debugtoolbar = pytest.importorskip("flask_debugtoolbar")
@@ -53,6 +54,7 @@ def registered_monitoring() -> MongoCommandLogger:
         monitoring._LISTENERS.command_listeners.remove(mongo_command_logger)
 
 
+@pytest.mark.skipif(flask.__version__ == "1.1.4", reason="Flask 1.1.4 is not supported")
 def test__maybe_patch_jinja_loader__replace_loader_when_initial_loader_is_not_choice_loader():
     jinja2_env = jinja2.Environment()
     assert not isinstance(jinja2_env.loader, ChoiceLoader)
@@ -60,6 +62,7 @@ def test__maybe_patch_jinja_loader__replace_loader_when_initial_loader_is_not_ch
     assert isinstance(jinja2_env.loader, ChoiceLoader)
 
 
+@pytest.mark.skipif(flask.__version__ == "1.1.4", reason="Flask 1.1.4 is not supported")
 def test__maybe_patch_jinja_loader__extend_loader_when_initial_loader_is_choice_loader():
     jinja2_env = jinja2.Environment(loader=ChoiceLoader([DictLoader({"1": "1"})]))
     assert isinstance(jinja2_env.loader, ChoiceLoader)
@@ -68,6 +71,7 @@ def test__maybe_patch_jinja_loader__extend_loader_when_initial_loader_is_choice_
     assert len(jinja2_env.loader.loaders) == 2
 
 
+@pytest.mark.skipif(flask.__version__ == "1.1.4", reason="Flask 1.1.4 is not supported")
 class TestMongoDebugPanel:
     """Trivial tests to highlight any unexpected changes in namings or code."""
 
