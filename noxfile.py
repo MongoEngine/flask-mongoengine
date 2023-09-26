@@ -31,6 +31,14 @@ def base_install(session, flask, mongoengine, toolbar, wtf):
             "-e",
             f".[{extra}legacy,legacy-dev]",
         )
+    elif flask == "==2.0.3":
+        session.install(
+            f"Flask{flask}",
+            f"mongoengine{mongoengine}",
+            f"werkzeug==2.2.3",
+            "-e",
+            f".[{extra}dev]",
+        )
     else:
         session.install(
             f"Flask{flask}",
