@@ -35,7 +35,7 @@ def base_install(session, flask, mongoengine, toolbar, wtf):
         session.install(
             f"Flask{flask}",
             f"mongoengine{mongoengine}",
-            f"werkzeug==2.2.3",
+            "werkzeug==2.2.3",
             "-e",
             f".[{extra}dev]",
         )
