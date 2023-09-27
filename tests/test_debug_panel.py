@@ -5,10 +5,10 @@ Tests for ``MongoDebugPanel`` and related mongo events listener.
 """
 import contextlib
 
+import flask
 import jinja2
 import pymongo
 import pytest
-import flask
 from flask import Flask
 
 flask_debugtoolbar = pytest.importorskip("flask_debugtoolbar")
