@@ -8,7 +8,7 @@ refactor:
     - refactoring
     - suggestion
     - comment
-  python_version: '3.7'
+  python_version: '3.10'
 
 metrics:
   quality_threshold: 25.0

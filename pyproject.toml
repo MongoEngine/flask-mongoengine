@@ -48,8 +48,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 wtf = ["WTForms[email]>=3.0.0",
-  #  "Flask-WTF>=0.14.3",
-  "flask-wtf @ git+https://github.com/wtforms/flask-wtf.git" #TEMP
+    "Flask-WTF>=0.14.3",
 ]
 toolbar = ["Flask-DebugToolbar>=0.11.0"]
 dev = [
