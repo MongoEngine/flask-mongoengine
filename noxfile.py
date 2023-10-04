@@ -57,7 +57,7 @@ def lint(session):
 
 
 @nox.session(python=["3.8", "3.9", "3.10", "3.11"])
-@nox.parametrize("flask", ["==1.1.4", "==2.0.3", ">=2.1.2"])
+@nox.parametrize("flask", ["==1.1.4", "==2.0.3", "==2.3.3", ">=3.0.0"])
 @nox.parametrize("mongoengine", ["==0.21.0", "==0.22.1", "==0.23.1", ">=0.24.1"])
 @nox.parametrize("toolbar", [True, False])
 @nox.parametrize("wtf", [True, False])
@@ -86,7 +86,7 @@ def _run_in_docker(session, db_version="5.0"):
 
 
 @nox.session(python=["3.8", "3.9", "3.10", "3.11"])
-@nox.parametrize("flask", ["==1.1.4", "==2.0.3", ">=2.1.2"])
+@nox.parametrize("flask", ["==1.1.4", "==2.0.3", "==2.3.3", ">=3.0.0"])
 @nox.parametrize("mongoengine", ["==0.21.0", "==0.22.1", "==0.23.1", ">=0.24.1"])
 @nox.parametrize("toolbar", [True, False])
 @nox.parametrize("wtf", [True, False])
@@ -103,7 +103,7 @@ def full_tests(session, flask, mongoengine, toolbar, wtf, db_version):
 @nox.parametrize("db_version", ["5.0", "6.0", "7.0"])
 def latest(session, toolbar, wtf, db_version):
     """Run minimum tests for checking minimum code quality."""
-    flask = ">=2.1.2"
+    flask = ">=3.0.0"
     mongoengine = ">=0.24.1"
     session = base_install(session, flask, mongoengine, toolbar, wtf)
     if session.interactive:
