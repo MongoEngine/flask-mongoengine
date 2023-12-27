@@ -117,7 +117,9 @@ def test_list_field_pagination(app, todo):
     _test_paginator(paginator, 1)
 
     # Check first_page_index
-    paginator = ListFieldPagination(Todo.objects, todo.id, "comments", 0, 10, first_page_index=0)
+    paginator = ListFieldPagination(
+        Todo.objects, todo.id, "comments", 0, 10, first_page_index=0
+    )
     _test_paginator(paginator, 0)
 
     # Check with providing a total (saves a query)

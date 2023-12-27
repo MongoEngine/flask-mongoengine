@@ -7,9 +7,14 @@ from flask_mongoengine.pagination.abc_pagination import ABCPagination
 
 
 class Pagination(ABCPagination):
-    def __init__(self, iterable, page: int, per_page: int, max_depth: int = None,
-                 first_page_index: int = 1
-                 ):
+    def __init__(
+        self,
+        iterable,
+        page: int,
+        per_page: int,
+        max_depth: int = None,
+        first_page_index: int = 1,
+    ):
         """
         :param iterable: iterable object .
         :param page: Required page number start from 1.
@@ -19,7 +24,7 @@ class Pagination(ABCPagination):
         """
 
         if page < first_page_index:
-            abort(404, 'Invalid page number.')
+            abort(404, "Invalid page number.")
 
         self.iterable = iterable
         self.page = page
@@ -28,9 +33,9 @@ class Pagination(ABCPagination):
 
         if isinstance(self.iterable, QuerySet):
             self.total = iterable.count()
-            self.items = self.iterable.skip(self.per_page * (self.page - self.first_page_index)).limit(
-                self.per_page
-            )
+            self.items = self.iterable.skip(
+                self.per_page * (self.page - self.first_page_index)
+            ).limit(self.per_page)
             if max_depth is not None:
                 self.items = self.items.select_related(max_depth)
         else:
@@ -38,9 +43,9 @@ class Pagination(ABCPagination):
             end_index = start_index + per_page
 
             self.total = len(iterable)
-            self.items = iterable[start_index:min(end_index, self.total)]
+            self.items = iterable[start_index : min(end_index, self.total)]
         if not self.items and page != self.first_page_index:
-            abort(404, 'Invalid page number.')
+            abort(404, "Invalid page number.")
 
     @property
     def pages(self) -> int:
@@ -56,10 +61,12 @@ class Pagination(ABCPagination):
         if isinstance(iterable, QuerySet):
             iterable._skip = None
             iterable._limit = None
-        return self.__class__(iterable,
-                              page=self.page - 1,
-                              per_page=self.per_page,
-                              first_page_index=self.first_page_index)
+        return self.__class__(
+            iterable,
+            page=self.page - 1,
+            per_page=self.per_page,
+            first_page_index=self.first_page_index,
+        )
 
     @property
     def prev_num(self) -> int:
@@ -80,10 +87,12 @@ class Pagination(ABCPagination):
         if isinstance(iterable, QuerySet):
             iterable._skip = None
             iterable._limit = None
-        return self.__class__(iterable,
-                              page=self.page + 1,
-                              per_page=self.per_page,
-                              first_page_index=self.first_page_index)
+        return self.__class__(
+            iterable,
+            page=self.page + 1,
+            per_page=self.per_page,
+            first_page_index=self.first_page_index,
+        )
 
     @property
     def has_next(self) -> bool:
@@ -100,7 +109,9 @@ class Pagination(ABCPagination):
         """Number of the next page"""
         return self.page + 1
 
-    def iter_pages(self, left_edge=2, left_current=2, right_current=5, right_edge=2):       # TODO: documentation!!!
+    def iter_pages(
+        self, left_edge=2, left_current=2, right_current=5, right_edge=2
+    ):  # TODO: documentation!!!
         """Iterates over the page numbers in the pagination.  The four
         parameters control the thresholds how many numbers should be produced
         from the sides.  Skipped page numbers are represented as `None`.

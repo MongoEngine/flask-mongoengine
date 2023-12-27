@@ -6,8 +6,16 @@ from flask_mongoengine.pagination.basic_pagination import Pagination
 
 
 class ListFieldPagination(Pagination):
-    def __init__(self, queryset, doc_id, field_name, page: int, per_page: int, total: [int | None] = None,
-                 first_page_index: int = 1):
+    def __init__(
+        self,
+        queryset,
+        doc_id,
+        field_name,
+        page: int,
+        per_page: int,
+        total: [int | None] = None,
+        first_page_index: int = 1,
+    ):
         """Allows an array within a document to be paginated.
 
         Queryset must contain the document which has the array we're
@@ -21,7 +29,7 @@ class ListFieldPagination(Pagination):
 
         """
         if page < first_page_index:
-            abort(404, 'Invalid page number.')
+            abort(404, "Invalid page number.")
 
         self.page = page
         self.per_page = per_page
@@ -42,7 +50,7 @@ class ListFieldPagination(Pagination):
         )
 
         if not self.items and page != self.first_page_index:
-            abort(404, 'Invalid page number.')
+            abort(404, "Invalid page number.")
 
     def prev(self, error_out=False):
         """Returns a :class:`Pagination` object for the previous page."""
@@ -56,7 +64,7 @@ class ListFieldPagination(Pagination):
             self.page - 1,
             self.per_page,
             self.total,
-            self.first_page_index
+            self.first_page_index,
         )
 
     def next(self, error_out=False):
