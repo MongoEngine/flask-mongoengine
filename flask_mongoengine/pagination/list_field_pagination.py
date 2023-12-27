@@ -16,6 +16,9 @@ class ListFieldPagination(Pagination):
         Page and per_page work just like in Pagination.
         Total is an argument because it can be computed more efficiently
         elsewhere, but we still use array.length as a fallback.
+
+        first_page_index is option for change first page index.
+
         """
         if page < first_page_index:
             abort(404, 'Invalid page number.')
