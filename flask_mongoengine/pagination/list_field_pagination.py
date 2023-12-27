@@ -6,7 +6,8 @@ from flask_mongoengine.pagination.basic_pagination import Pagination
 
 
 class ListFieldPagination(Pagination):
-    def __init__(self, queryset, doc_id, field_name, page, per_page, total=None):
+    def __init__(self, queryset, doc_id, field_name, page: int, per_page: int, total: [int | None] = None,
+                 first_page_index: int = 1):
         """Allows an array within a document to be paginated.
 
         Queryset must contain the document which has the array we're
@@ -16,17 +17,18 @@ class ListFieldPagination(Pagination):
         Total is an argument because it can be computed more efficiently
         elsewhere, but we still use array.length as a fallback.
         """
-        if page < 1:
-            abort(404)
+        if page < first_page_index:
+            abort(404, 'Invalid page number.')
 
         self.page = page
         self.per_page = per_page
+        self.first_page_index = first_page_index
 
         self.queryset = queryset
         self.doc_id = doc_id
         self.field_name = field_name
 
-        start_index = (page - 1) * per_page
+        start_index = (page - self.first_page_index) * per_page
 
         field_attrs = {field_name: {"$slice": [start_index, per_page]}}
 
@@ -36,8 +38,8 @@ class ListFieldPagination(Pagination):
             getattr(qs.fields(**{field_name: 1}).first(), field_name)
         )
 
-        if not self.items and page != 1:
-            abort(404)
+        if not self.items and page != self.first_page_index:
+            abort(404, 'Invalid page number.')
 
     def prev(self, error_out=False):
         """Returns a :class:`Pagination` object for the previous page."""
@@ -51,6 +53,7 @@ class ListFieldPagination(Pagination):
             self.page - 1,
             self.per_page,
             self.total,
+            self.first_page_index
         )
 
     def next(self, error_out=False):
@@ -65,4 +68,5 @@ class ListFieldPagination(Pagination):
             self.page + 1,
             self.per_page,
             self.total,
+            self.first_page_index,
         )

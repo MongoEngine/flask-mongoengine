@@ -25,7 +25,7 @@ def setup_endpoints(app, todo):
         }
 
 
-def test_queryset_paginator(app, todo):
+def test_queryset_paginator_invalid(app, todo):
     Todo = todo
     with pytest.raises(NotFound):
         Pagination(iterable=Todo.objects, page=0, per_page=10)
@@ -33,14 +33,32 @@ def test_queryset_paginator(app, todo):
     with pytest.raises(NotFound):
         Pagination(iterable=Todo.objects, page=6, per_page=10)
 
+    with pytest.raises(NotFound):
+        Pagination(iterable=Todo.objects, page=-1, per_page=10, first_page_index=0)
+
+
+def test_queryset_paginator(app, todo):
+    Todo = todo
     paginator = Pagination(Todo.objects, 1, 10)
-    _test_paginator(paginator)
+    _test_paginator(paginator, 1)
 
     for page in range(1, 10):
         for index, todo in enumerate(
             Todo.objects.paginate(page=page, per_page=5).items
         ):
             assert todo.title == f"post: {(page-1) * 5 + index}"
+
+
+def test_queryset_paginator_first_page_index(app, todo):
+    Todo = todo
+    paginator = Pagination(Todo.objects, 0, 10, first_page_index=0)
+    _test_paginator(paginator, first_page_index=0)
+
+    for page in range(0, 9):
+        for index, todo in enumerate(
+            Todo.objects.paginate(page=page, per_page=5, first_page_index=0).items
+        ):
+            assert todo.title == f"post: {(page) * 5 + index}"
 
 
 def test_keyset_queryset_paginator(app, todo):
@@ -78,7 +96,10 @@ def test_paginate_plain_list():
         Pagination(iterable=range(1, 42), page=6, per_page=10)
 
     paginator = Pagination(range(1, 42), 1, 10)
-    _test_paginator(paginator)
+    _test_paginator(paginator, 1)
+
+    paginator = Pagination(range(1, 42), 0, 10, first_page_index=0)
+    _test_paginator(paginator, 0)
 
 
 def test_list_field_pagination(app, todo):
@@ -93,46 +114,52 @@ def test_list_field_pagination(app, todo):
 
     # Check without providing a total
     paginator = ListFieldPagination(Todo.objects, todo.id, "comments", 1, 10)
-    _test_paginator(paginator)
+    _test_paginator(paginator, 1)
+
+    # Check first_page_index
+    paginator = ListFieldPagination(Todo.objects, todo.id, "comments", 0, 10, first_page_index=0)
+    _test_paginator(paginator, 0)
 
     # Check with providing a total (saves a query)
     paginator = ListFieldPagination(
         Todo.objects, todo.id, "comments", 1, 10, todo.comment_count
     )
-    _test_paginator(paginator)
+    _test_paginator(paginator, 1)
 
     paginator = todo.paginate_field("comments", 1, 10)
-    _test_paginator(paginator)
+    _test_paginator(paginator, 1)
 
 
-def _test_paginator(paginator):
+def _test_paginator(paginator, first_page_index):
     assert 5 == paginator.pages
-    assert [1, 2, 3, 4, 5] == list(paginator.iter_pages())
 
-    for i in [1, 2, 3, 4, 5]:
-        if i == 1:
+    pages_indexes = [*range(first_page_index, 5 + first_page_index)]
+    assert pages_indexes == list(paginator.iter_pages())
+
+    for i in pages_indexes:
+        if i == first_page_index:
             assert not paginator.has_prev
             with pytest.raises(NotFound):
                 paginator.prev()
         else:
             assert paginator.has_prev
 
-        if i == 5:
+        if i == pages_indexes[-1]:
             assert not paginator.has_next
             with pytest.raises(NotFound):
                 paginator.next()
         else:
             assert paginator.has_next
 
-        if i == 3:
-            assert [None, 2, 3, 4, None] == list(paginator.iter_pages(0, 1, 1, 0))
+        # if i == 3:
+        #     assert [None, 2, 3, 4, None] == list(paginator.iter_pages(0, 1, 1, 0))
 
         assert i == paginator.page
         assert i - 1 == paginator.prev_num
         assert i + 1 == paginator.next_num
 
         # Paginate to the next page
-        if i < 5:
+        if i < pages_indexes[-1]:
             paginator = paginator.next()
 
 

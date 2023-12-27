@@ -1,9 +1,9 @@
 from mongoengine.queryset import QuerySet
 
-from flask_mongoengine.pagination.basic_pagination import Pagination
+from flask_mongoengine.pagination.abc_pagination import ABCPagination
 
 
-class KeysetPagination(Pagination):
+class KeysetPagination(ABCPagination):
     def __init__(
         self,
         iterable,

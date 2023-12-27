@@ -57,12 +57,12 @@ class BaseQuerySet(QuerySet):
         """
         return self.first() or self._abort_404(_message_404)
 
-    def paginate(self, page, per_page):
+    def paginate(self, page, per_page, first_page_index=1):
         """
         Paginate the QuerySet with a certain number of docs per page
         and return docs for a given page.
         """
-        return Pagination(self, page, per_page)
+        return Pagination(self, page=page, per_page=per_page, first_page_index=first_page_index)
 
     def paginate_by_keyset(self, per_page, field_filter_by, last_field_value):
         """
@@ -71,7 +71,7 @@ class BaseQuerySet(QuerySet):
         """
         return KeysetPagination(self, per_page, field_filter_by, last_field_value)
 
-    def paginate_field(self, field_name, doc_id, page, per_page, total=None):
+    def paginate_field(self, field_name, doc_id, page, per_page, total=None, first_page_index=1):
         """
         Paginate items within a list field from one document in the
         QuerySet.
@@ -81,7 +81,8 @@ class BaseQuerySet(QuerySet):
         count = getattr(item, f"{field_name}_count", "")
         total = total or count or len(getattr(item, field_name))
         return ListFieldPagination(
-            self, doc_id, field_name, page, per_page, total=total
+            self, doc_id, field_name, page, per_page, total=total,
+            first_page_index=first_page_index
         )
 
 
