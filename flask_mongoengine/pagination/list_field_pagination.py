@@ -13,7 +13,7 @@ class ListFieldPagination(Pagination):
         field_name,
         page: int,
         per_page: int,
-        total: [int | None] = None,
+        total=None,
         first_page_index: int = 1,
     ):
         """Allows an array within a document to be paginated.

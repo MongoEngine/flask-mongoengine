@@ -7,11 +7,17 @@ __all__ = [
 ]
 from typing import Callable, Optional
 
+import wtforms
 from flask import json
 from mongoengine.queryset import DoesNotExist
 from wtforms import fields as wtf_fields
 from wtforms import validators as wtf_validators
 from wtforms import widgets as wtf_widgets
+
+wtf_version = list(wtforms.__version__.split("."))
+new_wtf_version = (int(wtf_version[0]) >= 3 and int(wtf_version[1]) >= 1) or int(
+    wtf_version[0]
+) > 3
 
 
 def coerce_boolean(value: Optional[str]) -> Optional[bool]:
@@ -77,7 +83,10 @@ class QuerySetSelectField(wtf_fields.SelectFieldBase):
         iterable of (value, label, selected) tuples.
         """
         if self.allow_blank:
-            yield "__None", self.blank_text, self.data is None
+            if new_wtf_version:
+                yield "__None", self.blank_text, self.data is None, self.render_kw or dict()
+            else:
+                yield "__None", self.blank_text, self.data is None
 
         if self.queryset is None:
             return
@@ -94,7 +103,10 @@ class QuerySetSelectField(wtf_fields.SelectFieldBase):
                 selected = obj in self.data
             else:
                 selected = self._is_selected(obj)
-            yield obj.id, label, selected
+            if new_wtf_version:
+                yield obj.id, label, selected, self.render_kw or {}
+            else:
+                yield obj.id, label, selected
 
     def process_formdata(self, valuelist):
         """
