@@ -123,7 +123,7 @@ def docs(session, batch_run: bool = False):
                 "--watch",
                 "../*.py",
                 "--watch",
-                "../flask_mongoengine",
+                "../flask_mongoengine2",
             ]
         )
 

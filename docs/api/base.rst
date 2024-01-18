@@ -1,39 +1,39 @@
 Base module API
 ===============
 
-This is the flask_mongoengine main modules API documentation.
+This is the flask_mongoengine2 main modules API documentation.
 
-flask_mongoengine.connection module
+flask_mongoengine2.connection module
 -----------------------------------
 
-.. automodule:: flask_mongoengine.connection
+.. automodule:: flask_mongoengine2.connection
 
-flask_mongoengine.db_fields module
+flask_mongoengine2.db_fields module
 ----------------------------------
 
-.. automodule:: flask_mongoengine.db_fields
+.. automodule:: flask_mongoengine2.db_fields
    :special-members: __init__
 
-flask_mongoengine.decorators module
+flask_mongoengine2.decorators module
 -----------------------------------
 
-.. automodule:: flask_mongoengine.decorators
+.. automodule:: flask_mongoengine2.decorators
 
-flask_mongoengine.documents module
+flask_mongoengine2.documents module
 ----------------------------------
 
-.. automodule:: flask_mongoengine.pagination
+.. automodule:: flask_mongoengine2.pagination
 
-flask_mongoengine.panels module
+flask_mongoengine2.panels module
 -------------------------------
 
-.. automodule:: flask_mongoengine.panels
+.. automodule:: flask_mongoengine2.panels
    :member-order: bysource
 
-flask_mongoengine.sessions module
+flask_mongoengine2.sessions module
 ---------------------------------
 
-.. automodule:: flask_mongoengine.sessions
+.. automodule:: flask_mongoengine2.sessions
 
 Module contents
 ---------------
@@ -43,5 +43,5 @@ Module contents
    some formatting issues. If class/function/method link not clickable, search on
    provided parent documentation manually.
 
-.. automodule:: flask_mongoengine
+.. automodule:: flask_mongoengine2
    :private-members: _abort_404

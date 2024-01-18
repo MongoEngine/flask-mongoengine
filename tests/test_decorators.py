@@ -1,5 +1,5 @@
 """Tests for project wide decorators."""
-from flask_mongoengine.decorators import orm_deprecated
+from flask_mongoengine2.decorators import orm_deprecated
 
 
 def test__orm_deprecated(recwarn):

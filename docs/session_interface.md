@@ -3,7 +3,7 @@
 To use MongoEngine as your session store simple configure the session interface:
 
 ```python
-from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
+from flask_mongoengine2 import MongoEngine, MongoEngineSessionInterface
 
 app = Flask(__name__)
 db = MongoEngine(app)

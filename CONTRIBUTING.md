@@ -17,7 +17,7 @@ integration or feature.
 
 ## Supported interpreters
 
-Flask-MongoEngine supports CPython 3.8 and newer. Language features
+Flask-MongoEngine2 supports CPython 3.8 and newer. Language features
 not supported by all interpreters can not be used.
 
 ## Running tests
@@ -67,11 +67,11 @@ nox -- -k test__normal_command__logged
 
 ## Setting up the code for local development and tests
 
-1. Fork the `flask-mongoengine` repo on GitHub.
+1. Fork the `flask-mongoengine2` repo on GitHub.
 2. Clone your fork locally:
 
    ```bash
-   git clone git@github.com:your_name_here/flask-mongoengine.git
+   git clone git@github.com:your_name_here/flask-mongoengine2.git
    ```
 
 3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper
@@ -79,7 +79,7 @@ nox -- -k test__normal_command__logged
    required development and testing dependencies (except docker):
 
    ```bash
-   cd flask-mongoengine/
+   cd flask-mongoengine2/
    # With all development and package requirements, except docker
    pip install -e .[toolbar,dev]
    ```
@@ -192,7 +192,7 @@ Any pull requests without tests will take longer to be integrated and might be r
 
 [community]: AUTHORS.md
 
-[tickets]: https://github.com/MongoEngine/flask-mongoengine/issues?state=open
+[tickets]: https://github.com/ahmetelgun/flask-mongoengine2/issues?state=open
 
 [PEP8]: http://www.python.org/dev/peps/pep-0008/
 
@@ -200,7 +200,7 @@ Any pull requests without tests will take longer to be integrated and might be r
 
 [pre-commit]: https://pre-commit.com/
 
-[GitHub actions]: https://github.com/MongoEngine/flask-mongoengine/actions
+[GitHub actions]: https://github.com/ahmetelgun/flask-mongoengine2/actions
 
 [Flask]: https://github.com/pallets/flask
 
@@ -212,7 +212,7 @@ Any pull requests without tests will take longer to be integrated and might be r
 
 [AUTHORS.md]: AUTHORS.md
 
-[documentation]: http://docs.mongoengine.org/projects/flask-mongoengine/
+[documentation]: https://flask-mongoengine2.readthedocs.io
 
 [nox]: https://nox.thea.codes/en/stable/usage.html
 

@@ -1,7 +1,7 @@
 import pytest
 from werkzeug.exceptions import NotFound
 
-from flask_mongoengine import ListFieldPagination, Pagination
+from flask_mongoengine2 import ListFieldPagination, Pagination
 
 
 def test_queryset_paginator(app, todo):

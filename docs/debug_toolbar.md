@@ -29,7 +29,7 @@ Described approach change brings several side effects, that user should be aware
 4. Mongo Debug Toolbar Panel code is now covered by internal tests, raising overall
    project code quality.
 5. Mongo Debug Toolbar Panel can work without any usage of other
-   ``flask_mongoengine`` functions.
+   ``flask_mongoengine2`` functions.
 6. Mongo Debug Toolbar Panel do not split requests types anymore, this is because
    now it handle any requests, including aggregations, collection creating/deleting
    and any other, reported by [pymongo] monitoring. Making splitting of incomming
@@ -40,7 +40,7 @@ Described approach change brings several side effects, that user should be aware
 
 To install and use Mongo Debug Toolbar Panel:
 
-1. Add ``'flask_mongoengine.panels.MongoDebugPanel'`` to ``DEBUG_TB_PANELS`` of
+1. Add ``'flask_mongoengine2.panels.MongoDebugPanel'`` to ``DEBUG_TB_PANELS`` of
    [Flask Debug Toolbar].
 2. Import ``mongo_command_logger`` in your Flask application initialization file.
 3. Import ``monitoring`` from ``pymongo`` package in your Flask application
@@ -55,8 +55,8 @@ import flask
 from flask_debugtoolbar import DebugToolbarExtension
 from pymongo import monitoring
 
-from flask_mongoengine.panels import mongo_command_logger
-from flask_mongoengine import MongoEngine
+from flask_mongoengine2.panels import mongo_command_logger
+from flask_mongoengine2 import MongoEngine
 
 
 app = flask.Flask(__name__)
@@ -65,7 +65,7 @@ app.config["MONGODB_SETTINGS"] = {"DB": "testing", "host": "mongo"}
 app.config["TESTING"] = True
 app.config["SECRET_KEY"] = "some_key"
 app.debug = True
-app.config["DEBUG_TB_PANELS"] = ("flask_mongoengine.panels.MongoDebugPanel",)
+app.config["DEBUG_TB_PANELS"] = ("flask_mongoengine2.panels.MongoDebugPanel",)
 DebugToolbarExtension(app)
 monitoring.register(mongo_command_logger)
 db = MongoEngine()

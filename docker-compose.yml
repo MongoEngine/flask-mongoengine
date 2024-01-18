@@ -21,5 +21,5 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - ./:/flask_mongoengine
+      - ./:/flask_mongoengine2
     restart: always

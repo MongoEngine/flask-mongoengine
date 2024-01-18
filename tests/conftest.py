@@ -6,7 +6,7 @@ import pytest
 from flask import Flask
 from pymongo import MongoClient
 
-from flask_mongoengine import MongoEngine
+from flask_mongoengine2 import MongoEngine
 
 
 @pytest.fixture(autouse=True, scope="session")

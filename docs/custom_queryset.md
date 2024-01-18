@@ -1,6 +1,6 @@
 # Custom Queryset
 
-flask-mongoengine attaches the following methods to Mongoengine's default QuerySet:
+flask-mongoengine2 attaches the following methods to Mongoengine's default QuerySet:
 
 * **get_or_404**: works like .get(), but calls abort(404) if the object DoesNotExist.
   Optional arguments: *message* - custom message to display.

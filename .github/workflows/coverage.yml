@@ -4,7 +4,7 @@ name: Send Coverage to different analytic engines
 on:
   push:
     branches:
-      - master
+      - main
     tags:
       - "*"
   pull_request:

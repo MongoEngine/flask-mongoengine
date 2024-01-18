@@ -3,7 +3,7 @@ import functools
 import logging
 import warnings
 
-logger = logging.getLogger("flask_mongoengine")
+logger = logging.getLogger("flask_mongoengine2")
 
 
 def orm_deprecated(func):

@@ -1,4 +1,4 @@
-Flask-MongoEngine documentation
+Flask-MongoEngine2 documentation
 ===============================
 
 A Flask extension that provides integration with `MongoEngine <http://mongoengine.org/>`_.

@@ -1,18 +1,18 @@
-# Flask-MongoEngine
+# Flask-MongoEngine2
 
-[![PyPI version](https://badge.fury.io/py/flask-mongoengine.svg)](https://badge.fury.io/py/flask-mongoengine)
-[![CI Tests](https://github.com/MongoEngine/flask-mongoengine/actions/workflows/tests.yml/badge.svg)](https://github.com/MongoEngine/flask-mongoengine/actions/workflows/tests.yml)
-[![Documentation Status](https://readthedocs.org/projects/flask-mongoengine/badge/?version=latest)](http://docs.mongoengine.org/projects/flask-mongoengine/en/latest/?badge=latest)
-[![Maintainability](https://api.codeclimate.com/v1/badges/6fb8ae00b1008f5f1b20/maintainability)](https://codeclimate.com/github/MongoEngine/flask-mongoengine/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/6fb8ae00b1008f5f1b20/test_coverage)](https://codeclimate.com/github/MongoEngine/flask-mongoengine/test_coverage)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/flask-mongoengine)
+[![PyPI version](https://badge.fury.io/py/flask-mongoengine2.svg)](https://badge.fury.io/py/flask-mongoengine2)
+[![CI Tests](https://github.com/ahmetelgun/flask-mongoengine2/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/ahmetelgun/flask-mongoengine2/actions/workflows/tests.yml)
+[![Documentation Status](https://readthedocs.org/projects/flask-mongoengine2/badge/?version=latest)](http://docs.mongoengine.org/projects/flask-mongoengine2/en/latest/?badge=latest)
+[![Maintainability](https://api.codeclimate.com/v1/badges/709e5854f7b76b27637c/maintainability)](https://codeclimate.com/github/ahmetelgun/flask-mongoengine2/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/709e5854f7b76b27637c/test_coverage)](https://codeclimate.com/github/ahmetelgun/flask-mongoengine2/test_coverage)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/flask-mongoengine2)
 
-Flask-MongoEngine is a Flask extension that provides integration with [MongoEngine]
+Flask-MongoEngine2 is a Flask extension that provides integration with [MongoEngine]
 and [FlaskDebugToolbar].
 
 ## Installation
 
-By default, Flask-MongoEngine will install integration only between [Flask] and
+By default, Flask-MongoEngine2 will install integration only between [Flask] and
 [MongoEngine]. Integration with [FlaskDebugToolbar] are optional and
 should be selected as extra option, if required. This is done by users request, to
 limit amount of external dependencies in different production setup environments.
@@ -24,18 +24,18 @@ used together.
 
 ```bash
 # For Flask >= 2.3.0
-pip install flask-mongoengine
+pip install flask-mongoengine2
 ```
 
 ### Installation with Flask Debug Toolbar support
 
 Flask-mongoengine provide beautiful extension to [FlaskDebugToolbar] allowing to monitor
 all database requests. To use this extension [FlaskDebugToolbar] itself required. If
-you need to install flask-mongoengine with related support, use:
+you need to install flask-mongoengine2 with related support, use:
 
 ```bash
 # With FlaskDebugToolbar dependencies
-pip install flask-mongoengine[toolbar]
+pip install flask-mongoengine2[toolbar]
 ```
 
 ## Flask configuration
@@ -61,18 +61,16 @@ We are welcome for contributors and testers! Check [Contribution guidelines].
 
 ## License
 
-Flask-MongoEngine is distributed under [BSD 3-Clause License].
+Flask-MongoEngine2 is distributed under [BSD 3-Clause License].
 
 [MongoEngine]: https://github.com/MongoEngine/mongoengine
 
 [FlaskDebugToolbar]: https://github.com/flask-debugtoolbar/flask-debugtoolbar
 
-[read the docs]: http://docs.mongoengine.org/projects/flask-mongoengine/
+[read the docs]: https://flask-mongoengine2.readthedocs.io/en/latest/
 
 [Flask]: https://github.com/pallets/flask
 
 [BSD 3-Clause License]: LICENSE.md
 
 [Contribution guidelines]: CONTRIBUTING.md
-
-[complete connection settings description]: http://docs.mongoengine.org/projects/flask-mongoengine/flask_config.html

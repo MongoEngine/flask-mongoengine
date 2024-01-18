@@ -19,7 +19,7 @@ from pymongo import monitoring  # noqa
 from pymongo.errors import OperationFailure  # noqa
 from pytest_mock import MockerFixture  # noqa
 
-from flask_mongoengine.panels import (  # noqa
+from flask_mongoengine2.panels import (  # noqa
     MongoCommandLogger,
     MongoDebugPanel,
     _maybe_patch_jinja_loader,
@@ -33,7 +33,7 @@ def app_no_mongo_monitoring() -> Flask:
     app.config["TESTING"] = True
     app.config["SECRET_KEY"] = "flask+mongoengine=<3"
     app.debug = True
-    app.config["DEBUG_TB_PANELS"] = ("flask_mongoengine.panels.MongoDebugPanel",)
+    app.config["DEBUG_TB_PANELS"] = ("flask_mongoengine2.panels.MongoDebugPanel",)
     app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
     DebugToolbarExtension(app)
     with app.app_context():

@@ -2,7 +2,7 @@ name: Labels verification
 
 on:
   push:
-    branches: [master]
+    branches: [main]
 
 jobs:
   labeler:

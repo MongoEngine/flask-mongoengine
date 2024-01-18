@@ -7,7 +7,7 @@ from pymongo.errors import InvalidURI
 from pymongo.mongo_client import MongoClient
 from pymongo.read_preferences import ReadPreference
 
-from flask_mongoengine import MongoEngine, current_mongoengine_instance
+from flask_mongoengine2 import MongoEngine, current_mongoengine_instance
 
 
 def test_connection__should_use_defaults__if_no_settings_provided(app):

@@ -9,7 +9,7 @@ recommended are deprecated and may be removed in future versions, to lower code 
 complexity and bugs. If you use any deprecated connection settings approach, you should
 update your application configuration.
 
-By default, flask-mongoengine open the connection when extension is instantiated,
+By default, flask-mongoengine2 open the connection when extension is instantiated,
 but you can configure it to open connection only on first database access by setting
 the ``'connect'`` dictionary parameter or its ``MONGODB_CONNECT`` flat equivalent to
 ``False``.
@@ -38,7 +38,7 @@ Example:
 
 ```python
 import flask
-from flask_mongoengine import MongoEngine
+from flask_mongoengine2 import MongoEngine
 
 db = MongoEngine()
 app = flask.Flask("example_app")

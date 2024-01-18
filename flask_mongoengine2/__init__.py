@@ -4,10 +4,10 @@ import mongoengine
 from flask import Flask, current_app
 from mongoengine import fields as db_fields
 
-from flask_mongoengine import documents
-from flask_mongoengine.connection import *
-from flask_mongoengine.pagination import *
-from flask_mongoengine.sessions import *
+from flask_mongoengine2 import documents
+from flask_mongoengine2.connection import *
+from flask_mongoengine2.pagination import *
+from flask_mongoengine2.sessions import *
 
 
 def current_mongoengine_instance():
@@ -19,14 +19,14 @@ def current_mongoengine_instance():
 
 
 class MongoEngine:
-    """Main class used for initialization of Flask-MongoEngine."""
+    """Main class used for initialization of Flask-MongoEngine2."""
 
     def __init__(self, app=None, config=None):
         if config is not None:
             warnings.warn(
                 (
                     "Passing flat configuration is deprecated. Please check "
-                    "http://docs.mongoengine.org/projects/flask-mongoengine/flask_config.html "
+                    "https://flask-mongoengine2.readthedocs.io/en/latest/flask_config.html "
                     "for more info."
                 ),
                 DeprecationWarning,
@@ -92,7 +92,7 @@ class MongoEngine:
             warnings.warn(
                 (
                     "Passing flat configuration is deprecated. Please check "
-                    "http://docs.mongoengine.org/projects/flask-mongoengine/flask_config.html "
+                    "https://flask-mongoengine2.readthedocs.io/en/latest/flask_config.html "
                     "for more info."
                 ),
                 DeprecationWarning,

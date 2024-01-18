@@ -2,7 +2,7 @@ import pytest
 from flask import session
 from pytest_mock import MockerFixture
 
-from flask_mongoengine import MongoEngineSessionInterface
+from flask_mongoengine2 import MongoEngineSessionInterface
 
 
 @pytest.fixture(autouse=True)

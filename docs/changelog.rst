@@ -13,7 +13,7 @@ Changes in 2.0.0
 Changes in 1.0.0
 ================
 Changelog maintenance automated and latest changelog available at
-`github release page <https://github.com/MongoEngine/flask-mongoengine/releases>`_.
+`github release page <https://github.com/ahmetelgun/flask-mongoengine2/releases>`_.
 
 Use version 0.9.5 if old dependencies required.
 

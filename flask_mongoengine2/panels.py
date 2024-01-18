@@ -10,7 +10,7 @@ from flask_debugtoolbar.panels import DebugPanel
 from jinja2 import ChoiceLoader, PackageLoader
 from pymongo import monitoring
 
-logger = logging.getLogger("flask_mongoengine")
+logger = logging.getLogger("flask_mongoengine2")
 
 
 @dataclass
@@ -121,8 +121,8 @@ mongo_command_logger = MongoCommandLogger()
 
 
 def _maybe_patch_jinja_loader(jinja_env):
-    """Extend jinja_env loader with flask_mongoengine templates folder."""
-    package_loader = PackageLoader("flask_mongoengine", "templates")
+    """Extend jinja_env loader with flask_mongoengine2 templates folder."""
+    package_loader = PackageLoader("flask_mongoengine2", "templates")
     if not isinstance(jinja_env.loader, ChoiceLoader):
         jinja_env.loader = ChoiceLoader([jinja_env.loader, package_loader])
     elif package_loader not in jinja_env.loader.loaders:

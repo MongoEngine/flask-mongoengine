@@ -6,9 +6,9 @@ from flask import abort
 from mongoengine.errors import DoesNotExist
 from mongoengine.queryset import QuerySet
 
-from flask_mongoengine.pagination import ListFieldPagination, Pagination
+from flask_mongoengine2.pagination import ListFieldPagination, Pagination
 
-logger = logging.getLogger("flask_mongoengine")
+logger = logging.getLogger("flask_mongoengine2")
 
 
 class BaseQuerySet(QuerySet):
