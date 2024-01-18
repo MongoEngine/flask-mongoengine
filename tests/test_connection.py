@@ -10,14 +10,6 @@ from pymongo.read_preferences import ReadPreference
 from flask_mongoengine import MongoEngine, current_mongoengine_instance
 
 
-def is_mongo_mock_installed() -> bool:
-    try:
-        import mongomock.__version__  # noqa
-    except ImportError:
-        return False
-    return True
-
-
 def test_connection__should_use_defaults__if_no_settings_provided(app):
     """Make sure a simple connection to a standalone MongoDB works."""
     db = MongoEngine()
@@ -134,49 +126,6 @@ def test_connection__should_parse_host_uri__if_host_formatted_as_uri(
     assert mongo_engine_db.name == "flask_mongoengine_test_db"
     assert connection.HOST == "localhost"
     assert connection.PORT == 27017
-
-
-@pytest.mark.skipif(
-    is_mongo_mock_installed(), reason="This test require mongomock not exist"
-)
-@pytest.mark.parametrize(
-    ("config_extension"),
-    [
-        {
-            "MONGODB_SETTINGS": {
-                "HOST": "mongomock://localhost:27017/flask_mongoengine_test_db"
-            }
-        },
-        {
-            "MONGODB_SETTINGS": {
-                "ALIAS": "simple_conn",
-                "HOST": "localhost",
-                "PORT": 27017,
-                "DB": "flask_mongoengine_test_db",
-                "IS_MOCK": True,
-            }
-        },
-        {"MONGODB_HOST": "mongomock://localhost:27017/flask_mongoengine_test_db"},
-    ],
-    ids=("Dict format as URI", "Dict format as Param", "Config variable format as URI"),
-)
-def test_connection__should_parse_mongo_mock_uri__as_uri_and_as_settings(
-    app, config_extension
-):
-    """Make sure a simple connection pass ALIAS setting variable."""
-    db = MongoEngine()
-    app.config.update(config_extension)
-
-    # Verify no extension for Mongoengine yet created for app
-    assert app.extensions == {}
-    assert current_mongoengine_instance() is None
-
-    # Create db connection. Should return None.
-
-    with pytest.raises(RuntimeError) as error:
-        assert db.init_app(app) is None
-
-    assert str(error.value) == "You need mongomock installed to mock MongoEngine."
 
 
 @pytest.mark.parametrize(

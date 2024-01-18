@@ -240,12 +240,10 @@ man_pages = [
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "flask": ("https://flask.palletsprojects.com/en/2.2.x/", None),
+    "flask": ("https://flask.palletsprojects.com/en/2.3.x/", None),
     "werkzeug": ("https://werkzeug.palletsprojects.com/en/2.1.x/", None),
     "pymongo": ("https://pymongo.readthedocs.io/en/stable/", None),
     "mongoengine": ("https://docs.mongoengine.org/", None),
-    "wtforms": ("https://wtforms.readthedocs.io/en/3.0.x/", None),
-    "flask-wtf": ("https://flask-wtf.readthedocs.io/en/1.0.x/", None),
 }
 myst_enable_extensions = [
     "tasklist",

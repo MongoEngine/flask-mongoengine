@@ -17,7 +17,7 @@ integration or feature.
 
 ## Supported interpreters
 
-Flask-MongoEngine supports CPython 3.7 and newer, PyPy 3.7 and newer. Language features
+Flask-MongoEngine supports CPython 3.8 and newer. Language features
 not supported by all interpreters can not be used.
 
 ## Running tests
@@ -81,7 +81,7 @@ nox -- -k test__normal_command__logged
    ```bash
    cd flask-mongoengine/
    # With all development and package requirements, except docker
-   pip install -e .[wtf,toolbar,dev]
+   pip install -e .[toolbar,dev]
    ```
 
 4. Create a branch for local development:

@@ -1,19 +1,13 @@
 """Extended version of :mod:`mongoengine.document`."""
 import logging
-from typing import Dict, List, Optional, Type, Union
 
 import mongoengine
 from flask import abort
 from mongoengine.errors import DoesNotExist
 from mongoengine.queryset import QuerySet
 
-from flask_mongoengine.decorators import wtf_required
 from flask_mongoengine.pagination import ListFieldPagination, Pagination
 
-try:
-    from flask_mongoengine.wtf.models import ModelForm
-except ImportError:  # pragma: no cover
-    ModelForm = None
 logger = logging.getLogger("flask_mongoengine")
 
 
@@ -74,110 +68,8 @@ class BaseQuerySet(QuerySet):
         )
 
 
-class WtfFormMixin:
-    """Special mixin, for form generation functions."""
-
-    @classmethod
-    def _get_fields_names(
-        cls: Union["WtfFormMixin", mongoengine.document.BaseDocument],
-        only: Optional[List[str]],
-        exclude: Optional[List[str]],
-    ):
-        """
-        Filter fields names for further form generation.
-
-        :param only:
-            An optional iterable with the property names that should be included in
-            the form. Only these properties will have fields.
-            Fields are always appear in provided order, this allows user to change form
-            fields ordering, without changing database model.
-        :param exclude:
-            An optional iterable with the property names that should be excluded
-            from the form. All other properties will have fields.
-            Fields are appears in order, defined in model, excluding provided fields
-            names. For adjusting fields ordering, use :attr:`only`.
-        """
-        field_names = cls._fields_ordered
-
-        if only:
-            field_names = [field for field in only if field in field_names]
-        elif exclude:
-            field_names = [field for field in field_names if field not in exclude]
-
-        return field_names
-
-    @classmethod
-    @wtf_required
-    def to_wtf_form(
-        cls: Union["WtfFormMixin", mongoengine.document.BaseDocument],
-        base_class: Type[ModelForm] = ModelForm,
-        only: Optional[List[str]] = None,
-        exclude: Optional[List[str]] = None,
-        fields_kwargs: Optional[Dict[str, Dict]] = None,
-    ) -> Type[ModelForm]:
-        """
-        Generate WTForm from Document model.
-
-        :param base_class:
-            Base form class to extend from. Must be a :class:`.ModelForm` subclass.
-        :param only:
-            An optional iterable with the property names that should be included in
-            the form. Only these properties will have fields.
-            Fields are always appear in provided order, this allows user to change form
-            fields ordering, without changing database model.
-        :param exclude:
-            An optional iterable with the property names that should be excluded
-            from the form. All other properties will have fields.
-            Fields are appears in order, defined in model, excluding provided fields
-            names. For adjusting fields ordering, use :attr:`only`.
-        :param fields_kwargs:
-            An optional dictionary of dictionaries, where field names mapping to keyword
-            arguments used to construct each field object. Has the highest priority over
-            all fields settings (made in Document field definition). Field options are
-            directly passed to field generation, so must match WTForm Field keyword
-            arguments. Support special field keyword option ``wtf_field_class``, that
-            can be used for complete field class replacement.
-
-            Dictionary format example::
-
-                dictionary = {
-                    "field_name":{
-                        "label":"new",
-                        "default": "new",
-                        "wtf_field_class": wtforms.fields.StringField
-                    }
-                }
-
-            With such dictionary for field with name ``field_name``
-            :class:`wtforms.fields.StringField` will be called like::
-
-                field_name = wtforms.fields.StringField(label="new", default="new")
-        """
-        form_fields_dict = {}
-        fields_kwargs = fields_kwargs or {}
-        fields_names = cls._get_fields_names(only, exclude)
-
-        for field_name in fields_names:
-            # noinspection PyUnresolvedReferences
-            field_class = cls._fields[field_name]
-            try:
-                form_fields_dict[field_name] = field_class.to_wtf_field(
-                    model=cls,
-                    field_kwargs=fields_kwargs.get(field_name, {}),
-                )
-            except (AttributeError, NotImplementedError):
-                logger.warning(
-                    f"Field {field_name} ignored, field type does not have "
-                    f".to_wtf_field() method or method raised NotImplementedError."
-                )
-
-        form_fields_dict["model_class"] = cls
-        # noinspection PyTypeChecker
-        return type(f"{cls.__name__}Form", (base_class,), form_fields_dict)
-
-
-class Document(WtfFormMixin, mongoengine.Document):
-    """Abstract Document with QuerySet and WTForms extra helpers."""
+class Document(mongoengine.Document):
+    """Abstract Document with QuerySet"""
 
     meta = {"abstract": True, "queryset_class": BaseQuerySet}
 
@@ -191,19 +83,19 @@ class Document(WtfFormMixin, mongoengine.Document):
         )
 
 
-class DynamicDocument(WtfFormMixin, mongoengine.DynamicDocument):
-    """Abstract DynamicDocument with QuerySet and WTForms extra helpers."""
+class DynamicDocument(mongoengine.DynamicDocument):
+    """Abstract DynamicDocument with QuerySet."""
 
     meta = {"abstract": True, "queryset_class": BaseQuerySet}
 
 
-class EmbeddedDocument(WtfFormMixin, mongoengine.EmbeddedDocument):
-    """Abstract EmbeddedDocument document with extra WTForms helpers."""
+class EmbeddedDocument(mongoengine.EmbeddedDocument):
+    """Abstract EmbeddedDocument document."""
 
     meta = {"abstract": True}
 
 
-class DynamicEmbeddedDocument(WtfFormMixin, mongoengine.DynamicEmbeddedDocument):
-    """Abstract DynamicEmbeddedDocument document with extra WTForms helpers."""
+class DynamicEmbeddedDocument(mongoengine.DynamicEmbeddedDocument):
+    """Abstract DynamicEmbeddedDocument document."""
 
     meta = {"abstract": True}

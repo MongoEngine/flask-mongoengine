@@ -2,6 +2,14 @@
 Old changelog
 =============
 
+Changes in 2.0.0
+================
+- Forked from flask-mongoengine to flask-mongoengine2
+- Remove legacy support
+- Remove WTForms support
+- Support Flask 2.3.0 and above
+
+
 Changes in 1.0.0
 ================
 Changelog maintenance automated and latest changelog available at

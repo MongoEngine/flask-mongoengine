@@ -1,8 +1,8 @@
 [project]
 name = "flask-mongoengine"
-description = "Flask extension that provides integration with MongoEngine and WTF model forms."
+description = "Flask extension that provides integration with MongoEngine."
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = {text = "BSD 3-Clause License"}
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -13,10 +13,11 @@ classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.7",
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: Implementation :: PyPy",
   "Programming Language :: Python :: Implementation :: CPython",
   "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
@@ -24,14 +25,12 @@ classifiers = [
   "Framework :: Flask",
 ]
 dependencies = [
-  "Flask>=1.1.4",
+  "Flask>=2.3.0",
   "mongoengine>=0.21",
   'importlib-metadata; python_version<"3.8"',
 ]
 keywords = [
   "flask",
-  "wtf",
-  "wtf-forms",
   "forms",
   "mongo",
   "pymongo",
@@ -47,7 +46,6 @@ maintainers = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-wtf = ["WTForms[email]>=3.0.0", "Flask-WTF>=0.14.3"]
 toolbar = ["Flask-DebugToolbar>=0.11.0"]
 dev = [
   "black==22.6.0",
@@ -59,14 +57,7 @@ dev = [
   "Pillow>=7.0.0",
   "blinker",
 ]
-legacy = ["MarkupSafe==2.0.1"]
-legacy-dev = [
-  "pytest",
-  "pytest-cov",
-  "pytest-mock",
-  "Pillow>=7.0.0",
-  "blinker",
-]
+
 
 [project.urls]
 Homepage = "https://github.com/MongoEngine/flask-mongoengine"
@@ -85,7 +76,7 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 zip-safe = false
 platforms = ["any"]
-packages=["flask_mongoengine", "flask_mongoengine.wtf"]
+packages=["flask_mongoengine"]
 
 [tool.setuptools.dynamic]
 version = {attr = "flask_mongoengine._version.version"}

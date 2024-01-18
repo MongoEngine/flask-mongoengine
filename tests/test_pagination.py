@@ -22,7 +22,7 @@ def test_queryset_paginator(app, todo):
         for index, todo in enumerate(
             Todo.objects.paginate(page=page, per_page=5).items
         ):
-            assert todo.title == f"post: {(page-1) * 5 + index}"
+            assert todo.title == f"post: {(page - 1) * 5 + index}"
 
 
 def test_paginate_plain_list():
@@ -65,7 +65,6 @@ def _test_paginator(paginator):
     assert [1, 2, 3, 4, 5] == list(paginator.iter_pages())
 
     for i in [1, 2, 3, 4, 5]:
-
         if i == 1:
             assert not paginator.has_prev
             with pytest.raises(NotFound):

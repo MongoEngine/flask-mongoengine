@@ -5,4 +5,3 @@ API documentation
    :maxdepth: 2
 
    base
-   wtf

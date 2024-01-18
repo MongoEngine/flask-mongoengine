@@ -2,10 +2,10 @@ import warnings
 
 import mongoengine
 from flask import Flask, current_app
+from mongoengine import fields as db_fields
 
-from flask_mongoengine import db_fields, documents
+from flask_mongoengine import documents
 from flask_mongoengine.connection import *
-from flask_mongoengine.json import override_json_encoder
 from flask_mongoengine.pagination import *
 from flask_mongoengine.sessions import *
 
@@ -101,9 +101,6 @@ class MongoEngine:
         self.app = app
 
         app.extensions = getattr(app, "extensions", {})
-
-        # Make documents JSON serializable
-        override_json_encoder(app)
 
         if "mongoengine" not in app.extensions:
             app.extensions["mongoengine"] = {}

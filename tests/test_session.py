@@ -7,7 +7,6 @@ from flask_mongoengine import MongoEngineSessionInterface
 
 @pytest.fixture(autouse=True)
 def setup_endpoints(app, db):
-
     app.session_interface = MongoEngineSessionInterface(db)
 
     @app.route("/")

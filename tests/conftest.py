@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import NoReturn
 
 import mongoengine
@@ -28,7 +28,6 @@ def session_clean_up() -> NoReturn:
 def app() -> Flask:
     app = Flask(__name__)
     app.config["TESTING"] = True
-    app.config["WTF_CSRF_ENABLED"] = False
 
     with app.app_context():
         yield app
@@ -72,7 +71,7 @@ def todo(db):
         title = mongoengine.StringField(max_length=60)
         text = mongoengine.StringField()
         done = mongoengine.BooleanField(default=False)
-        pub_date = mongoengine.DateTimeField(default=datetime.utcnow)
+        pub_date = mongoengine.DateTimeField(default=datetime.now(timezone.utc))
         comments = mongoengine.ListField(mongoengine.StringField())
         comment_count = mongoengine.IntField()
 

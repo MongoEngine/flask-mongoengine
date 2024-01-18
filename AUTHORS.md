@@ -2,11 +2,12 @@
 
 ## Current maintainers:
 
-- Andrey Shpak
+- Ahmet Elgün
 
 This project is made by incredible authors:
 
 - Adam Chainz
+- Ahmet Elgün
 - aliaksandr.askerka
 - Alistair Roche
 - Almog Cohen
@@ -96,7 +97,5 @@ This project is made by incredible authors:
 This project inspired by two repos:
 
 - [danjac]
-- [maratfm]
 
 [danjac]: https://bitbucket.org/danjac/flask-mongoengine
-[maratfm]: https://bitbucket.org/maratfm/wtforms

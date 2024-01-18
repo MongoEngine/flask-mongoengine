@@ -37,7 +37,7 @@ jobs:
       with:
         mongodb-version: ${{ matrix.mongodb-version }}
     - name: Test build
-      run: "nox -s 'latest-${{ matrix.python }}(wtf=True, toolbar=True)' -- --cov-report=xml --cov-report=html"
+      run: "nox -s 'latest-${{ matrix.python }}(toolbar=True)' -- --cov-report=xml --cov-report=html"
     - name: Send coverage report to codecov
       uses: codecov/codecov-action@v3
       with:

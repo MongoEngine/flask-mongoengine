@@ -22,17 +22,6 @@ flask_mongoengine.decorators module
 flask_mongoengine.documents module
 ----------------------------------
 
-.. automodule:: flask_mongoengine.documents
-
-flask_mongoengine.json module
------------------------------
-
-.. automodule:: flask_mongoengine.json
-   :exclude-members: MongoEngineJSONProvider
-
-flask_mongoengine.pagination module
------------------------------------
-
 .. automodule:: flask_mongoengine.pagination
 
 flask_mongoengine.panels module

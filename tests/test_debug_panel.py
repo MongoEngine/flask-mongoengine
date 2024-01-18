@@ -31,7 +31,6 @@ from flask_mongoengine.panels import (  # noqa
 def app_no_mongo_monitoring() -> Flask:
     app = Flask(__name__)
     app.config["TESTING"] = True
-    app.config["WTF_CSRF_ENABLED"] = False
     app.config["SECRET_KEY"] = "flask+mongoengine=<3"
     app.debug = True
     app.config["DEBUG_TB_PANELS"] = ("flask_mongoengine.panels.MongoDebugPanel",)

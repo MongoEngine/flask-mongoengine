@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from bson.tz_util import utc
 from flask.sessions import SessionInterface, SessionMixin
@@ -56,7 +56,7 @@ class MongoEngineSessionInterface(SessionInterface):
         return timedelta(**app.config.get("SESSION_TTL", {"days": 1}))
 
     def open_session(self, app, request):
-        sid = request.cookies.get(app.session_cookie_name)
+        sid = request.cookies.get(app.config["SESSION_COOKIE_NAME"])
         if sid:
             stored_session = self.cls.objects(sid=sid).first()
 
@@ -66,7 +66,7 @@ class MongoEngineSessionInterface(SessionInterface):
                 if not expiration.tzinfo:
                     expiration = expiration.replace(tzinfo=utc)
 
-                if expiration > datetime.utcnow().replace(tzinfo=utc):
+                if expiration > datetime.now(tz=timezone.utc).replace(tzinfo=utc):
                     return MongoEngineSession(
                         initial=stored_session.data, sid=stored_session.sid
                     )
@@ -81,18 +81,18 @@ class MongoEngineSessionInterface(SessionInterface):
         # If the session is empty, return without setting the cookie.
         if not session:
             if session.modified:
-                response.delete_cookie(app.session_cookie_name, domain=domain)
+                response.delete_cookie(app.config["SESSION_COOKIE_NAME"], domain=domain)
             return
 
-        expiration = datetime.utcnow().replace(tzinfo=utc) + self.get_expiration_time(
-            app, session
-        )
+        expiration = datetime.now(timezone.utc).replace(
+            tzinfo=utc
+        ) + self.get_expiration_time(app, session)
 
         if session.modified:
             self.cls(sid=session.sid, data=session, expiration=expiration).save()
 
         response.set_cookie(
-            app.session_cookie_name,
+            app.config["SESSION_COOKIE_NAME"],
             session.sid,
             expires=expiration,
             httponly=httponly,
